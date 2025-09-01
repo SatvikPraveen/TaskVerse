@@ -2,8 +2,6 @@
 
 A modern, enterprise-grade task management application built with cutting-edge technologies. TaskVerse combines real-time collaboration, intelligent task organization, and comprehensive analytics in a beautiful, responsive interface.
 
-[![CI/CD](https://github.com/SatvikPraveen/TaskVerse/workflows/CI/badge.svg)](https://github.com/SatvikPraveen/TaskVerse/actions)
-[![E2E Tests](https://github.com/SatvikPraveen/TaskVerse/workflows/E2E/badge.svg)](https://github.com/SatvikPraveen/TaskVerse/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
