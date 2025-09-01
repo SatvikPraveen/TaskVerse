@@ -1,0 +1,188 @@
+<!-- File: docs/architecture-diagram.svg -->
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #2c3e50; }
+      .subtitle { font-family: Arial, sans-serif; font-size: 14px; fill: #34495e; }
+      .component-title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: white; }
+      .component-subtitle { font-family: Arial, sans-serif; font-size: 12px; fill: white; opacity: 0.9; }
+      .tech-label { font-family: Arial, sans-serif; font-size: 10px; fill: #7f8c8d; }
+      .arrow { fill: none; stroke: #3498db; stroke-width: 2; marker-end: url(#arrowhead); }
+      .data-arrow { fill: none; stroke: #e74c3c; stroke-width: 2; marker-end: url(#arrowhead); }
+      .ws-arrow { fill: none; stroke: #9b59b6; stroke-width: 2; marker-end: url(#arrowhead); stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" class="title">TaskVerse Architecture</text>
+  <text x="600" y="50" text-anchor="middle" class="subtitle">Full-Stack Task Management Application</text>
+
+  <!-- Frontend Layer -->
+  <rect x="50" y="100" width="300" height="150" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="200" y="125" text-anchor="middle" class="component-title">Frontend (React)</text>
+  <text x="200" y="145" text-anchor="middle" class="component-subtitle">Port: 5173</text>
+  
+  <!-- Frontend Components -->
+  <rect x="70" y="160" width="80" height="40" rx="5" fill="#2980b9"/>
+  <text x="110" y="175" text-anchor="middle" class="tech-label">React 18</text>
+  <text x="110" y="190" text-anchor="middle" class="tech-label">TypeScript</text>
+  
+  <rect x="160" y="160" width="80" height="40" rx="5" fill="#2980b9"/>
+  <text x="200" y="175" text-anchor="middle" class="tech-label">Vite</text>
+  <text x="200" y="190" text-anchor="middle" class="tech-label">Tailwind CSS</text>
+  
+  <rect x="250" y="160" width="80" height="40" rx="5" fill="#2980b9"/>
+  <text x="290" y="175" text-anchor="middle" class="tech-label">React Query</text>
+  <text x="290" y="190" text-anchor="middle" class="tech-label">Socket.io Client</text>
+
+  <!-- API Gateway Layer -->
+  <rect x="450" y="100" width="300" height="150" rx="10" fill="#27ae60" stroke="#229954" stroke-width="2"/>
+  <text x="600" y="125" text-anchor="middle" class="component-title">API Server (Node.js)</text>
+  <text x="600" y="145" text-anchor="middle" class="component-subtitle">Port: 3001</text>
+  
+  <!-- API Components -->
+  <rect x="470" y="160" width="80" height="40" rx="5" fill="#229954"/>
+  <text x="510" y="175" text-anchor="middle" class="tech-label">Express.js</text>
+  <text x="510" y="190" text-anchor="middle" class="tech-label">JWT Auth</text>
+  
+  <rect x="560" y="160" width="80" height="40" rx="5" fill="#229954"/>
+  <text x="600" y="175" text-anchor="middle" class="tech-label">Socket.io</text>
+  <text x="600" y="190" text-anchor="middle" class="tech-label">Real-time</text>
+  
+  <rect x="650" y="160" width="80" height="40" rx="5" fill="#229954"/>
+  <text x="690" y="175" text-anchor="middle" class="tech-label">Mongoose</text>
+  <text x="690" y="190" text-anchor="middle" class="tech-label">Validation</text>
+
+  <!-- Database Layer -->
+  <rect x="100" y="350" width="200" height="120" rx="10" fill="#e67e22" stroke="#d68910" stroke-width="2"/>
+  <text x="200" y="375" text-anchor="middle" class="component-title">MongoDB</text>
+  <text x="200" y="395" text-anchor="middle" class="component-subtitle">Port: 27017</text>
+  
+  <rect x="120" y="410" width="160" height="40" rx="5" fill="#d68910"/>
+  <text x="200" y="425" text-anchor="middle" class="tech-label">Document Database</text>
+  <text x="200" y="440" text-anchor="middle" class="tech-label">Users, Tasks, Categories</text>
+
+  <!-- File Storage -->
+  <rect x="400" y="350" width="200" height="120" rx="10" fill="#8e44ad" stroke="#7d3c98" stroke-width="2"/>
+  <text x="500" y="375" text-anchor="middle" class="component-title">MinIO/S3</text>
+  <text x="500" y="395" text-anchor="middle" class="component-subtitle">Port: 9000</text>
+  
+  <rect x="420" y="410" width="160" height="40" rx="5" fill="#7d3c98"/>
+  <text x="500" y="425" text-anchor="middle" class="tech-label">Object Storage</text>
+  <text x="500" y="440" text-anchor="middle" class="tech-label">File Attachments</text>
+
+  <!-- Admin Tools -->
+  <rect x="700" y="350" width="200" height="120" rx="10" fill="#34495e" stroke="#2c3e50" stroke-width="2"/>
+  <text x="800" y="375" text-anchor="middle" class="component-title">Admin Tools</text>
+  <text x="800" y="395" text-anchor="middle" class="component-subtitle">Development</text>
+  
+  <rect x="720" y="410" width="160" height="40" rx="5" fill="#2c3e50"/>
+  <text x="800" y="425" text-anchor="middle" class="tech-label">Mongo Express</text>
+  <text x="800" y="440" text-anchor="middle" class="tech-label">MinIO Console</text>
+
+  <!-- Shared Packages -->
+  <rect x="850" y="100" width="300" height="150" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="1000" y="125" text-anchor="middle" class="component-title">Shared Packages</text>
+  <text x="1000" y="145" text-anchor="middle" class="component-subtitle">Monorepo Workspace</text>
+  
+  <rect x="870" y="160" width="80" height="40" rx="5" fill="#e67e22"/>
+  <text x="910" y="175" text-anchor="middle" class="tech-label">@taskverse/</text>
+  <text x="910" y="190" text-anchor="middle" class="tech-label">types</text>
+  
+  <rect x="960" y="160" width="80" height="40" rx="5" fill="#e67e22"/>
+  <text x="1000" y="175" text-anchor="middle" class="tech-label">@taskverse/</text>
+  <text x="1000" y="190" text-anchor="middle" class="tech-label">utils</text>
+  
+  <rect x="1050" y="160" width="80" height="40" rx="5" fill="#e67e22"/>
+  <text x="1090" y="175" text-anchor="middle" class="tech-label">@taskverse/</text>
+  <text x="1090" y="190" text-anchor="middle" class="tech-label">eslint-config</text>
+
+  <!-- External Services -->
+  <rect x="50" y="550" width="1100" height="80" rx="10" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="600" y="575" text-anchor="middle" class="component-title" style="fill: #2c3e50;">External Services & Infrastructure</text>
+  
+  <rect x="100" y="590" width="120" height="30" rx="5" fill="#e74c3c"/>
+  <text x="160" y="610" text-anchor="middle" class="tech-label" style="fill: white;">GitHub Actions</text>
+  
+  <rect x="240" y="590" width="120" height="30" rx="5" fill="#3498db"/>
+  <text x="300" y="610" text-anchor="middle" class="tech-label" style="fill: white;">Docker</text>
+  
+  <rect x="380" y="590" width="120" height="30" rx="5" fill="#27ae60"/>
+  <text x="440" y="610" text-anchor="middle" class="tech-label" style="fill: white;">Kubernetes</text>
+  
+  <rect x="520" y="590" width="120" height="30" rx="5" fill="#f39c12"/>
+  <text x="580" y="610" text-anchor="middle" class="tech-label" style="fill: white;">AWS/Azure/GCP</text>
+  
+  <rect x="660" y="590" width="120" height="30" rx="5" fill="#9b59b6"/>
+  <text x="720" y="610" text-anchor="middle" class="tech-label" style="fill: white;">Monitoring</text>
+  
+  <rect x="800" y="590" width="120" height="30" rx="5" fill="#e67e22"/>
+  <text x="860" y="610" text-anchor="middle" class="tech-label" style="fill: white;">CDN</text>
+  
+  <rect x="940" y="590" width="120" height="30" rx="5" fill="#1abc9c"/>
+  <text x="1000" y="610" text-anchor="middle" class="tech-label" style="fill: white;">Load Balancer</text>
+
+  <!-- Arrows/Connections -->
+  
+  <!-- Frontend to API -->
+  <line x1="350" y1="175" x2="450" y2="175" class="arrow"/>
+  <text x="400" y="170" text-anchor="middle" class="tech-label">HTTP/REST</text>
+  
+  <!-- Frontend WebSocket to API -->
+  <line x1="350" y1="195" x2="450" y2="195" class="ws-arrow"/>
+  <text x="400" y="210" text-anchor="middle" class="tech-label">WebSocket</text>
+  
+  <!-- API to Database -->
+  <line x1="550" y1="250" x2="250" y2="350" class="data-arrow"/>
+  <text x="380" y="290" text-anchor="middle" class="tech-label">MongoDB Driver</text>
+  
+  <!-- API to File Storage -->
+  <line x1="600" y1="250" x2="500" y2="350" class="data-arrow"/>
+  <text x="550" y="290" text-anchor="middle" class="tech-label">S3 SDK</text>
+  
+  <!-- Admin Tools connections -->
+  <line x1="750" y1="175" x2="800" y2="350" stroke="#95a5a6" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="775" y="260" text-anchor="middle" class="tech-label">Admin Access</text>
+  
+  <!-- Shared Packages to Frontend -->
+  <line x1="850" y1="150" x2="350" y2="150" stroke="#f39c12" stroke-width="2" stroke-dasharray="3,3"/>
+  <text x="600" y="85" text-anchor="middle" class="tech-label">Import Shared Types & Utils</text>
+  
+  <!-- Shared Packages to API -->
+  <line x1="850" y1="200" x2="750" y2="200" stroke="#f39c12" stroke-width="2" stroke-dasharray="3,3"/>
+
+  <!-- Data Flow Legend -->
+  <rect x="50" y="680" width="300" height="100" rx="5" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  <text x="200" y="700" text-anchor="middle" class="subtitle">Data Flow Legend</text>
+  
+  <line x1="70" y1="720" x2="120" y2="720" class="arrow"/>
+  <text x="140" y="725" class="tech-label">HTTP/REST API</text>
+  
+  <line x1="70" y1="740" x2="120" y2="740" class="ws-arrow"/>
+  <text x="140" y="745" class="tech-label">WebSocket (Real-time)</text>
+  
+  <line x1="70" y1="760" x2="120" y2="760" class="data-arrow"/>
+  <text x="140" y="765" class="tech-label">Database/Storage</text>
+
+  <!-- Key Features -->
+  <rect x="400" y="680" width="400" height="100" rx="5" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  <text x="600" y="700" text-anchor="middle" class="subtitle">Key Features</text>
+  
+  <text x="420" y="720" class="tech-label">• Real-time task updates via WebSocket</text>
+  <text x="420" y="735" class="tech-label">• JWT authentication with refresh tokens</text>
+  <text x="420" y="750" class="tech-label">• File uploads with presigned URLs</text>
+  <text x="420" y="765" class="tech-label">• Responsive React frontend with Tailwind CSS</text>
+
+  <!-- Tech Stack -->
+  <rect x="850" y="680" width="300" height="100" rx="5" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  <text x="1000" y="700" text-anchor="middle" class="subtitle">Technology Stack</text>
+  
+  <text x="870" y="720" class="tech-label">Frontend: React, TypeScript, Vite, Tailwind</text>
+  <text x="870" y="735" class="tech-label">Backend: Node.js, Express, Socket.io, JWT</text>
+  <text x="870" y="750" class="tech-label">Database: MongoDB with Mongoose ODM</text>
+  <text x="870" y="765" class="tech-label">Storage: MinIO (S3-compatible) object storage</text>
+</svg>
