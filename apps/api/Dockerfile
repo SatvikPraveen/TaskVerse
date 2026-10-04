@@ -1,7 +1,7 @@
 # apps/api/Dockerfile
 # Build from the repository root so workspace packages are available:
 #   docker build -f apps/api/Dockerfile -t taskverse-api .
-FROM node:20-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /repo
 COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/
@@ -21,7 +21,7 @@ RUN npm run build --workspace=packages/types --workspace=packages/scheduler \
  && npm run build --workspace=apps/api \
  && npm prune --omit=dev
 
-FROM node:20-alpine AS runtime
+FROM node:26-alpine AS runtime
 ENV NODE_ENV=production PORT=3001
 WORKDIR /app
 RUN addgroup -S nodejs && adduser -S api -G nodejs
