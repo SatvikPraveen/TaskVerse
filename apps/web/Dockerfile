@@ -1,7 +1,7 @@
 # apps/web/Dockerfile
 # Build from the repository root:
 #   docker build -f apps/web/Dockerfile -t taskverse-web .
-FROM node:20-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /repo
 COPY package.json package-lock.json ./
 COPY apps/web/package.json apps/web/
