@@ -2,8 +2,6 @@
 import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import type { EisenhowerQuadrant, PolicyName } from '@taskverse/types';
-
 import {
   useCriticalPath,
   useEisenhower,
@@ -15,6 +13,7 @@ import {
 import ChartCard, { DataTable } from '@/components/charts/ChartCard';
 import StatTile from '@/components/charts/StatTile';
 import { axisTick, chart, formatHours, formatPercent, tooltipStyle } from '@/components/charts/theme';
+import type { EisenhowerQuadrant, PolicyName } from '@taskverse/types';
 
 const selectClass =
   'rounded-md border-gray-300 py-1 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500';

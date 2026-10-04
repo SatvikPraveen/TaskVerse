@@ -19,6 +19,10 @@ All notable changes to this project are documented here. The format follows
 - Task dependencies with cycle rejection, status transition log,
   `startedAt`/`completedAt` tracking.
 - Planning API: `/api/planning/{policies,recommendations,critical-path,eisenhower,forecast,simulate}`.
+- Web Planner page (recommendations with rationale, critical path, Monte
+  Carlo forecast, policy what-if, Eisenhower matrix) and Analytics page
+  (flow stat tiles, throughput, cumulative flow, aging WIP) with an
+  accessible table view on every chart.
 - Analytics API: `/api/analytics/{flow,throughput,cfd,aging}`.
 - Typed domain-event bus; persisted activity log with a personal feed and
   per-task history; Socket.IO bridge that actually delivers events.
