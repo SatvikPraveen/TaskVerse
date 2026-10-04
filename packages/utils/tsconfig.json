@@ -1,19 +1,17 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "rootDir": ".",
     "outDir": "./dist",
-    "rootDir": "./",
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "composite": true,
-    "incremental": true
+    "noEmit": true,
+    "incremental": false,
+    "jsx": "preserve"
   },
-  "include": [
-    "**/*.ts"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules"
-  ]
+  "include": ["index.ts", "date.ts"],
+  "exclude": ["node_modules", "dist"]
 }

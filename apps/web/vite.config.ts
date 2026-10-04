@@ -1,28 +1,24 @@
 // apps/web/vite.config.ts
-import { defineConfig } from 'vite';
+import { fileURLToPath, URL } from 'node:url';
+
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from 'vite';
+
+const API_TARGET = process.env.VITE_PROXY_TARGET ?? 'http://localhost:3001';
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   server: {
     port: 5173,
     host: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/socket.io': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-        ws: true,
-      },
+      '/api': { target: API_TARGET, changeOrigin: true },
+      '/socket.io': { target: API_TARGET, changeOrigin: true, ws: true },
     },
   },
   build: {
@@ -31,15 +27,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          query: ['react-query'],
+          react: ['react', 'react-dom', 'react-router-dom'],
+          query: ['react-query', 'axios'],
           ui: ['@headlessui/react', '@heroicons/react'],
+          charts: ['recharts'],
         },
       },
     },
-  },
-  define: {
-    __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
   },
 });

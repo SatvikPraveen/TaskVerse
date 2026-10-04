@@ -14,7 +14,7 @@ interface LoginForm {
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading } = useAuthStore();
+  const { login, isSubmitting } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -28,7 +28,7 @@ export default function LoginPage() {
   } = useForm<LoginForm>();
 
   const onSubmit = async (data: LoginForm) => {
-    const success = await login(data.email, data.password);
+    const success = await login(data);
     if (success) {
       navigate(from, { replace: true });
     } else {
@@ -95,10 +95,7 @@ export default function LoginPage() {
               }
               {...register('password', {
                 required: 'Password is required',
-                minLength: {
-                  value: 6,
-                  message: 'Password must be at least 6 characters',
-                },
+
               })}
             />
           </div>
@@ -127,30 +124,12 @@ export default function LoginPage() {
             <Button
               type="submit"
               fullWidth
-              isLoading={isLoading}
+              isLoading={isSubmitting}
             >
               Sign in
             </Button>
           </div>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-50 text-gray-500">Demo Credentials</span>
-              </div>
-            </div>
-
-            <div className="mt-4 text-center text-sm text-gray-600">
-              <div className="bg-gray-100 p-3 rounded-md">
-                <p className="font-medium">Try the demo:</p>
-                <p>Email: demo@taskverse.com</p>
-                <p>Password: demo123</p>
-              </div>
-            </div>
-          </div>
         </form>
       </div>
     </div>

@@ -1,202 +1,110 @@
 // apps/web/src/hooks/useSocket.ts
-import { useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { useQueryClient } from 'react-query';
-import { taskKeys } from '@/api/tasks.api';
-import { categoryKeys } from '@/api/categories.api';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useQueryClient } from 'react-query';
+import { io, type Socket } from 'socket.io-client';
+import type { TaskSocketEvents } from '@taskverse/types';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+import { taskKeys } from '@/api/tasks.api';
+import { tokenStorage } from '@/store/tokens';
 
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '/';
+
+const STATUS_LABEL: Record<string, string> = {
+  todo: 'moved to To Do',
+  in_progress: 'started',
+  completed: 'completed',
+  cancelled: 'cancelled',
+};
+
+/**
+ * Maintains one authenticated Socket.IO connection per signed-in user and
+ * translates server-side task events into React Query cache invalidations.
+ */
 export const useSocket = (userId?: string) => {
   const socketRef = useRef<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!userId) {
-      // Disconnect if no user
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+    const token = tokenStorage.getAccessToken();
+    if (!userId || !token) {
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+      setIsConnected(false);
       return;
     }
 
-    // Get access token for authentication
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
-
-    // Create socket connection
     const socket = io(SOCKET_URL, {
       auth: { token },
-      autoConnect: true,
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
-
     socketRef.current = socket;
 
-    // Connection event handlers
-    socket.on('connect', () => {
-      console.log('✅ Connected to server');
-      socket.emit('user:online');
-    });
-
-    socket.on('disconnect', (reason) => {
-      console.log('❌ Disconnected from server:', reason);
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('🔥 Connection error:', error);
-      if (error.message.includes('Authentication')) {
-        toast.error('Authentication failed. Please log in again.');
-      }
-    });
-
-    // Task event handlers
-    socket.on('task:created', (data) => {
-      console.log('📝 Task created:', data);
+    const invalidate = (taskId?: string) => {
       queryClient.invalidateQueries(taskKeys.lists());
       queryClient.invalidateQueries(taskKeys.stats());
-      
-      if (data.createdBy.id !== userId) {
-        toast.success(`New task assigned: ${data.task.title}`);
+      if (taskId) queryClient.invalidateQueries(taskKeys.detail(taskId));
+    };
+    const isSomeoneElse = (actorId: string) => actorId !== userId;
+
+    socket.on('connect', () => setIsConnected(true));
+    socket.on('disconnect', () => setIsConnected(false));
+    socket.on('connect_error', error => {
+      if (error.message.toLowerCase().includes('auth')) {
+        toast.error('Real-time connection rejected. Please sign in again.');
       }
     });
 
-    socket.on('task:updated', (data) => {
-      console.log('📝 Task updated:', data);
-      queryClient.invalidateQueries(taskKeys.lists());
-      queryClient.invalidateQueries(taskKeys.detail(data.taskId));
-      queryClient.invalidateQueries(taskKeys.stats());
-      
-      if (data.updatedBy.id !== userId) {
-        toast(`Task updated: ${data.task.title}`, {
-          icon: '✏️',
-        });
+    socket.on('task:created', (data: TaskSocketEvents['task:created']) => {
+      invalidate();
+      if (isSomeoneElse(data.actorId)) toast.success(`New task: ${data.task.title}`);
+    });
+    socket.on('task:updated', (data: TaskSocketEvents['task:updated']) => {
+      invalidate(data.taskId);
+      if (isSomeoneElse(data.actorId)) toast(`Task updated: ${data.task.title}`, { icon: '✏️' });
+    });
+    socket.on('task:status_changed', (data: TaskSocketEvents['task:status_changed']) => {
+      invalidate(data.taskId);
+      if (isSomeoneElse(data.actorId)) {
+        toast(`${data.task.title} ${STATUS_LABEL[data.newStatus] ?? data.newStatus}`);
       }
     });
-
-    socket.on('task:status_changed', (data) => {
-      console.log('📝 Task status changed:', data);
-      queryClient.invalidateQueries(taskKeys.lists());
-      queryClient.invalidateQueries(taskKeys.detail(data.taskId));
-      queryClient.invalidateQueries(taskKeys.stats());
-      
-      if (data.changedBy.id !== userId) {
-        const statusEmoji = {
-          todo: '📋',
-          in_progress: '🔄',
-          completed: '✅',
-          cancelled: '❌',
-        };
-        
-        toast(`Task ${data.newStatus.replace('_', ' ')}: ${data.task.title}`, {
-          icon: statusEmoji[data.newStatus as keyof typeof statusEmoji],
-        });
+    socket.on('task:assigned', (data: TaskSocketEvents['task:assigned']) => {
+      invalidate(data.taskId);
+      if (data.assignedTo === userId && isSomeoneElse(data.actorId)) {
+        toast.success(`You were assigned: ${data.task.title}`);
       }
     });
-
-    socket.on('task:assigned', (data) => {
-      console.log('📝 Task assigned:', data);
-      queryClient.invalidateQueries(taskKeys.lists());
-      queryClient.invalidateQueries(taskKeys.detail(data.taskId));
-      
-      if (data.assignedTo.id === userId && data.assignedBy.id !== userId) {
-        toast.success(`You've been assigned: ${data.task.title}`);
+    socket.on('task:comment_added', (data: TaskSocketEvents['task:comment_added']) => {
+      invalidate(data.taskId);
+      if (isSomeoneElse(data.actorId)) {
+        toast(`New comment from ${data.comment.author.username}`, { icon: '💬' });
       }
     });
-
-    socket.on('task:comment_added', (data) => {
-      console.log('💬 Comment added:', data);
-      queryClient.invalidateQueries(taskKeys.detail(data.taskId));
-      
-      if (data.author.id !== userId) {
-        toast(`New comment from ${data.author.username}`, {
-          icon: '💬',
-        });
-      }
+    socket.on('task:subtask_updated', (data: TaskSocketEvents['task:subtask_updated']) => {
+      invalidate(data.taskId);
+    });
+    socket.on('task:deleted', (data: TaskSocketEvents['task:deleted']) => {
+      invalidate(data.taskId);
+      if (isSomeoneElse(data.actorId)) toast('A task was deleted', { icon: '🗑️' });
     });
 
-    socket.on('task:attachment_added', (data) => {
-      console.log('📎 Attachment added:', data);
-      queryClient.invalidateQueries(taskKeys.detail(data.taskId));
-      
-      if (data.uploadedBy.id !== userId) {
-        toast(`New attachment: ${data.attachment.originalName}`, {
-          icon: '📎',
-        });
-      }
-    });
-
-    socket.on('task:deleted', (data) => {
-      console.log('🗑️ Task deleted:', data);
-      queryClient.invalidateQueries(taskKeys.lists());
-      queryClient.invalidateQueries(taskKeys.stats());
-      
-      if (data.deletedBy.id !== userId) {
-        toast('A task has been deleted', {
-          icon: '🗑️',
-        });
-      }
-    });
-
-    socket.on('task:subtask_updated', (data) => {
-      console.log('✅ Subtask updated:', data);
-      queryClient.invalidateQueries(taskKeys.detail(data.taskId));
-      queryClient.invalidateQueries(taskKeys.lists());
-      queryClient.invalidateQueries(taskKeys.stats());
-    });
-
-    // User presence handlers
-    socket.on('user:status', (data) => {
-      console.log('👤 User status:', data);
-      // Could be used to show online/offline status in UI
-    });
-
-    // Typing indicators
-    socket.on('typing:start', (data) => {
-      console.log('⌨️ User typing:', data);
-      // Show typing indicator in task comments
-    });
-
-    socket.on('typing:stop', (data) => {
-      console.log('⌨️ User stopped typing:', data);
-      // Hide typing indicator
-    });
-
-    // Cleanup on unmount
     return () => {
-      console.log('🧹 Cleaning up socket connection');
       socket.disconnect();
       socketRef.current = null;
+      setIsConnected(false);
     };
   }, [userId, queryClient]);
 
-  // Helper functions to emit events
-  const joinTaskRoom = (taskId: string) => {
+  const joinTaskRoom = useCallback((taskId: string) => {
     socketRef.current?.emit('task:join', taskId);
-  };
-
-  const leaveTaskRoom = (taskId: string) => {
+  }, []);
+  const leaveTaskRoom = useCallback((taskId: string) => {
     socketRef.current?.emit('task:leave', taskId);
-  };
+  }, []);
 
-  const startTyping = (taskId: string) => {
-    socketRef.current?.emit('typing:start', { taskId });
-  };
-
-  const stopTyping = (taskId: string) => {
-    socketRef.current?.emit('typing:stop', { taskId });
-  };
-
-  return {
-    socket: socketRef.current,
-    joinTaskRoom,
-    leaveTaskRoom,
-    startTyping,
-    stopTyping,
-    isConnected: socketRef.current?.connected ?? false,
-  };
+  return { isConnected, joinTaskRoom, leaveTaskRoom };
 };

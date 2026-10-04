@@ -1,144 +1,156 @@
 // File: packages/types/zod/task.schema.ts
-
 import { z } from 'zod';
 
-// Task Status Enum
-export const TaskStatusEnum = z.enum(['pending', 'in-progress', 'completed', 'cancelled']);
+import { UserSummarySchema } from './auth.schema';
+import { CategorySchema } from './category.schema';
+import { IsoDateSchema, ObjectIdSchema, PaginationQuerySchema, SortOrderEnum } from './common.schema';
 
-// Task Priority Enum
-export const TaskPriorityEnum = z.enum(['low', 'medium', 'high', 'urgent']);
+export const TASK_STATUSES = ['todo', 'in_progress', 'completed', 'cancelled'] as const;
+export const TASK_PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 
-// File Attachment Schema
-export const AttachmentSchema = z.object({
-  id: z.string(),
-  filename: z.string().min(1, 'Filename is required'),
-  url: z.string().url('Invalid URL'),
-  size: z.number().positive('File size must be positive'),
-  mimeType: z.string().min(1, 'MIME type is required'),
-  uploadedAt: z.date(),
+export const TaskStatusEnum = z.enum(TASK_STATUSES);
+export const TaskPriorityEnum = z.enum(TASK_PRIORITIES);
+
+/** Ordinal weight of each priority; shared by sorting and the scheduler. */
+export const PRIORITY_WEIGHT: Record<z.infer<typeof TaskPriorityEnum>, number> = {
+  low: 1,
+  medium: 2,
+  high: 3,
+  urgent: 4,
+};
+
+export const SubtaskSchema = z.object({
+  _id: ObjectIdSchema,
+  title: z.string().min(1).max(200),
+  isCompleted: z.boolean(),
+  createdAt: IsoDateSchema,
+  updatedAt: IsoDateSchema,
 });
 
-// Task Schema
+export const CommentSchema = z.object({
+  _id: ObjectIdSchema,
+  content: z.string().min(1).max(2000),
+  author: UserSummarySchema,
+  createdAt: IsoDateSchema,
+  updatedAt: IsoDateSchema,
+});
+
+export const AttachmentSchema = z.object({
+  _id: ObjectIdSchema,
+  filename: z.string(),
+  originalName: z.string(),
+  mimeType: z.string(),
+  size: z.number().positive(),
+  url: z.string().url(),
+  uploadedBy: z.union([ObjectIdSchema, UserSummarySchema]),
+  uploadedAt: IsoDateSchema,
+});
+
+/** A task as serialised by the API with its usual populations. */
 export const TaskSchema = z.object({
-  id: z.string(),
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
-  description: z.string().max(2000, 'Description too long').optional(),
+  _id: ObjectIdSchema,
+  id: ObjectIdSchema.optional(),
+  title: z.string().min(1).max(200),
+  description: z.string().max(5000).optional(),
   status: TaskStatusEnum,
   priority: TaskPriorityEnum,
-  dueDate: z.date().nullable().optional(),
-  completedAt: z.date().nullable().optional(),
-  categoryId: z.string().nullable().optional(),
-  attachments: z.array(AttachmentSchema).optional(),
-  userId: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  priorityWeight: z.number().int().min(1).max(4),
+  category: CategorySchema.pick({ _id: true, name: true, color: true, icon: true }).nullable().optional(),
+  assignedTo: UserSummarySchema.nullable().optional(),
+  createdBy: UserSummarySchema,
+  dueDate: IsoDateSchema.optional(),
+  startDate: IsoDateSchema.optional(),
+  completedAt: IsoDateSchema.optional(),
+  estimatedHours: z.number().min(0).optional(),
+  actualHours: z.number().min(0).optional(),
+  tags: z.array(z.string().max(50)),
+  subtasks: z.array(SubtaskSchema),
+  comments: z.array(CommentSchema),
+  attachments: z.array(AttachmentSchema),
+  isArchived: z.boolean(),
+  position: z.number(),
+  completionPercentage: z.number().min(0).max(100),
+  isOverdue: z.boolean(),
+  createdAt: IsoDateSchema,
+  updatedAt: IsoDateSchema,
 });
 
-// Create Task Schema
+export const CreateSubtaskSchema = z.object({
+  title: z.string().min(1, 'Subtask title is required').max(200).trim(),
+  isCompleted: z.boolean().default(false),
+});
+
 export const CreateTaskSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
-  description: z.string().max(2000, 'Description too long').optional(),
+  title: z.string().min(1, 'Title is required').max(200, 'Title too long').trim(),
+  description: z.string().max(5000, 'Description too long').optional(),
+  status: TaskStatusEnum.default('todo'),
   priority: TaskPriorityEnum.default('medium'),
-  dueDate: z.string().datetime().nullable().optional(),
-  categoryId: z.string().nullable().optional(),
+  category: ObjectIdSchema.optional(),
+  assignedTo: ObjectIdSchema.optional(),
+  dueDate: z.string().datetime().optional(),
+  startDate: z.string().datetime().optional(),
+  estimatedHours: z.number().min(0).optional(),
+  tags: z.array(z.string().max(50)).default([]),
+  subtasks: z.array(CreateSubtaskSchema).default([]),
 });
 
-// Update Task Schema
-export const UpdateTaskSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long').optional(),
-  description: z.string().max(2000, 'Description too long').optional(),
+export const UpdateTaskSchema = CreateTaskSchema.partial().extend({
+  actualHours: z.number().min(0).optional(),
+  isArchived: z.boolean().optional(),
+  position: z.number().optional(),
+});
+
+export const TaskSortByEnum = z.enum([
+  'createdAt',
+  'updatedAt',
+  'dueDate',
+  'priority',
+  'title',
+  'position',
+]);
+
+/** Query-string filters accepted by GET /api/tasks. */
+export const TaskFiltersSchema = PaginationQuerySchema.extend({
   status: TaskStatusEnum.optional(),
   priority: TaskPriorityEnum.optional(),
-  dueDate: z.string().datetime().nullable().optional(),
-  categoryId: z.string().nullable().optional(),
+  category: ObjectIdSchema.optional(),
+  assignedTo: ObjectIdSchema.optional(),
+  search: z.string().max(200).optional(),
+  /** Comma-separated list. */
+  tags: z.string().optional(),
+  dueAfter: z.string().datetime().optional(),
+  dueBefore: z.string().datetime().optional(),
+  archived: z.boolean().default(false),
+  sortBy: TaskSortByEnum.default('position'),
+  sortOrder: SortOrderEnum.default('asc'),
 });
 
-// Task Query Schema
-export const TaskQuerySchema = z.object({
-  limit: z.coerce.number().min(1).max(100).default(20),
-  offset: z.coerce.number().min(0).default(0),
-  status: TaskStatusEnum.optional(),
-  priority: TaskPriorityEnum.optional(),
-  categoryId: z.string().optional(),
-  search: z.string().max(100).optional(),
-  sortBy: z.enum(['createdAt', 'updatedAt', 'dueDate', 'priority', 'title']).default('createdAt'),
-  sortOrder: z.enum(['asc', 'desc']).default('desc'),
-  dueDateFrom: z.string().datetime().optional(),
-  dueDateTo: z.string().datetime().optional(),
+export const CommentInputSchema = z.object({
+  content: z.string().min(1, 'Comment cannot be empty').max(2000).trim(),
 });
 
-// Task Statistics Schema
+export const UpdateSubtaskSchema = z.object({
+  isCompleted: z.boolean(),
+});
+
 export const TaskStatsSchema = z.object({
-  total: z.number(),
-  pending: z.number(),
-  inProgress: z.number(),
-  completed: z.number(),
-  cancelled: z.number(),
-  overdue: z.number(),
-  dueToday: z.number(),
-  dueSoon: z.number(),
-  byPriority: z.object({
-    low: z.number(),
-    medium: z.number(),
-    high: z.number(),
-    urgent: z.number(),
-  }),
-  byCategory: z.array(z.object({
-    categoryId: z.string().nullable(),
-    categoryName: z.string().nullable(),
-    count: z.number(),
-  })),
+  todo: z.number().int(),
+  in_progress: z.number().int(),
+  completed: z.number().int(),
+  cancelled: z.number().int(),
+  overdue: z.number().int(),
 });
 
-// Bulk Task Operation Schema
-export const BulkTaskOperationSchema = z.object({
-  taskIds: z.array(z.string()).min(1, 'At least one task ID is required'),
-  operation: z.enum(['delete', 'updateStatus', 'updateCategory', 'updatePriority']),
-  data: z.object({
-    status: TaskStatusEnum.optional(),
-    categoryId: z.string().nullable().optional(),
-    priority: TaskPriorityEnum.optional(),
-  }).optional(),
-});
-
-// Task with populated category
-export const TaskWithCategorySchema = TaskSchema.extend({
-  category: z.object({
-    id: z.string(),
-    name: z.string(),
-    color: z.string(),
-  }).nullable().optional(),
-});
-
-// Paginated Tasks Response Schema
-export const PaginatedTasksSchema = z.object({
-  tasks: z.array(TaskWithCategorySchema),
-  total: z.number(),
-  limit: z.number(),
-  offset: z.number(),
-  hasNext: z.boolean(),
-  hasPrev: z.boolean(),
-});
-
-// Upload Attachment Schema
-export const UploadAttachmentSchema = z.object({
-  taskId: z.string(),
-  fileId: z.string(),
-  filename: z.string().min(1, 'Filename is required'),
-  size: z.number().positive('File size must be positive'),
-  mimeType: z.string().min(1, 'MIME type is required'),
-});
-
-// Type exports
 export type TaskStatus = z.infer<typeof TaskStatusEnum>;
 export type TaskPriority = z.infer<typeof TaskPriorityEnum>;
+export type Subtask = z.infer<typeof SubtaskSchema>;
+export type Comment = z.infer<typeof CommentSchema>;
 export type Attachment = z.infer<typeof AttachmentSchema>;
 export type Task = z.infer<typeof TaskSchema>;
-export type CreateTaskInput = z.infer<typeof CreateTaskSchema>;
-export type UpdateTaskInput = z.infer<typeof UpdateTaskSchema>;
-export type TaskQuery = z.infer<typeof TaskQuerySchema>;
+export type CreateTaskInput = z.input<typeof CreateTaskSchema>;
+export type UpdateTaskInput = z.input<typeof UpdateTaskSchema>;
+export type TaskSortBy = z.infer<typeof TaskSortByEnum>;
+export type TaskFiltersInput = z.input<typeof TaskFiltersSchema>;
+export type CommentInput = z.infer<typeof CommentInputSchema>;
+export type UpdateSubtaskInput = z.infer<typeof UpdateSubtaskSchema>;
 export type TaskStats = z.infer<typeof TaskStatsSchema>;
-export type BulkTaskOperation = z.infer<typeof BulkTaskOperationSchema>;
-export type TaskWithCategory = z.infer<typeof TaskWithCategorySchema>;
-export type PaginatedTasks = z.infer<typeof PaginatedTasksSchema>;
-export type UploadAttachmentInput = z.infer<typeof UploadAttachmentSchema>;

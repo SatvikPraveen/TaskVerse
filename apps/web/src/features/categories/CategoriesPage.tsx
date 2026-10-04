@@ -1,103 +1,199 @@
 // apps/web/src/features/categories/CategoriesPage.tsx
+import { PencilIcon, PlusIcon, TagIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { PlusIcon, PencilIcon, TrashIcon, Bars3Icon } from '@heroicons/react/24/outline';
-import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory, useReorderCategories } from '@/api/categories.api';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import toast from 'react-hot-toast';
+import type { CreateCategoryInput, UpdateCategoryInput } from '@taskverse/types';
+
+import {
+  type Category,
+  useCategories,
+  useCreateCategory,
+  useDeleteCategory,
+  useUpdateCategory,
+} from '@/api/categories.api';
+import { getErrorMessage } from '@/api/client';
 import Button from '@/components/Button';
 import Modal, { ModalActions } from '@/components/Modal';
+
 import CategoryForm from './CategoryForm';
-import type { Category } from '@/api/categories.api';
-import toast from 'react-hot-toast';
+
+function CategorySkeleton() {
+  return (
+    <div className="space-y-4" aria-hidden="true">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="animate-pulse rounded-lg bg-white p-6 shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-4 w-4 rounded bg-gray-200" />
+              <div className="h-6 w-32 rounded bg-gray-200" />
+            </div>
+            <div className="flex gap-2">
+              <div className="h-8 w-16 rounded bg-gray-200" />
+              <div className="h-8 w-16 rounded bg-gray-200" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function CategoriesPage() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [editing, setEditing] = useState<Category | null>(null);
+  const [deleting, setDeleting] = useState<Category | null>(null);
 
-  const { data: categoriesData, isLoading } = useCategories();
+  const { data, isLoading, error } = useCategories();
   const createMutation = useCreateCategory();
   const updateMutation = useUpdateCategory();
   const deleteMutation = useDeleteCategory();
-  const reorderMutation = useReorderCategories();
 
-  const categories = categoriesData?.data?.categories || [];
+  const categories = data?.data.categories ?? [];
 
-  const handleCreateCategory = async (data: any) => {
+  const handleCreate = async (input: CreateCategoryInput) => {
     try {
-      await createMutation.mutateAsync(data);
-      setShowCreateModal(false);
-      toast.success('Category created successfully');
-    } catch (error) {
-      toast.error('Failed to create category');
+      await createMutation.mutateAsync(input);
+      setShowCreate(false);
+      toast.success('Category created');
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Failed to create category'));
     }
   };
 
-  const handleUpdateCategory = async (data: any) => {
-    if (!editingCategory) return;
-    
+  const handleUpdate = async (input: UpdateCategoryInput) => {
+    if (!editing) return;
     try {
-      await updateMutation.mutateAsync({
-        categoryId: editingCategory._id,
-        data,
-      });
-      setEditingCategory(null);
-      toast.success('Category updated successfully');
-    } catch (error) {
-      toast.error('Failed to update category');
+      await updateMutation.mutateAsync({ categoryId: editing._id, data: input });
+      setEditing(null);
+      toast.success('Category updated');
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Failed to update category'));
     }
   };
 
-  const handleDeleteCategory = async () => {
-    if (!deletingCategory) return;
-    
+  const handleDelete = async () => {
+    if (!deleting) return;
     try {
-      await deleteMutation.mutateAsync(deletingCategory._id);
-      setDeletingCategory(null);
-      toast.success('Category deleted successfully');
-    } catch (error) {
-      toast.error('Failed to delete category');
+      await deleteMutation.mutateAsync(deleting._id);
+      setDeleting(null);
+      toast.success('Category deleted');
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Failed to delete category'));
     }
   };
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const reorderedCategories = Array.from(categories);
-    const [reorderedItem] = reorderedCategories.splice(result.source.index, 1);
-    reorderedCategories.splice(result.destination.index, 0, reorderedItem);
-
-    // Update sort orders
-    const reorderData = {
-      categories: reorderedCategories.map((category, index) => ({
-        id: category._id,
-        sortOrder: index,
-      })),
-    };
-
-    reorderMutation.mutate(reorderData);
-  };
-
-  if (isLoading) {
+  if (error) {
     return (
-      <div className="space-y-6">
-        <div className="mb-4">
-          <p className="text-sm text-gray-600">
-            Are you sure you want to delete the category "{deletingCategory?.name}"?
-            This action cannot be undone.
-          </p>
-          {(deletingCategory?.taskCount || 0) > 0 && (
-            <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
-              <p className="text-sm text-amber-800">
-                This category has {deletingCategory?.taskCount} task{(deletingCategory?.taskCount || 0) !== 1 ? 's' : ''}. 
-                Deleting it will remove the category from those tasks.
-              </p>
-            </div>
-          )}
+      <div className="py-12 text-center text-red-600">
+        <p>Error loading categories</p>
+        <p className="mt-1 text-sm text-gray-500">Please try refreshing the page</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+          <p className="mt-1 text-gray-600">Group related tasks and colour-code your work</p>
         </div>
-        
+        <Button leftIcon={<PlusIcon className="h-4 w-4" />} onClick={() => setShowCreate(true)}>
+          New Category
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <CategorySkeleton />
+      ) : categories.length === 0 ? (
+        <div className="py-12 text-center">
+          <TagIcon className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden="true" />
+          <p className="text-lg text-gray-700">No categories yet</p>
+          <p className="mt-1 text-sm text-gray-500">Create one to start organising your tasks</p>
+          <div className="mt-6">
+            <Button leftIcon={<PlusIcon className="h-4 w-4" />} onClick={() => setShowCreate(true)}>
+              Create Category
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <ul role="list" className="space-y-4">
+          {categories.map(category => (
+            <li
+              key={category._id}
+              className="flex items-center justify-between rounded-lg bg-white p-6 shadow-sm"
+            >
+              <div className="flex min-w-0 items-center gap-4">
+                <span
+                  className="h-4 w-4 shrink-0 rounded-full"
+                  style={{ backgroundColor: category.color }}
+                  aria-hidden="true"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-base font-medium text-gray-900">{category.name}</p>
+                  {category.description && (
+                    <p className="truncate text-sm text-gray-500">{category.description}</p>
+                  )}
+                </div>
+                <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                  {category.taskCount ?? 0} task{(category.taskCount ?? 0) === 1 ? '' : 's'}
+                </span>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<PencilIcon className="h-4 w-4" />}
+                  onClick={() => setEditing(category)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  leftIcon={<TrashIcon className="h-4 w-4" />}
+                  onClick={() => setDeleting(category)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Create Category" size="lg">
+        <CategoryForm
+          onSubmit={handleCreate}
+          onCancel={() => setShowCreate(false)}
+          isLoading={createMutation.isLoading}
+        />
+      </Modal>
+
+      <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Edit Category" size="lg">
+        {editing && (
+          <CategoryForm
+            initialData={editing}
+            onSubmit={handleUpdate}
+            onCancel={() => setEditing(null)}
+            isLoading={updateMutation.isLoading}
+          />
+        )}
+      </Modal>
+
+      <Modal isOpen={!!deleting} onClose={() => setDeleting(null)} title="Delete Category" size="sm">
+        <p className="text-sm text-gray-600">
+          Delete <span className="font-medium text-gray-900">{deleting?.name}</span>?
+        </p>
+        {(deleting?.taskCount ?? 0) > 0 && (
+          <p className="mt-3 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+            {deleting?.taskCount} task{deleting?.taskCount === 1 ? '' : 's'} will be left without a
+            category. The tasks themselves are kept.
+          </p>
+        )}
         <ModalActions
-          onCancel={() => setDeletingCategory(null)}
-          onConfirm={handleDeleteCategory}
+          onCancel={() => setDeleting(null)}
+          onConfirm={handleDelete}
           confirmText="Delete"
           confirmVariant="danger"
           isLoading={deleteMutation.isLoading}
@@ -105,196 +201,4 @@ export default function CategoriesPage() {
       </Modal>
     </div>
   );
-} className="flex items-center justify-between">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-32 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-48"></div>
-          </div>
-          <div className="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
-        </div>
-        
-        <div className="space-y-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="animate-pulse bg-white p-6 rounded-lg shadow">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                  <div className="h-6 bg-gray-200 rounded w-32"></div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600 mt-1">
-            Organize your tasks with categories
-          </p>
-        </div>
-        
-        <Button
-          leftIcon={<PlusIcon className="h-4 w-4" />}
-          onClick={() => setShowCreateModal(true)}
-        >
-          New Category
-        </Button>
-      </div>
-
-      {/* Categories List */}
-      {categories.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400">
-            <PlusIcon className="h-12 w-12 mx-auto mb-4" />
-            <p className="text-lg">No categories yet</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Create your first category to organize your tasks
-            </p>
-          </div>
-          <div className="mt-6">
-            <Button
-              leftIcon={<PlusIcon className="h-4 w-4" />}
-              onClick={() => setShowCreateModal(true)}
-            >
-              Create Category
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="categories">
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="space-y-4"
-              >
-                {categories.map((category, index) => (
-                  <Draggable
-                    key={category._id}
-                    draggableId={category._id}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className={`bg-white rounded-lg shadow-sm border p-6 ${
-                          snapshot.isDragging ? 'shadow-lg' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div
-                              {...provided.dragHandleProps}
-                              className="cursor-grab hover:cursor-grabbing"
-                            >
-                              <Bars3Icon className="h-5 w-5 text-gray-400" />
-                            </div>
-                            
-                            <div
-                              className="w-4 h-4 rounded-full"
-                              style={{ backgroundColor: category.color }}
-                            />
-                            
-                            <div>
-                              <h3 className="text-lg font-medium text-gray-900">
-                                {category.name}
-                              </h3>
-                              {category.description && (
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {category.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4">
-                            <div className="text-sm text-gray-500">
-                              {category.taskCount || 0} task{(category.taskCount || 0) !== 1 ? 's' : ''}
-                            </div>
-                            
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                leftIcon={<PencilIcon className="h-4 w-4" />}
-                                onClick={() => setEditingCategory(category)}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                leftIcon={<TrashIcon className="h-4 w-4" />}
-                                onClick={() => setDeletingCategory(category)}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {category.icon && (
-                          <div className="mt-2 text-sm text-gray-500">
-                            Icon: {category.icon}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      )}
-
-      {/* Create Category Modal */}
-      <Modal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        title="Create New Category"
-      >
-        <CategoryForm
-          onSubmit={handleCreateCategory}
-          onCancel={() => setShowCreateModal(false)}
-          isLoading={createMutation.isLoading}
-        />
-      </Modal>
-
-      {/* Edit Category Modal */}
-      <Modal
-        isOpen={!!editingCategory}
-        onClose={() => setEditingCategory(null)}
-        title="Edit Category"
-      >
-        {editingCategory && (
-          <CategoryForm
-            initialData={editingCategory}
-            onSubmit={handleUpdateCategory}
-            onCancel={() => setEditingCategory(null)}
-            isLoading={updateMutation.isLoading}
-          />
-        )}
-      </Modal>
-
-      {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={!!deletingCategory}
-        onClose={() => setDeletingCategory(null)}
-        title="Delete Category"
-      >
-        <div
+}

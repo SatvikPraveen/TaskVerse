@@ -14,12 +14,13 @@ interface RegisterForm {
   email: string;
   password: string;
   confirmPassword: string;
+  agreeTerms: boolean;
 }
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { register: registerUser, isLoading } = useAuthStore();
+  const { register: registerUser, isSubmitting } = useAuthStore();
   const navigate = useNavigate();
 
   const {
@@ -158,8 +159,8 @@ export default function RegisterPage() {
               {...register('password', {
                 required: 'Password is required',
                 minLength: {
-                  value: 6,
-                  message: 'Password must be at least 6 characters',
+                  value: 8,
+                  message: 'Password must be at least 8 characters',
                 },
               })}
             />
@@ -193,10 +194,9 @@ export default function RegisterPage() {
           <div className="flex items-center">
             <input
               id="agree-terms"
-              name="agree-terms"
               type="checkbox"
               className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              {...register('agreeTerms' as any, {
+              {...register('agreeTerms', {
                 required: 'You must agree to the terms and conditions',
               })}
             />
@@ -211,12 +211,15 @@ export default function RegisterPage() {
               </a>
             </label>
           </div>
+          {errors.agreeTerms && (
+            <p className="text-sm text-red-600">{errors.agreeTerms.message}</p>
+          )}
 
           <div>
             <Button
               type="submit"
               fullWidth
-              isLoading={isLoading}
+              isLoading={isSubmitting}
             >
               Create account
             </Button>

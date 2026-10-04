@@ -1,63 +1,73 @@
 // apps/web/src/features/tasks/FiltersBar.tsx
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { clsx } from 'clsx';
-import type { TaskFiltersInput } from '@taskverse/types';
-import type { Category } from '@/api/categories.api';
+import type { Category, TaskPriority, TaskSortBy, TaskStatus } from '@taskverse/types';
+
+import type { TaskFilters } from '@/api/tasks.api';
 
 interface FiltersBarProps {
-  filters: Partial<TaskFiltersInput>;
-  onFiltersChange: (filters: Partial<TaskFiltersInput>) => void;
+  filters: TaskFilters;
+  onFiltersChange: (filters: TaskFilters) => void;
   categories: Category[];
 }
 
-const statusOptions = [
+const statusOptions: Array<{ value: TaskStatus; label: string }> = [
   { value: 'todo', label: 'To Do' },
   { value: 'in_progress', label: 'In Progress' },
   { value: 'completed', label: 'Completed' },
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
-const priorityOptions = [
+const priorityOptions: Array<{ value: TaskPriority; label: string }> = [
   { value: 'low', label: 'Low' },
   { value: 'medium', label: 'Medium' },
   { value: 'high', label: 'High' },
   { value: 'urgent', label: 'Urgent' },
 ];
 
-const sortOptions = [
+const sortOptions: Array<{ value: TaskSortBy; label: string }> = [
   { value: 'position', label: 'Position' },
-  { value: 'createdAt', label: 'Created Date' },
-  { value: 'updatedAt', label: 'Updated Date' },
-  { value: 'dueDate', label: 'Due Date' },
+  { value: 'createdAt', label: 'Created' },
+  { value: 'updatedAt', label: 'Updated' },
+  { value: 'dueDate', label: 'Due date' },
   { value: 'priority', label: 'Priority' },
   { value: 'title', label: 'Title' },
 ];
 
-export default function FiltersBar({ filters, onFiltersChange, categories }: FiltersBarProps) {
-  const updateFilter = (key: keyof TaskFiltersInput, value: any) => {
-    onFiltersChange({
-      ...filters,
-      [key]: value || undefined,
-    });
-  };
+const selectClass =
+  'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
 
-  const clearFilters = () => {
-    onFiltersChange({});
-  };
-
-  const hasFilters = Object.keys(filters).some(key => 
-    filters[key as keyof TaskFiltersInput] !== undefined && 
-    filters[key as keyof TaskFiltersInput] !== ''
+function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+      {children}
+    </div>
   );
+}
+
+export default function FiltersBar({ filters, onFiltersChange, categories }: FiltersBarProps) {
+  const update = <K extends keyof TaskFilters>(key: K, value: TaskFilters[K] | '' | undefined) => {
+    // Any filter change resets to page 1.
+    const next: TaskFilters = { ...filters };
+    delete next.page;
+    if (value === '' || value === undefined || value === false) delete next[key];
+    else next[key] = value as TaskFilters[K];
+    onFiltersChange(next);
+  };
+
+  const hasFilters = Object.entries(filters).some(([k, v]) => k !== 'page' && v !== undefined && v !== '');
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-900">Filters</h3>
+    <section className="rounded-lg border bg-white p-4 shadow-sm" aria-label="Task filters">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm font-medium text-gray-900">Filters</h2>
         {hasFilters && (
           <button
-            onClick={clearFilters}
-            className="text-sm text-indigo-600 hover:text-indigo-500 flex items-center gap-1"
+            type="button"
+            onClick={() => onFiltersChange({})}
+            className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-500"
           >
             <XMarkIcon className="h-4 w-4" />
             Clear all
@@ -65,171 +75,137 @@ export default function FiltersBar({ filters, onFiltersChange, categories }: Fil
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-        {/* Search */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Search
-          </label>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <Field id="filter-search" label="Search">
           <input
-            type="text"
-            placeholder="Search tasks..."
-            value={filters.search || ''}
-            onChange={(e) => updateFilter('search', e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            id="filter-search"
+            type="search"
+            placeholder="Search tasks…"
+            value={filters.search ?? ''}
+            onChange={e => update('search', e.target.value)}
+            className={selectClass}
           />
-        </div>
+        </Field>
 
-        {/* Status */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
+        <Field id="filter-status" label="Status">
           <select
-            value={filters.status || ''}
-            onChange={(e) => updateFilter('status', e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            id="filter-status"
+            value={filters.status ?? ''}
+            onChange={e => update('status', e.target.value as TaskStatus | '')}
+            className={selectClass}
           >
             <option value="">All statuses</option>
-            {statusOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            {statusOptions.map(o => (
+              <option key={o.value} value={o.value}>
+                {o.label}
               </option>
             ))}
           </select>
-        </div>
+        </Field>
 
-        {/* Priority */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Priority
-          </label>
+        <Field id="filter-priority" label="Priority">
           <select
-            value={filters.priority || ''}
-            onChange={(e) => updateFilter('priority', e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            id="filter-priority"
+            value={filters.priority ?? ''}
+            onChange={e => update('priority', e.target.value as TaskPriority | '')}
+            className={selectClass}
           >
             <option value="">All priorities</option>
-            {priorityOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            {priorityOptions.map(o => (
+              <option key={o.value} value={o.value}>
+                {o.label}
               </option>
             ))}
           </select>
-        </div>
+        </Field>
 
-        {/* Category */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Category
-          </label>
+        <Field id="filter-category" label="Category">
           <select
-            value={filters.category || ''}
-            onChange={(e) => updateFilter('category', e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            id="filter-category"
+            value={filters.category ?? ''}
+            onChange={e => update('category', e.target.value)}
+            className={selectClass}
           >
             <option value="">All categories</option>
-            {categories.map(category => (
-              <option key={category._id} value={category._id}>
-                {category.name}
+            {categories.map(c => (
+              <option key={c._id} value={c._id}>
+                {c.name}
               </option>
             ))}
           </select>
-        </div>
+        </Field>
 
-        {/* Sort By */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Sort by
-          </label>
+        <Field id="filter-sort" label="Sort by">
           <select
-            value={filters.sortBy || 'position'}
-            onChange={(e) => updateFilter('sortBy', e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            id="filter-sort"
+            value={filters.sortBy ?? 'position'}
+            onChange={e => update('sortBy', e.target.value as TaskSortBy)}
+            className={selectClass}
           >
-            {sortOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            {sortOptions.map(o => (
+              <option key={o.value} value={o.value}>
+                {o.label}
               </option>
             ))}
           </select>
-        </div>
+        </Field>
 
-        {/* Sort Order */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Order
-          </label>
+        <Field id="filter-order" label="Order">
           <select
-            value={filters.sortOrder || 'asc'}
-            onChange={(e) => updateFilter('sortOrder', e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            id="filter-order"
+            value={filters.sortOrder ?? 'asc'}
+            onChange={e => update('sortOrder', e.target.value as 'asc' | 'desc')}
+            className={selectClass}
           >
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
-        </div>
+        </Field>
       </div>
 
-      {/* Date Range Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Due after
-          </label>
+      <div className="mt-4 grid grid-cols-1 gap-4 border-t border-gray-200 pt-4 md:grid-cols-3">
+        <Field id="filter-due-after" label="Due after">
           <input
+            id="filter-due-after"
             type="date"
-            value={filters.dueAfter ? filters.dueAfter.split('T')[0] : ''}
-            onChange={(e) => updateFilter('dueAfter', e.target.value ? `${e.target.value}T00:00:00.000Z` : '')}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            value={filters.dueAfter ? filters.dueAfter.slice(0, 10) : ''}
+            onChange={e => update('dueAfter', e.target.value ? `${e.target.value}T00:00:00.000Z` : '')}
+            className={selectClass}
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Due before
-          </label>
+        </Field>
+        <Field id="filter-due-before" label="Due before">
           <input
+            id="filter-due-before"
             type="date"
-            value={filters.dueBefore ? filters.dueBefore.split('T')[0] : ''}
-            onChange={(e) => updateFilter('dueBefore', e.target.value ? `${e.target.value}T23:59:59.999Z` : '')}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            value={filters.dueBefore ? filters.dueBefore.slice(0, 10) : ''}
+            onChange={e => update('dueBefore', e.target.value ? `${e.target.value}T23:59:59.999Z` : '')}
+            className={selectClass}
           />
-        </div>
+        </Field>
+        <Field id="filter-tags" label="Tags (comma separated)">
+          <input
+            id="filter-tags"
+            type="text"
+            placeholder="urgent, research"
+            value={filters.tags ?? ''}
+            onChange={e => update('tags', e.target.value)}
+            className={selectClass}
+          />
+        </Field>
       </div>
 
-      {/* Tags Filter */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Tags
-        </label>
+      <div className="mt-4 flex items-center border-t border-gray-200 pt-4">
         <input
-          type="text"
-          placeholder="Enter tags separated by commas"
-          value={filters.tags || ''}
-          onChange={(e) => updateFilter('tags', e.target.value)}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          id="filter-archived"
+          type="checkbox"
+          checked={filters.archived ?? false}
+          onChange={e => update('archived', e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
         />
-        <p className="text-xs text-gray-500 mt-1">
-          Enter tags separated by commas (e.g., "urgent, important")
-        </p>
+        <label htmlFor="filter-archived" className="ml-2 block text-sm text-gray-700">
+          Show archived tasks
+        </label>
       </div>
-
-      {/* Archive Toggle */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="flex items-center">
-          <input
-            id="include-archived"
-            type="checkbox"
-            checked={filters.archived || false}
-            onChange={(e) => updateFilter('archived', e.target.checked)}
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-          />
-          <label htmlFor="include-archived" className="ml-2 block text-sm text-gray-700">
-            Include archived tasks
-          </label>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }

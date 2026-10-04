@@ -219,38 +219,50 @@ export const throttle = <T extends (...args: any[]) => any>(
   };
 };
 
-// Local storage utilities
+// Local storage utilities (no-ops outside a browser so the package stays isomorphic)
+interface KeyValueStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+  clear(): void;
+}
+
+const resolveStorage = (): KeyValueStorage | null => {
+  const candidate = (globalThis as { localStorage?: KeyValueStorage }).localStorage;
+  return candidate ?? null;
+};
+
 export const storage = {
   get: <T>(key: string, defaultValue?: T): T | null => {
     try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue ?? null;
+      const item = resolveStorage()?.getItem(key);
+      return item ? (JSON.parse(item) as T) : defaultValue ?? null;
     } catch {
       return defaultValue ?? null;
     }
   },
-  
+
   set: <T>(key: string, value: T): void => {
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      resolveStorage()?.setItem(key, JSON.stringify(value));
     } catch {
-      // Handle storage errors silently
+      // Storage may be unavailable (private mode, quota); fail silently.
     }
   },
-  
+
   remove: (key: string): void => {
     try {
-      localStorage.removeItem(key);
+      resolveStorage()?.removeItem(key);
     } catch {
-      // Handle storage errors silently
+      // see above
     }
   },
-  
+
   clear: (): void => {
     try {
-      localStorage.clear();
+      resolveStorage()?.clear();
     } catch {
-      // Handle storage errors silently
+      // see above
     }
   },
 };

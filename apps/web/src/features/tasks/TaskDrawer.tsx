@@ -11,6 +11,7 @@ import {
   TrashIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
+import type { TaskPriority, TaskStatus } from '@taskverse/types';
 import type { Task } from '@/api/tasks.api';
 import { useUpdateTask, useDeleteTask, useAddComment, useUpdateSubtask } from '@/api/tasks.api';
 import { formatDate, formatTimeAgo } from '@/utils/date';
@@ -60,7 +61,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
     try {
       await updateTaskMutation.mutateAsync({
         taskId: task._id,
-        data: { status: newStatus as any }
+        data: { status: newStatus as TaskStatus }
       });
       setEditingStatus(false);
       toast.success('Task status updated');
@@ -73,7 +74,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
     try {
       await updateTaskMutation.mutateAsync({
         taskId: task._id,
-        data: { priority: newPriority as any }
+        data: { priority: newPriority as TaskPriority }
       });
       setEditingPriority(false);
       toast.success('Task priority updated');
@@ -83,7 +84,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
   };
 
   const handleDeleteTask = async () => {
-    if (!confirm('Are you sure you want to delete this task?')) return;
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
     
     try {
       await deleteTaskMutation.mutateAsync(task._id);

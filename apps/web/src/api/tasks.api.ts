@@ -1,238 +1,109 @@
 // apps/web/src/api/tasks.api.ts
-import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from 'react-query';
-import { api, ApiResponse, PaginatedResponse } from './client';
-import type { CreateTaskInput, UpdateTaskInput, TaskFiltersInput, CommentInput } from '@taskverse/types';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import type {
+  Comment,
+  CommentInput,
+  CreateTaskInput,
+  PaginatedTasks,
+  Task,
+  TaskFiltersInput,
+  TaskStats,
+  UpdateTaskInput,
+} from '@taskverse/types';
 
-// Types
-export interface Task {
-  _id: string;
-  title: string;
-  description?: string;
-  status: 'todo' | 'in_progress' | 'completed' | 'cancelled';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  category?: {
-    _id: string;
-    name: string;
-    color: string;
-    icon?: string;
-  };
-  assignedTo?: {
-    _id: string;
-    username: string;
-    firstName?: string;
-    lastName?: string;
-    avatar?: string;
-  };
-  createdBy: {
-    _id: string;
-    username: string;
-    firstName?: string;
-    lastName?: string;
-    avatar?: string;
-  };
-  dueDate?: string;
-  startDate?: string;
-  completedAt?: string;
-  estimatedHours?: number;
-  actualHours?: number;
-  tags: string[];
-  subtasks: Array<{
-    _id: string;
-    title: string;
-    isCompleted: boolean;
-    createdAt: string;
-  }>;
-  comments: Array<{
-    _id: string;
-    content: string;
-    author: {
-      _id: string;
-      username: string;
-      firstName?: string;
-      lastName?: string;
-      avatar?: string;
-    };
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  attachments: Array<{
-    _id: string;
-    filename: string;
-    originalName: string;
-    mimeType: string;
-    size: number;
-    url: string;
-    uploadedBy: string;
-    uploadedAt: string;
-  }>;
-  completionPercentage: number;
-  isOverdue: boolean;
-  isArchived: boolean;
-  position: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { api } from './client';
 
-export interface TaskStats {
-  todo: number;
-  in_progress: number;
-  completed: number;
-  cancelled: number;
-  overdue: number;
-}
+export type { Task, TaskStats, Comment } from '@taskverse/types';
 
-export interface Comment {
-  _id: string;
-  content: string;
-  author: {
-    username: string;
-    firstName?: string;
-    lastName?: string;
-    avatar?: string;
-  };
-  createdAt: string;
-}
+export type TaskFilters = Partial<TaskFiltersInput>;
 
-// API functions
-export const tasksApi = {
-  getTasks: (filters: Partial<TaskFiltersInput> = {}): Promise<PaginatedResponse<Task[]>> => {
-    const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
-    return api.get(`/tasks?${params.toString()}`);
-  },
-
-  getTask: (taskId: string): Promise<ApiResponse<{ task: Task }>> =>
-    api.get(`/tasks/${taskId}`),
-
-  createTask: (data: CreateTaskInput): Promise<ApiResponse<{ task: Task }>> =>
-    api.post('/tasks', data),
-
-  updateTask: (taskId: string, data: Partial<UpdateTaskInput>): Promise<ApiResponse<{ task: Task }>> =>
-    api.put(`/tasks/${taskId}`, data),
-
-  deleteTask: (taskId: string): Promise<ApiResponse> =>
-    api.delete(`/tasks/${taskId}`),
-
-  getTaskStats: (): Promise<ApiResponse<{ stats: TaskStats }>> =>
-    api.get('/tasks/stats'),
-
-  addComment: (taskId: string, data: CommentInput): Promise<ApiResponse<{ comment: Comment }>> =>
-    api.post(`/tasks/${taskId}/comments`, data),
-
-  updateSubtask: (taskId: string, subtaskId: string, data: { isCompleted: boolean }): Promise<ApiResponse<{ task: Task }>> =>
-    api.put(`/tasks/${taskId}/subtasks/${subtaskId}`, data),
+const toQueryString = (filters: TaskFilters): string => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== null && value !== '') params.append(key, String(value));
+  }
+  const qs = params.toString();
+  return qs ? `?${qs}` : '';
 };
 
-// Query keys
+export const tasksApi = {
+  getTasks: (filters: TaskFilters = {}) => api.get<PaginatedTasks>(`/tasks${toQueryString(filters)}`),
+  getTask: (taskId: string) => api.get<{ task: Task }>(`/tasks/${taskId}`),
+  createTask: (data: CreateTaskInput) => api.post<{ task: Task }>('/tasks', data),
+  updateTask: (taskId: string, data: UpdateTaskInput) =>
+    api.put<{ task: Task }>(`/tasks/${taskId}`, data),
+  deleteTask: (taskId: string) => api.delete(`/tasks/${taskId}`),
+  getTaskStats: () => api.get<{ stats: TaskStats }>('/tasks/stats'),
+  addComment: (taskId: string, data: CommentInput) =>
+    api.post<{ comment: Comment }>(`/tasks/${taskId}/comments`, data),
+  updateSubtask: (taskId: string, subtaskId: string, data: { isCompleted: boolean }) =>
+    api.put<{ task: Task }>(`/tasks/${taskId}/subtasks/${subtaskId}`, data),
+};
+
 export const taskKeys = {
   all: ['tasks'] as const,
   lists: () => [...taskKeys.all, 'list'] as const,
-  list: (filters: Partial<TaskFiltersInput>) => [...taskKeys.lists(), { filters }] as const,
+  list: (filters: TaskFilters) => [...taskKeys.lists(), filters] as const,
   details: () => [...taskKeys.all, 'detail'] as const,
   detail: (id: string) => [...taskKeys.details(), id] as const,
   stats: () => [...taskKeys.all, 'stats'] as const,
 };
 
-// React Query hooks
-export const useTasks = (filters: Partial<TaskFiltersInput> = {}) => {
-  return useQuery(
-    taskKeys.list(filters),
-    () => tasksApi.getTasks(filters),
-    {
-      keepPreviousData: true,
-      staleTime: 30 * 1000, // 30 seconds
-    }
-  );
-};
+export const useTasks = (filters: TaskFilters = {}) =>
+  useQuery(taskKeys.list(filters), () => tasksApi.getTasks(filters), {
+    keepPreviousData: true,
+    staleTime: 30 * 1000,
+  });
 
-export const useTask = (taskId: string, enabled = true) => {
-  return useQuery(
-    taskKeys.detail(taskId),
-    () => tasksApi.getTask(taskId),
-    {
-      enabled: enabled && !!taskId,
-    }
-  );
+export const useTask = (taskId: string | null) =>
+  useQuery(taskKeys.detail(taskId ?? ''), () => tasksApi.getTask(taskId!), {
+    enabled: !!taskId,
+  });
+
+export const useTaskStats = () =>
+  useQuery(taskKeys.stats(), tasksApi.getTaskStats, { staleTime: 60 * 1000 });
+
+const useInvalidateTasks = () => {
+  const queryClient = useQueryClient();
+  return (taskId?: string) => {
+    queryClient.invalidateQueries(taskKeys.lists());
+    queryClient.invalidateQueries(taskKeys.stats());
+    if (taskId) queryClient.invalidateQueries(taskKeys.detail(taskId));
+  };
 };
 
 export const useCreateTask = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation(tasksApi.createTask, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(taskKeys.lists());
-      queryClient.invalidateQueries(taskKeys.stats());
-    },
-  });
+  const invalidate = useInvalidateTasks();
+  return useMutation(tasksApi.createTask, { onSuccess: () => invalidate() });
 };
 
 export const useUpdateTask = () => {
-  const queryClient = useQueryClient();
-  
+  const invalidate = useInvalidateTasks();
   return useMutation(
-    ({ taskId, data }: { taskId: string; data: Partial<UpdateTaskInput> }) =>
+    ({ taskId, data }: { taskId: string; data: UpdateTaskInput }) =>
       tasksApi.updateTask(taskId, data),
-    {
-      onSuccess: (response, { taskId }) => {
-        queryClient.invalidateQueries(taskKeys.lists());
-        queryClient.invalidateQueries(taskKeys.detail(taskId));
-        queryClient.invalidateQueries(taskKeys.stats());
-      },
-    }
+    { onSuccess: (_res, { taskId }) => invalidate(taskId) }
   );
 };
 
 export const useDeleteTask = () => {
-  const queryClient = useQueryClient();
-  
-  return useMutation(tasksApi.deleteTask, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(taskKeys.lists());
-      queryClient.invalidateQueries(taskKeys.stats());
-    },
-  });
-};
-
-export const useTaskStats = () => {
-  return useQuery(
-    taskKeys.stats(),
-    tasksApi.getTaskStats,
-    {
-      staleTime: 60 * 1000, // 1 minute
-    }
-  );
+  const invalidate = useInvalidateTasks();
+  return useMutation(tasksApi.deleteTask, { onSuccess: () => invalidate() });
 };
 
 export const useAddComment = () => {
-  const queryClient = useQueryClient();
-  
+  const invalidate = useInvalidateTasks();
   return useMutation(
-    ({ taskId, data }: { taskId: string; data: CommentInput }) =>
-      tasksApi.addComment(taskId, data),
-    {
-      onSuccess: (response, { taskId }) => {
-        queryClient.invalidateQueries(taskKeys.detail(taskId));
-      },
-    }
+    ({ taskId, data }: { taskId: string; data: CommentInput }) => tasksApi.addComment(taskId, data),
+    { onSuccess: (_res, { taskId }) => invalidate(taskId) }
   );
 };
 
 export const useUpdateSubtask = () => {
-  const queryClient = useQueryClient();
-  
+  const invalidate = useInvalidateTasks();
   return useMutation(
     ({ taskId, subtaskId, data }: { taskId: string; subtaskId: string; data: { isCompleted: boolean } }) =>
       tasksApi.updateSubtask(taskId, subtaskId, data),
-    {
-      onSuccess: (response, { taskId }) => {
-        queryClient.invalidateQueries(taskKeys.detail(taskId));
-        queryClient.invalidateQueries(taskKeys.lists());
-        queryClient.invalidateQueries(taskKeys.stats());
-      },
-    }
+    { onSuccess: (_res, { taskId }) => invalidate(taskId) }
   );
 };

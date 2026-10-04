@@ -18,8 +18,8 @@ export default function DashboardPage() {
   const { data: taskStatsData, isLoading: taskStatsLoading } = useTaskStats();
   const { data: categoryStatsData, isLoading: categoryStatsLoading } = useCategoryStats();
 
-  const taskStats = taskStatsData?.data?.stats;
-  const categoryStats = categoryStatsData?.data?.stats;
+  const taskStats = taskStatsData?.data.stats;
+  const categoryStats = categoryStatsData?.data.stats;
 
   const stats = [
     {
@@ -118,24 +118,6 @@ export default function DashboardPage() {
             Tasks by Category
           </h3>
           <CategoryDistribution stats={categoryStats} isLoading={categoryStatsLoading} />
-        </div>
-      </div>
-
-      {/* Recent Activity (placeholder for future implementation) */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Recent Activity
-          </h3>
-          <div className="text-center py-12">
-            <div className="text-gray-400">
-              <ClockIcon className="h-12 w-12 mx-auto mb-4" />
-              <p className="text-sm">Recent activity will appear here</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Task updates, comments, and completions
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 

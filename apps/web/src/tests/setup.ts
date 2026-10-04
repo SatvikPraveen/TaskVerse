@@ -1,9 +1,9 @@
 // apps/web/src/tests/setup.ts
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, type Page } from '@playwright/test';
 
 // Extend the basic test with custom fixtures
 export const test = base.extend<{
-  authenticatedPage: any;
+  authenticatedPage: Page;
 }>({
   authenticatedPage: async ({ page }, use) => {
     // Mock authentication for tests
@@ -39,7 +39,7 @@ export const TEST_USER = {
 };
 
 // Helper functions for tests
-export const createTestTask = async (page: any, taskData: any = {}) => {
+export const createTestTask = async (page: Page, taskData: Record<string, string> = {}) => {
   const defaultTask = {
     title: 'Test Task',
     description: 'Test task description',

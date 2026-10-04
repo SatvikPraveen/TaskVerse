@@ -58,3 +58,5 @@ playwright/.cache/
 # Temporary files
 tmp/
 temp/
+# TypeScript incremental build info
+*.tsbuildinfo
