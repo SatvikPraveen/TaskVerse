@@ -69,7 +69,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -143,6 +143,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   className="text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
@@ -166,6 +167,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   className="text-gray-400 hover:text-gray-600"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (

@@ -1,168 +1,112 @@
 // apps/web/src/tests/auth.e2e.spec.ts
-import { test, expect, TEST_USER } from './setup';
+import { expect, loginThroughUi, makeUser, registerViaApi, test } from './setup';
 
 test.describe('Authentication', () => {
-  test.beforeEach(async ({ page }) => {
+  test('redirects anonymous visitors to the login page', async ({ page }) => {
     await page.goto('/');
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole('heading', { name: 'Sign in to your account' })).toBeVisible();
   });
 
-  test('should redirect to login when not authenticated', async ({ page }) => {
-    await expect(page).toHaveURL('/login');
-  });
-
-  test('should display login form', async ({ page }) => {
+  test('shows validation messages for an empty login form', async ({ page }) => {
     await page.goto('/login');
-
-    await expect(page.locator('h2')).toContainText('Sign in to your account');
-    await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.getByText('Email is required')).toBeVisible();
+    await expect(page.getByText('Password is required')).toBeVisible();
   });
 
-  test('should show validation errors for empty form', async ({ page }) => {
+  test('rejects a malformed email client-side', async ({ page }) => {
     await page.goto('/login');
-
-    await page.click('button[type="submit"]');
-
-    await expect(page.locator('text=Email is required')).toBeVisible();
-    await expect(page.locator('text=Password is required')).toBeVisible();
+    await page.getByLabel('Email address').fill('not-an-email');
+    await page.getByLabel('Password', { exact: true }).fill('whatever123');
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.getByText('Invalid email address')).toBeVisible();
   });
 
-  test('should show error for invalid email format', async ({ page }) => {
+  test('navigates between login and registration', async ({ page }) => {
     await page.goto('/login');
-
-    await page.fill('input[type="email"]', 'invalid-email');
-    await page.fill('input[type="password"]', 'password123');
-    await page.click('button[type="submit"]');
-
-    await expect(page.locator('text=Invalid email address')).toBeVisible();
+    await page.getByRole('link', { name: 'create a new account' }).click();
+    await expect(page).toHaveURL(/\/register$/);
+    await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible();
+    await page.getByRole('link', { name: 'sign in to your existing account' }).click();
+    await expect(page).toHaveURL(/\/login$/);
   });
 
-  test('should navigate to register page', async ({ page }) => {
-    await page.goto('/login');
-
-    await page.click('text=create a new account');
-
-    await expect(page).toHaveURL('/register');
-    await expect(page.locator('h2')).toContainText('Create your account');
-  });
-
-  test('should display register form', async ({ page }) => {
+  test('registers a new account through the form', async ({ page }) => {
+    const user = makeUser();
     await page.goto('/register');
-
-    await expect(page.locator('input[placeholder*="First"]')).toBeVisible();
-    await expect(page.locator('input[placeholder*="Last"]')).toBeVisible();
-    await expect(page.locator('input[placeholder*="username"]')).toBeVisible();
-    await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
+    await page.getByLabel('First name').fill(user.firstName);
+    await page.getByLabel('Last name').fill(user.lastName);
+    await page.getByLabel('Username').fill(user.username);
+    await page.getByLabel('Email address').fill(user.email);
+    await page.getByLabel('Password', { exact: true }).fill(user.password);
+    await page.getByRole('textbox', { name: 'Confirm password' }).fill(user.password);
+    await page.getByLabel(/I agree to the/).check();
+    await page.getByRole('button', { name: 'Create account' }).click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(`Welcome back, ${user.firstName}`);
   });
 
-  test('should validate password confirmation', async ({ page }) => {
+  test('requires matching passwords on registration', async ({ page }) => {
+    const user = makeUser();
     await page.goto('/register');
-
-    await page.fill('input[placeholder*="First"]', TEST_USER.firstName);
-    await page.fill('input[placeholder*="Last"]', TEST_USER.lastName);
-    await page.fill('input[placeholder*="username"]', TEST_USER.username);
-    await page.fill('input[type="email"]', TEST_USER.email);
-    await page.fill('input[placeholder="Enter your password"]', 'password123');
-    await page.fill('input[placeholder="Confirm your password"]', 'different-password');
-
-    await page.click('button[type="submit"]');
-
-    await expect(page.locator('text=Passwords do not match')).toBeVisible();
+    await page.getByLabel('First name').fill(user.firstName);
+    await page.getByLabel('Last name').fill(user.lastName);
+    await page.getByLabel('Username').fill(user.username);
+    await page.getByLabel('Email address').fill(user.email);
+    await page.getByLabel('Password', { exact: true }).fill(user.password);
+    await page.getByRole('textbox', { name: 'Confirm password' }).fill('something-else');
+    await page.getByLabel(/I agree to the/).check();
+    await page.getByRole('button', { name: 'Create account' }).click();
+    await expect(page.getByText('Passwords do not match')).toBeVisible();
+    await expect(page).toHaveURL(/\/register$/);
   });
 
-  test('should successfully login with valid credentials', async ({ page }) => {
-    await page.goto('/login');
-
-    await page.fill('input[type="email"]', TEST_USER.email);
-    await page.fill('input[type="password"]', TEST_USER.password);
-    await page.click('button[type="submit"]');
-
-    // Should redirect to dashboard
-    await expect(page).toHaveURL('/dashboard');
-    await expect(page.locator('h1')).toContainText('Welcome back');
+  test('logs in with valid credentials and shows the dashboard', async ({ page, request }) => {
+    const user = makeUser();
+    await registerViaApi(request, user);
+    await loginThroughUi(page, user);
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Welcome back');
   });
 
-  test('should show loading state during login', async ({ page }) => {
+  test('shows an error toast for wrong credentials', async ({ page, request }) => {
+    const user = makeUser();
+    await registerViaApi(request, user);
     await page.goto('/login');
-
-    await page.fill('input[type="email"]', TEST_USER.email);
-    await page.fill('input[type="password"]', TEST_USER.password);
-
-    // Look for loading spinner when clicking submit
-    const submitButton = page.locator('button[type="submit"]');
-    await submitButton.click();
-
-    // Button should show loading state
-    await expect(submitButton).toBeDisabled();
+    await page.getByLabel('Email address').fill(user.email);
+    await page.getByLabel('Password', { exact: true }).fill('wrong-password');
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Invalid credentials' })).toBeVisible();
+    await expect(page).toHaveURL(/\/login$/);
   });
 
-  test('should toggle password visibility', async ({ page }) => {
+  test('toggles password visibility', async ({ page }) => {
     await page.goto('/login');
-
-    const passwordInput = page.locator('input[type="password"]');
-    const toggleButton = page.locator('button:has(svg)').nth(0); // Eye icon button
-
-    await expect(passwordInput).toHaveAttribute('type', 'password');
-
-    await toggleButton.click();
-    await expect(passwordInput).toHaveAttribute('type', 'text');
-
-    await toggleButton.click();
-    await expect(passwordInput).toHaveAttribute('type', 'password');
+    const password = page.getByLabel('Password', { exact: true });
+    await expect(password).toHaveAttribute('type', 'password');
+    await page.getByRole('button', { name: 'Show password' }).click();
+    await expect(password).toHaveAttribute('type', 'text');
+    await page.getByRole('button', { name: 'Hide password' }).click();
+    await expect(password).toHaveAttribute('type', 'password');
   });
 
-  test('should persist login state after page refresh', async ({ page }) => {
-    // Login first
-    await page.goto('/login');
-    await page.fill('input[type="email"]', TEST_USER.email);
-    await page.fill('input[type="password"]', TEST_USER.password);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/dashboard');
-
-    // Refresh page
+  test('keeps the session across a reload', async ({ authenticatedPage: page }) => {
     await page.reload();
-
-    // Should still be on dashboard
-    await expect(page).toHaveURL('/dashboard');
-    await expect(page.locator('h1')).toContainText('Welcome back');
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Welcome back');
   });
 
-  test('should logout successfully', async ({ page }) => {
-    // Login first
+  test('bounces signed-in users away from auth pages', async ({ authenticatedPage: page }) => {
     await page.goto('/login');
-    await page.fill('input[type="email"]', TEST_USER.email);
-    await page.fill('input[type="password"]', TEST_USER.password);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/dashboard');
-
-    // Click logout
-    await page.click('button:has-text("Logout")');
-
-    // Should redirect to login
-    await expect(page).toHaveURL('/login');
-  });
-
-  test('should redirect authenticated users away from auth pages', async ({ page }) => {
-    // Login first
-    await page.goto('/login');
-    await page.fill('input[type="email"]', TEST_USER.email);
-    await page.fill('input[type="password"]', TEST_USER.password);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/dashboard');
-
-    // Try to go to login page
-    await page.goto('/login');
-
-    // Should redirect to dashboard
-    await expect(page).toHaveURL('/dashboard');
-
-    // Try to go to register page
+    await expect(page).toHaveURL(/\/dashboard$/);
     await page.goto('/register');
+    await expect(page).toHaveURL(/\/dashboard$/);
+  });
 
-    // Should redirect to dashboard
-    await expect(page).toHaveURL('/dashboard');
+  test('logs out', async ({ authenticatedPage: page }) => {
+    await page.getByRole('button', { name: 'Logout' }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await page.goto('/dashboard');
+    await expect(page).toHaveURL(/\/login$/);
   });
 });

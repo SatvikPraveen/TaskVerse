@@ -1,87 +1,57 @@
 // apps/web/src/tests/setup.ts
-import { test as base, expect, type Page } from '@playwright/test';
+import { test as base, expect, type APIRequestContext, type Page } from '@playwright/test';
 
-// Extend the basic test with custom fixtures
-export const test = base.extend<{
-  authenticatedPage: Page;
-}>({
-  authenticatedPage: async ({ page }, use) => {
-    // Mock authentication for tests
-    await page.goto('/login');
+export const API_URL = process.env.API_URL ?? 'http://localhost:3001';
 
-    // Fill in test credentials
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'testpass123');
+export interface TestUser {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
 
-    // Click login button
-    await page.click('button[type="submit"]');
+let counter = 0;
 
-    // Wait for dashboard to load
-    await page.waitForURL('/dashboard');
+/** A unique user per call so specs never collide on the unique email/username indexes. */
+export const makeUser = (): TestUser => {
+  counter += 1;
+  const stamp = `${Date.now().toString(36)}${counter}`;
+  return {
+    username: `e2e_${stamp}`.slice(0, 20),
+    email: `e2e_${stamp}@example.com`,
+    password: 'Str0ngPassw0rd!',
+    firstName: 'Test',
+    lastName: 'User',
+  };
+};
 
+/** Registers the user through the API and returns its tokens. */
+export const registerViaApi = async (request: APIRequestContext, user: TestUser) => {
+  const res = await request.post(`${API_URL}/api/auth/register`, { data: user });
+  if (!res.ok()) throw new Error(`register failed: ${res.status()} ${await res.text()}`);
+  const body = await res.json();
+  return body.data.tokens as { accessToken: string; refreshToken: string };
+};
+
+export const loginThroughUi = async (page: Page, user: TestUser) => {
+  await page.goto('/login');
+  await page.getByLabel('Email address').fill(user.email);
+  await page.getByLabel('Password', { exact: true }).fill(user.password);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+};
+
+export const test = base.extend<{ user: TestUser; authenticatedPage: Page }>({
+  user: async ({ request }, use) => {
+    const user = makeUser();
+    await registerViaApi(request, user);
+    await use(user);
+  },
+  authenticatedPage: async ({ page, user }, use) => {
+    await loginThroughUi(page, user);
     await use(page);
   },
 });
 
 export { expect };
-
-// Global test configuration
-export const API_BASE_URL = 'http://localhost:3001';
-export const APP_BASE_URL = 'http://localhost:5173';
-
-// Test user credentials
-export const TEST_USER = {
-  email: 'test@example.com',
-  password: 'testpass123',
-  username: 'testuser',
-  firstName: 'Test',
-  lastName: 'User',
-};
-
-// Helper functions for tests
-export const createTestTask = async (page: Page, taskData: Record<string, string> = {}) => {
-  const defaultTask = {
-    title: 'Test Task',
-    description: 'Test task description',
-    priority: 'medium',
-    ...taskData,
-  };
-
-  await page.click('button:has-text("New Task")');
-  await page.fill('input[placeholder*="title"]', defaultTask.title);
-
-  if (defaultTask.description) {
-    await page.fill('textarea[placeholder*="description"]', defaultTask.description);
-  }
-
-  await page.selectOption('select', defaultTask.priority);
-  await page.click('button[type="submit"]');
-
-  // Wait for task to be created
-  await page.waitForSelector(`text=${defaultTask.title}`);
-
-  return defaultTask;
-};
-
-export const createTestCategory = async (page: Page, categoryData: Record<string, string> = {}) => {
-  const defaultCategory = {
-    name: 'Test Category',
-    description: 'Test category description',
-    color: '#6366f1',
-    ...categoryData,
-  };
-
-  await page.click('button:has-text("New Category")');
-  await page.fill('input[placeholder*="name"]', defaultCategory.name);
-
-  if (defaultCategory.description) {
-    await page.fill('textarea[placeholder*="description"]', defaultCategory.description);
-  }
-
-  await page.click('button[type="submit"]');
-
-  // Wait for category to be created
-  await page.waitForSelector(`text=${defaultCategory.name}`);
-
-  return defaultCategory;
-};
