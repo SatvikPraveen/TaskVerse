@@ -1,0 +1,3753 @@
+{
+  "generatedAt": "2026-10-04T00:59:10.673Z",
+  "node": "v20.20.0",
+  "platform": "darwin-arm64",
+  "design": {
+    "sizes": [
+      50,
+      200,
+      1000
+    ],
+    "workers": [
+      1,
+      3
+    ],
+    "horizons": [
+      120,
+      240,
+      480
+    ],
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "policies": [
+      "fifo",
+      "priority",
+      "spt",
+      "edf",
+      "wsjf",
+      "eisenhower"
+    ]
+  },
+  "overall": [
+    {
+      "policy": "wsjf",
+      "meanRank": 1.2055555555555555,
+      "wins": 162,
+      "meanElapsedMs": 113.40898333333332
+    },
+    {
+      "policy": "edf",
+      "meanRank": 2.4555555555555557,
+      "wins": 14,
+      "meanElapsedMs": 39.672161111111116
+    },
+    {
+      "policy": "spt",
+      "meanRank": 3.438888888888889,
+      "wins": 0,
+      "meanElapsedMs": 50.12727777777776
+    },
+    {
+      "policy": "eisenhower",
+      "meanRank": 3.6555555555555554,
+      "wins": 1,
+      "meanElapsedMs": 42.18534444444445
+    },
+    {
+      "policy": "priority",
+      "meanRank": 4.411111111111111,
+      "wins": 0,
+      "meanElapsedMs": 37.298899999999996
+    },
+    {
+      "policy": "fifo",
+      "meanRank": 5.833333333333333,
+      "wins": 3,
+      "meanElapsedMs": 59.33685
+    }
+  ],
+  "cells": [
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 4540.951999999999,
+          "std": 690.0599534951856
+        },
+        "totalTardiness": {
+          "mean": 1939.292,
+          "std": 313.8169638428675
+        },
+        "onTimeRate": {
+          "mean": 0.26815,
+          "std": 0.04101089963520538
+        },
+        "lateTasks": {
+          "mean": 25.5,
+          "std": 2.9533408577782247
+        },
+        "meanFlowTime": {
+          "mean": 96.337,
+          "std": 9.046989738765781
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 3551.1240000000007,
+          "std": 721.9874055565112
+        },
+        "totalTardiness": {
+          "mean": 1698.0739999999998,
+          "std": 366.0211990278402
+        },
+        "onTimeRate": {
+          "mean": 0.26837,
+          "std": 0.08985783895811328
+        },
+        "lateTasks": {
+          "mean": 25.5,
+          "std": 4.169998667732268
+        },
+        "meanFlowTime": {
+          "mean": 93.708,
+          "std": 8.650022222193677
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 3490.4300000000003,
+          "std": 930.0464066079952
+        },
+        "totalTardiness": {
+          "mean": 1482.881,
+          "std": 386.0594981044588
+        },
+        "onTimeRate": {
+          "mean": 0.4157499999999999,
+          "std": 0.07134774387151674
+        },
+        "lateTasks": {
+          "mean": 20.4,
+          "std": 3.40587727318528
+        },
+        "meanFlowTime": {
+          "mean": 75.92600000000002,
+          "std": 8.511225528676817
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 3091.8720000000003,
+          "std": 705.2599657305258
+        },
+        "totalTardiness": {
+          "mean": 1306.7730000000001,
+          "std": 271.8281782078116
+        },
+        "onTimeRate": {
+          "mean": 0.42722,
+          "std": 0.1810656160990632
+        },
+        "lateTasks": {
+          "mean": 20.3,
+          "std": 7.916929820187733
+        },
+        "meanFlowTime": {
+          "mean": 94.297,
+          "std": 9.573102422934795
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 2
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2656.589,
+          "std": 783.2961986722804
+        },
+        "totalTardiness": {
+          "mean": 1148.0790000000002,
+          "std": 325.54923367032114
+        },
+        "onTimeRate": {
+          "mean": 0.47337000000000007,
+          "std": 0.09779334276365077
+        },
+        "lateTasks": {
+          "mean": 18.5,
+          "std": 4.352521619066865
+        },
+        "meanFlowTime": {
+          "mean": 76.93299999999999,
+          "std": 6.793657254298958
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 8
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 3501.8990000000003,
+          "std": 854.477549194048
+        },
+        "totalTardiness": {
+          "mean": 1568.858,
+          "std": 407.67353348809223
+        },
+        "onTimeRate": {
+          "mean": 0.27261,
+          "std": 0.1015976645619595
+        },
+        "lateTasks": {
+          "mean": 25.4,
+          "std": 4.742245131674331
+        },
+        "meanFlowTime": {
+          "mean": 93.73299999999999,
+          "std": 8.93782729004464
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2842.754,
+          "std": 611.2360785999321
+        },
+        "totalTardiness": {
+          "mean": 1253.9,
+          "std": 327.0711564102765
+        },
+        "onTimeRate": {
+          "mean": 0.5715600000000001,
+          "std": 0.06276230645149292
+        },
+        "lateTasks": {
+          "mean": 14.9,
+          "std": 2.378141197564929
+        },
+        "meanFlowTime": {
+          "mean": 96.337,
+          "std": 9.046989738765781
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2263.4849999999997,
+          "std": 515.6636267363531
+        },
+        "totalTardiness": {
+          "mean": 1086.85,
+          "std": 280.5974667661053
+        },
+        "onTimeRate": {
+          "mean": 0.59895,
+          "std": 0.06938138158837075
+        },
+        "lateTasks": {
+          "mean": 14,
+          "std": 3.0550504633038935
+        },
+        "meanFlowTime": {
+          "mean": 93.708,
+          "std": 8.650022222193677
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2353.2149999999997,
+          "std": 741.1086877592397
+        },
+        "totalTardiness": {
+          "mean": 1006.0279999999999,
+          "std": 324.85276455649876
+        },
+        "onTimeRate": {
+          "mean": 0.6471799999999999,
+          "std": 0.07686888982040929
+        },
+        "lateTasks": {
+          "mean": 12.4,
+          "std": 3.3399933466334266
+        },
+        "meanFlowTime": {
+          "mean": 75.92600000000002,
+          "std": 8.511225528676817
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2012.034,
+          "std": 520.3510379264283
+        },
+        "totalTardiness": {
+          "mean": 857.4110000000001,
+          "std": 183.3633929569004
+        },
+        "onTimeRate": {
+          "mean": 0.65073,
+          "std": 0.05865068058712816
+        },
+        "lateTasks": {
+          "mean": 12.2,
+          "std": 2.6161889160464775
+        },
+        "meanFlowTime": {
+          "mean": 94.297,
+          "std": 9.573102422934795
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 2
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1700.875,
+          "std": 631.120021130864
+        },
+        "totalTardiness": {
+          "mean": 721.2589999999998,
+          "std": 254.21463601758956
+        },
+        "onTimeRate": {
+          "mean": 0.6745499999999999,
+          "std": 0.07884232154539
+        },
+        "lateTasks": {
+          "mean": 11.5,
+          "std": 3.5668224265054493
+        },
+        "meanFlowTime": {
+          "mean": 77.05199999999999,
+          "std": 7.117126136611915
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 8
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2158.2999999999997,
+          "std": 554.5991075242249
+        },
+        "totalTardiness": {
+          "mean": 957.805,
+          "std": 250.61333556120096
+        },
+        "onTimeRate": {
+          "mean": 0.5836699999999999,
+          "std": 0.08362408013113075
+        },
+        "lateTasks": {
+          "mean": 14.6,
+          "std": 3.8355066303046734
+        },
+        "meanFlowTime": {
+          "mean": 93.73299999999999,
+          "std": 8.93782729004464
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2088.096,
+          "std": 642.0985375435421
+        },
+        "totalTardiness": {
+          "mean": 918.1370000000001,
+          "std": 315.15834760922604
+        },
+        "onTimeRate": {
+          "mean": 0.7214799999999999,
+          "std": 0.0929388185851316
+        },
+        "lateTasks": {
+          "mean": 9.8,
+          "std": 3.675746333890726
+        },
+        "meanFlowTime": {
+          "mean": 96.337,
+          "std": 9.046989738765781
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1700.2989999999998,
+          "std": 572.888987141294
+        },
+        "totalTardiness": {
+          "mean": 793.969,
+          "std": 280.9189659532126
+        },
+        "onTimeRate": {
+          "mean": 0.73892,
+          "std": 0.06540274883791626
+        },
+        "lateTasks": {
+          "mean": 9.2,
+          "std": 2.8982753492378874
+        },
+        "meanFlowTime": {
+          "mean": 93.708,
+          "std": 8.650022222193677
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1755.2669999999998,
+          "std": 595.8309660008915
+        },
+        "totalTardiness": {
+          "mean": 743.0939999999999,
+          "std": 284.6128456615329
+        },
+        "onTimeRate": {
+          "mean": 0.7635599999999999,
+          "std": 0.06084771884704382
+        },
+        "lateTasks": {
+          "mean": 8.3,
+          "std": 2.540778533354601
+        },
+        "meanFlowTime": {
+          "mean": 75.92600000000002,
+          "std": 8.511225528676817
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1516.6810000000003,
+          "std": 608.6529619751399
+        },
+        "totalTardiness": {
+          "mean": 644.8199999999999,
+          "std": 216.40495347585943
+        },
+        "onTimeRate": {
+          "mean": 0.7666,
+          "std": 0.05033613678726912
+        },
+        "lateTasks": {
+          "mean": 8.2,
+          "std": 2.250925735484551
+        },
+        "meanFlowTime": {
+          "mean": 94.297,
+          "std": 9.573102422934795
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 2
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1162.06,
+          "std": 506.29253533242354
+        },
+        "totalTardiness": {
+          "mean": 483.238,
+          "std": 209.29423699662635
+        },
+        "onTimeRate": {
+          "mean": 0.78407,
+          "std": 0.057385810286361076
+        },
+        "lateTasks": {
+          "mean": 7.6,
+          "std": 2.503331114069145
+        },
+        "meanFlowTime": {
+          "mean": 76.71400000000001,
+          "std": 7.037274093473031
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 7
+    },
+    {
+      "size": 50,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1626.425,
+          "std": 578.5027379604852
+        },
+        "totalTardiness": {
+          "mean": 711.063,
+          "std": 239.9356592019341
+        },
+        "onTimeRate": {
+          "mean": 0.75162,
+          "std": 0.08294520011563192
+        },
+        "lateTasks": {
+          "mean": 8.8,
+          "std": 3.521363372331802
+        },
+        "meanFlowTime": {
+          "mean": 93.73299999999999,
+          "std": 8.93782729004464
+        },
+        "makespan": {
+          "mean": 186,
+          "std": 14.302291968616622
+        }
+      },
+      "wins": 1
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1050.088,
+          "std": 294.1881480277545
+        },
+        "totalTardiness": {
+          "mean": 453.037,
+          "std": 151.9176477971609
+        },
+        "onTimeRate": {
+          "mean": 0.6420299999999999,
+          "std": 0.05872605043760392
+        },
+        "lateTasks": {
+          "mean": 12.5,
+          "std": 2.4608038433722332
+        },
+        "meanFlowTime": {
+          "mean": 32.989999999999995,
+          "std": 2.9117577738083456
+        },
+        "makespan": {
+          "mean": 65.25,
+          "std": 4.644291597697591
+        }
+      },
+      "wins": 1
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 914.887,
+          "std": 292.5771747780594
+        },
+        "totalTardiness": {
+          "mean": 411.87000000000006,
+          "std": 139.16642674630017
+        },
+        "onTimeRate": {
+          "mean": 0.6747499999999997,
+          "std": 0.057117972458568374
+        },
+        "lateTasks": {
+          "mean": 11.4,
+          "std": 2.7162065049951147
+        },
+        "meanFlowTime": {
+          "mean": 32.147,
+          "std": 2.9909086319117875
+        },
+        "makespan": {
+          "mean": 64.6,
+          "std": 5.269408568963566
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 946.2349999999999,
+          "std": 320.6448820476219
+        },
+        "totalTardiness": {
+          "mean": 400.261,
+          "std": 146.52739133008546
+        },
+        "onTimeRate": {
+          "mean": 0.69936,
+          "std": 0.0679882212020746
+        },
+        "lateTasks": {
+          "mean": 10.6,
+          "std": 3.0983866769659336
+        },
+        "meanFlowTime": {
+          "mean": 27.391,
+          "std": 3.145559303738102
+        },
+        "makespan": {
+          "mean": 65.75,
+          "std": 4.354116825871044
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 849.222,
+          "std": 280.5002820675944
+        },
+        "totalTardiness": {
+          "mean": 359.23099999999994,
+          "std": 115.43445388328966
+        },
+        "onTimeRate": {
+          "mean": 0.72868,
+          "std": 0.05066789033610058
+        },
+        "lateTasks": {
+          "mean": 9.5,
+          "std": 2.173067468400883
+        },
+        "meanFlowTime": {
+          "mean": 32.358000000000004,
+          "std": 3.2476617229426257
+        },
+        "makespan": {
+          "mean": 64.95,
+          "std": 4.90719426511276
+        }
+      },
+      "wins": 3
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 817.417,
+          "std": 342.9041778381956
+        },
+        "totalTardiness": {
+          "mean": 341.38300000000004,
+          "std": 140.58072106247158
+        },
+        "onTimeRate": {
+          "mean": 0.7308600000000001,
+          "std": 0.07230941540045502
+        },
+        "lateTasks": {
+          "mean": 9.5,
+          "std": 3.1710495984067415
+        },
+        "meanFlowTime": {
+          "mean": 27.119999999999997,
+          "std": 2.5323111973057344
+        },
+        "makespan": {
+          "mean": 65.05,
+          "std": 4.91285162722335
+        }
+      },
+      "wins": 6
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 895.1020000000001,
+          "std": 292.9094466744136
+        },
+        "totalTardiness": {
+          "mean": 385.50899999999996,
+          "std": 131.4153128613422
+        },
+        "onTimeRate": {
+          "mean": 0.70724,
+          "std": 0.07259190649713569
+        },
+        "lateTasks": {
+          "mean": 10.3,
+          "std": 3.2335051500740732
+        },
+        "meanFlowTime": {
+          "mean": 32.163,
+          "std": 3.0778854574023518
+        },
+        "makespan": {
+          "mean": 64.6,
+          "std": 5.435480148473035
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 875.716,
+          "std": 310.09200581619496
+        },
+        "totalTardiness": {
+          "mean": 373.557,
+          "std": 150.09378549945217
+        },
+        "onTimeRate": {
+          "mean": 0.7751199999999999,
+          "std": 0.07965974586396263
+        },
+        "lateTasks": {
+          "mean": 7.9,
+          "std": 3.142893217686178
+        },
+        "meanFlowTime": {
+          "mean": 32.989999999999995,
+          "std": 2.9117577738083456
+        },
+        "makespan": {
+          "mean": 65.25,
+          "std": 4.644291597697591
+        }
+      },
+      "wins": 1
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 776.464,
+          "std": 303.3381354638197
+        },
+        "totalTardiness": {
+          "mean": 339.732,
+          "std": 138.00940175703008
+        },
+        "onTimeRate": {
+          "mean": 0.7854399999999998,
+          "std": 0.06817463197146315
+        },
+        "lateTasks": {
+          "mean": 7.6,
+          "std": 2.913569784454954
+        },
+        "meanFlowTime": {
+          "mean": 32.147,
+          "std": 2.9909086319117875
+        },
+        "makespan": {
+          "mean": 64.6,
+          "std": 5.269408568963566
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 800.6119999999999,
+          "std": 330.8365026481274
+        },
+        "totalTardiness": {
+          "mean": 335.48999999999995,
+          "std": 144.41949283635887
+        },
+        "onTimeRate": {
+          "mean": 0.7887500000000001,
+          "std": 0.055718563633077756
+        },
+        "lateTasks": {
+          "mean": 7.4,
+          "std": 2.270584848790187
+        },
+        "meanFlowTime": {
+          "mean": 27.391,
+          "std": 3.145559303738102
+        },
+        "makespan": {
+          "mean": 65.75,
+          "std": 4.354116825871044
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 724.616,
+          "std": 303.69643290628227
+        },
+        "totalTardiness": {
+          "mean": 304.60499999999996,
+          "std": 122.73506917566617
+        },
+        "onTimeRate": {
+          "mean": 0.7976800000000001,
+          "std": 0.05976667224391125
+        },
+        "lateTasks": {
+          "mean": 7.1,
+          "std": 2.378141197564929
+        },
+        "meanFlowTime": {
+          "mean": 32.358000000000004,
+          "std": 3.2476617229426257
+        },
+        "makespan": {
+          "mean": 64.95,
+          "std": 4.90719426511276
+        }
+      },
+      "wins": 2
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 656.454,
+          "std": 322.84636470687485
+        },
+        "totalTardiness": {
+          "mean": 271.90999999999997,
+          "std": 132.5487838914832
+        },
+        "onTimeRate": {
+          "mean": 0.8180800000000001,
+          "std": 0.0480850126800903
+        },
+        "lateTasks": {
+          "mean": 6.4,
+          "std": 2.118699810942761
+        },
+        "meanFlowTime": {
+          "mean": 27.017000000000003,
+          "std": 2.569747285456512
+        },
+        "makespan": {
+          "mean": 65,
+          "std": 5.296749527356901
+        }
+      },
+      "wins": 7
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 766.913,
+          "std": 296.3600044259234
+        },
+        "totalTardiness": {
+          "mean": 326.629,
+          "std": 127.51335358829418
+        },
+        "onTimeRate": {
+          "mean": 0.79271,
+          "std": 0.06905980419575165
+        },
+        "lateTasks": {
+          "mean": 7.3,
+          "std": 2.7507574714370344
+        },
+        "meanFlowTime": {
+          "mean": 32.163,
+          "std": 3.0778854574023518
+        },
+        "makespan": {
+          "mean": 64.6,
+          "std": 5.435480148473035
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 768.405,
+          "std": 307.891287136295
+        },
+        "totalTardiness": {
+          "mean": 323.6940000000001,
+          "std": 143.50427219347085
+        },
+        "onTimeRate": {
+          "mean": 0.8242100000000001,
+          "std": 0.05548796566223466
+        },
+        "lateTasks": {
+          "mean": 6.2,
+          "std": 2.3944379994757297
+        },
+        "meanFlowTime": {
+          "mean": 32.989999999999995,
+          "std": 2.9117577738083456
+        },
+        "makespan": {
+          "mean": 65.25,
+          "std": 4.644291597697591
+        }
+      },
+      "wins": 1
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 708.5260000000001,
+          "std": 304.313240892049
+        },
+        "totalTardiness": {
+          "mean": 304.74799999999993,
+          "std": 131.98769343305372
+        },
+        "onTimeRate": {
+          "mean": 0.8411100000000001,
+          "std": 0.052986569577163196
+        },
+        "lateTasks": {
+          "mean": 5.6,
+          "std": 2.270584848790187
+        },
+        "meanFlowTime": {
+          "mean": 32.147,
+          "std": 2.9909086319117875
+        },
+        "makespan": {
+          "mean": 64.6,
+          "std": 5.269408568963566
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 709.152,
+          "std": 355.1284674217674
+        },
+        "totalTardiness": {
+          "mean": 294.091,
+          "std": 147.97454303959776
+        },
+        "onTimeRate": {
+          "mean": 0.8475400000000001,
+          "std": 0.05438580697204006
+        },
+        "lateTasks": {
+          "mean": 5.4,
+          "std": 2.319003617456812
+        },
+        "meanFlowTime": {
+          "mean": 27.391,
+          "std": 3.145559303738102
+        },
+        "makespan": {
+          "mean": 65.75,
+          "std": 4.354116825871044
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 658.077,
+          "std": 300.88266207019046
+        },
+        "totalTardiness": {
+          "mean": 275.80699999999996,
+          "std": 121.6492834202761
+        },
+        "onTimeRate": {
+          "mean": 0.8446100000000001,
+          "std": 0.05526404195617015
+        },
+        "lateTasks": {
+          "mean": 5.5,
+          "std": 2.3687784005919825
+        },
+        "meanFlowTime": {
+          "mean": 32.358000000000004,
+          "std": 3.2476617229426257
+        },
+        "makespan": {
+          "mean": 64.95,
+          "std": 4.90719426511276
+        }
+      },
+      "wins": 2
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 602.0840000000001,
+          "std": 322.5620050023113
+        },
+        "totalTardiness": {
+          "mean": 247.907,
+          "std": 134.2888915774909
+        },
+        "onTimeRate": {
+          "mean": 0.8593200000000001,
+          "std": 0.055987117565859154
+        },
+        "lateTasks": {
+          "mean": 5,
+          "std": 2.4037008503093262
+        },
+        "meanFlowTime": {
+          "mean": 26.967000000000002,
+          "std": 2.411108781360882
+        },
+        "makespan": {
+          "mean": 65.55,
+          "std": 5.35127191526567
+        }
+      },
+      "wins": 7
+    },
+    {
+      "size": 50,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 695.575,
+          "std": 300.33652533449873
+        },
+        "totalTardiness": {
+          "mean": 296.09799999999996,
+          "std": 126.39402674001471
+        },
+        "onTimeRate": {
+          "mean": 0.8441400000000001,
+          "std": 0.054306029949618764
+        },
+        "lateTasks": {
+          "mean": 5.5,
+          "std": 2.3213980461973533
+        },
+        "meanFlowTime": {
+          "mean": 32.163,
+          "std": 3.0778854574023518
+        },
+        "makespan": {
+          "mean": 64.6,
+          "std": 5.435480148473035
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 108380.16299999999,
+          "std": 9248.66657178458
+        },
+        "totalTardiness": {
+          "mean": 45071.903000000006,
+          "std": 4148.526310339479
+        },
+        "onTimeRate": {
+          "mean": 0.07139,
+          "std": 0.015615907132009832
+        },
+        "lateTasks": {
+          "mean": 127.8,
+          "std": 7.114929530376406
+        },
+        "meanFlowTime": {
+          "mean": 371.07800000000003,
+          "std": 15.036672799821408
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 92105.16,
+          "std": 8351.73502686584
+        },
+        "totalTardiness": {
+          "mean": 42899.985,
+          "std": 4305.5873094342305
+        },
+        "onTimeRate": {
+          "mean": 0.06905000000000001,
+          "std": 0.026405102621357954
+        },
+        "lateTasks": {
+          "mean": 128.3,
+          "std": 10.573026477262266
+        },
+        "meanFlowTime": {
+          "mean": 369.582,
+          "std": 16.966696005213677
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 85609.874,
+          "std": 13267.472153396815
+        },
+        "totalTardiness": {
+          "mean": 35708.941999999995,
+          "std": 4956.346445672345
+        },
+        "onTimeRate": {
+          "mean": 0.13926,
+          "std": 0.02317207131201026
+        },
+        "lateTasks": {
+          "mean": 118.6,
+          "std": 9.395034149308168
+        },
+        "meanFlowTime": {
+          "mean": 299.28100000000006,
+          "std": 20.626217108869536
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 86390.79999999999,
+          "std": 11377.381303318927
+        },
+        "totalTardiness": {
+          "mean": 35675.401,
+          "std": 4581.344207773401
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 137.7,
+          "std": 8.781925883439364
+        },
+        "meanFlowTime": {
+          "mean": 372.099,
+          "std": 19.161764851448893
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 66677.31400000001,
+          "std": 12095.39807479798
+        },
+        "totalTardiness": {
+          "mean": 28517.113,
+          "std": 4541.881368035963
+        },
+        "onTimeRate": {
+          "mean": 0.15990000000000004,
+          "std": 0.028625901247335817
+        },
+        "lateTasks": {
+          "mean": 115.8,
+          "std": 10.064238117656442
+        },
+        "meanFlowTime": {
+          "mean": 307.39,
+          "std": 15.159494274766113
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 90106.402,
+          "std": 8559.11079242438
+        },
+        "totalTardiness": {
+          "mean": 39973.366,
+          "std": 4007.502631848308
+        },
+        "onTimeRate": {
+          "mean": 0.07919,
+          "std": 0.05392433896983192
+        },
+        "lateTasks": {
+          "mean": 127,
+          "std": 13.581032524975576
+        },
+        "meanFlowTime": {
+          "mean": 370.576,
+          "std": 17.166764530465382
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 94762.76,
+          "std": 9061.519690282517
+        },
+        "totalTardiness": {
+          "mean": 39438.74199999999,
+          "std": 4055.916211212127
+        },
+        "onTimeRate": {
+          "mean": 0.14186,
+          "std": 0.02316300690516861
+        },
+        "lateTasks": {
+          "mean": 118.1,
+          "std": 6.967384333050994
+        },
+        "meanFlowTime": {
+          "mean": 371.07800000000003,
+          "std": 15.036672799821408
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 79244.30099999999,
+          "std": 7558.621493984276
+        },
+        "totalTardiness": {
+          "mean": 37138.143,
+          "std": 4068.271550114099
+        },
+        "onTimeRate": {
+          "mean": 0.13624999999999998,
+          "std": 0.03136375296421013
+        },
+        "lateTasks": {
+          "mean": 119,
+          "std": 9.797958971132712
+        },
+        "meanFlowTime": {
+          "mean": 369.582,
+          "std": 16.966696005213677
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 73744.588,
+          "std": 12413.168149228373
+        },
+        "totalTardiness": {
+          "mean": 30745.879000000004,
+          "std": 4670.447387107934
+        },
+        "onTimeRate": {
+          "mean": 0.22879999999999998,
+          "std": 0.03882527813451209
+        },
+        "lateTasks": {
+          "mean": 106.3,
+          "std": 9.978309810116475
+        },
+        "meanFlowTime": {
+          "mean": 299.28100000000006,
+          "std": 20.626217108869536
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 70079.33600000001,
+          "std": 10526.836725298504
+        },
+        "totalTardiness": {
+          "mean": 28959.332000000002,
+          "std": 4291.204054253305
+        },
+        "onTimeRate": {
+          "mean": 0.05081,
+          "std": 0.0890126888582621
+        },
+        "lateTasks": {
+          "mean": 131.1,
+          "std": 17.953334571110243
+        },
+        "meanFlowTime": {
+          "mean": 372.099,
+          "std": 19.161764851448893
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 55388.596,
+          "std": 11108.68934552407
+        },
+        "totalTardiness": {
+          "mean": 23726.677999999996,
+          "std": 4171.344661062346
+        },
+        "onTimeRate": {
+          "mean": 0.28757,
+          "std": 0.0486516426581193
+        },
+        "lateTasks": {
+          "mean": 98.3,
+          "std": 11.402241495035575
+        },
+        "meanFlowTime": {
+          "mean": 307.445,
+          "std": 15.23011873449011
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 77593.56,
+          "std": 7768.124670146157
+        },
+        "totalTardiness": {
+          "mean": 34353.40699999999,
+          "std": 3860.33620587364
+        },
+        "onTimeRate": {
+          "mean": 0.15567999999999999,
+          "std": 0.02939046708637948
+        },
+        "lateTasks": {
+          "mean": 116.2,
+          "std": 7.539525478731699
+        },
+        "meanFlowTime": {
+          "mean": 370.576,
+          "std": 17.166764530465382
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 72790.013,
+          "std": 8730.871540653952
+        },
+        "totalTardiness": {
+          "mean": 30304.735999999997,
+          "std": 3731.229759929323
+        },
+        "onTimeRate": {
+          "mean": 0.27915000000000006,
+          "std": 0.030357179271686845
+        },
+        "lateTasks": {
+          "mean": 99.3,
+          "std": 8.11103500725332
+        },
+        "meanFlowTime": {
+          "mean": 371.07800000000003,
+          "std": 15.036672799821408
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 58588.44,
+          "std": 6974.201911564265
+        },
+        "totalTardiness": {
+          "mean": 27486.462,
+          "std": 3710.7747884050063
+        },
+        "onTimeRate": {
+          "mean": 0.27968,
+          "std": 0.04898729540514675
+        },
+        "lateTasks": {
+          "mean": 99.2,
+          "std": 9.37846232361977
+        },
+        "meanFlowTime": {
+          "mean": 369.582,
+          "std": 16.966696005213677
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 56107.507999999994,
+          "std": 10761.771698730445
+        },
+        "totalTardiness": {
+          "mean": 23319.911,
+          "std": 4065.025717847988
+        },
+        "onTimeRate": {
+          "mean": 0.37832999999999994,
+          "std": 0.049634285865048304
+        },
+        "lateTasks": {
+          "mean": 85.7,
+          "std": 9.68446637088946
+        },
+        "meanFlowTime": {
+          "mean": 299.28100000000006,
+          "std": 20.626217108869536
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 49678.685,
+          "std": 7429.049746061069
+        },
+        "totalTardiness": {
+          "mean": 20538.247000000003,
+          "std": 2728.7482667497934
+        },
+        "onTimeRate": {
+          "mean": 0.41339000000000004,
+          "std": 0.07607177093596108
+        },
+        "lateTasks": {
+          "mean": 81,
+          "std": 13.5400640077266
+        },
+        "meanFlowTime": {
+          "mean": 372.099,
+          "std": 19.161764851448893
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 38646.62699999999,
+          "std": 8794.647960682361
+        },
+        "totalTardiness": {
+          "mean": 16539.678999999996,
+          "std": 3294.864981875248
+        },
+        "onTimeRate": {
+          "mean": 0.45394000000000007,
+          "std": 0.057540347197036934
+        },
+        "lateTasks": {
+          "mean": 75.3,
+          "std": 10.100055005350768
+        },
+        "meanFlowTime": {
+          "mean": 308.01300000000003,
+          "std": 15.233312946740554
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 200,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 56457.53300000001,
+          "std": 7722.30293721885
+        },
+        "totalTardiness": {
+          "mean": 24448.298,
+          "std": 3729.2857920721376
+        },
+        "onTimeRate": {
+          "mean": 0.26497000000000004,
+          "std": 0.0664508180703761
+        },
+        "lateTasks": {
+          "mean": 101.5,
+          "std": 13.778001790293589
+        },
+        "meanFlowTime": {
+          "mean": 370.576,
+          "std": 17.166764530465382
+        },
+        "makespan": {
+          "mean": 739.3,
+          "std": 24.36892374407299
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 28922.768,
+          "std": 3365.390981554578
+        },
+        "totalTardiness": {
+          "mean": 12032.298999999999,
+          "std": 1474.5848551631966
+        },
+        "onTimeRate": {
+          "mean": 0.20729999999999998,
+          "std": 0.021572770903257755
+        },
+        "lateTasks": {
+          "mean": 109.2,
+          "std": 8.256983576208551
+        },
+        "meanFlowTime": {
+          "mean": 124.516,
+          "std": 5.029002993746487
+        },
+        "makespan": {
+          "mean": 249.35,
+          "std": 8.670031398123333
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 24163.531,
+          "std": 2813.5185218964602
+        },
+        "totalTardiness": {
+          "mean": 11191.984,
+          "std": 1460.418178408728
+        },
+        "onTimeRate": {
+          "mean": 0.19024999999999997,
+          "std": 0.0232914028011291
+        },
+        "lateTasks": {
+          "mean": 111.6,
+          "std": 9.299940262651631
+        },
+        "meanFlowTime": {
+          "mean": 124.04399999999998,
+          "std": 5.669921026296967
+        },
+        "makespan": {
+          "mean": 250.35,
+          "std": 7.291738094888244
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 23012.715000000004,
+          "std": 4196.782910988024
+        },
+        "totalTardiness": {
+          "mean": 9570.401999999998,
+          "std": 1598.4202060840503
+        },
+        "onTimeRate": {
+          "mean": 0.30598000000000003,
+          "std": 0.04680156217715626
+        },
+        "lateTasks": {
+          "mean": 95.7,
+          "std": 10.403525043625038
+        },
+        "meanFlowTime": {
+          "mean": 101.82500000000002,
+          "std": 7.122721468028293
+        },
+        "makespan": {
+          "mean": 250.65,
+          "std": 8.058983944780026
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 20955.662,
+          "std": 2969.7403191517524
+        },
+        "totalTardiness": {
+          "mean": 8660.643999999998,
+          "std": 1169.6247655760753
+        },
+        "onTimeRate": {
+          "mean": 0.29767,
+          "std": 0.16428358307106244
+        },
+        "lateTasks": {
+          "mean": 97.6,
+          "std": 28.308616670155004
+        },
+        "meanFlowTime": {
+          "mean": 124.96599999999998,
+          "std": 6.438302398752157
+        },
+        "makespan": {
+          "mean": 250.05,
+          "std": 7.189691694827162
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 17474.165999999997,
+          "std": 3608.963277499202
+        },
+        "totalTardiness": {
+          "mean": 7459.814,
+          "std": 1350.4465854852936
+        },
+        "onTimeRate": {
+          "mean": 0.36018,
+          "std": 0.05431504395653197
+        },
+        "lateTasks": {
+          "mean": 88.3,
+          "std": 11.195733314278455
+        },
+        "meanFlowTime": {
+          "mean": 103.197,
+          "std": 5.108215713708437
+        },
+        "makespan": {
+          "mean": 249.35,
+          "std": 8.323494191477252
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 23695.374999999996,
+          "std": 3004.142386865361
+        },
+        "totalTardiness": {
+          "mean": 10316.511000000002,
+          "std": 1455.057857173079
+        },
+        "onTimeRate": {
+          "mean": 0.19098,
+          "std": 0.024190438882610903
+        },
+        "lateTasks": {
+          "mean": 111.4,
+          "std": 7.791733511299724
+        },
+        "meanFlowTime": {
+          "mean": 124.47,
+          "std": 5.837893455691016
+        },
+        "makespan": {
+          "mean": 250.3,
+          "std": 7.004760286167305
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 20658.538000000004,
+          "std": 3243.165008995585
+        },
+        "totalTardiness": {
+          "mean": 8577.753,
+          "std": 1354.4679714932763
+        },
+        "onTimeRate": {
+          "mean": 0.41083,
+          "std": 0.04286171692522101
+        },
+        "lateTasks": {
+          "mean": 81.2,
+          "std": 8.62554346113913
+        },
+        "meanFlowTime": {
+          "mean": 124.516,
+          "std": 5.029002993746487
+        },
+        "makespan": {
+          "mean": 249.35,
+          "std": 8.670031398123333
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 16814.587000000003,
+          "std": 2622.421941586102
+        },
+        "totalTardiness": {
+          "mean": 7676.115000000001,
+          "std": 1249.5598957255133
+        },
+        "onTimeRate": {
+          "mean": 0.42255000000000004,
+          "std": 0.06575814693928722
+        },
+        "lateTasks": {
+          "mean": 79.6,
+          "std": 11.354881475970295
+        },
+        "meanFlowTime": {
+          "mean": 124.04399999999998,
+          "std": 5.669921026296967
+        },
+        "makespan": {
+          "mean": 250.35,
+          "std": 7.291738094888244
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 16685.234999999997,
+          "std": 3480.9156052658523
+        },
+        "totalTardiness": {
+          "mean": 6894.994000000001,
+          "std": 1342.4520126759758
+        },
+        "onTimeRate": {
+          "mean": 0.5024000000000001,
+          "std": 0.041637509798524486
+        },
+        "lateTasks": {
+          "mean": 68.6,
+          "std": 7.904991390816875
+        },
+        "meanFlowTime": {
+          "mean": 101.82500000000002,
+          "std": 7.122721468028293
+        },
+        "makespan": {
+          "mean": 250.65,
+          "std": 8.058983944780026
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 14703.994000000002,
+          "std": 2500.5992821775076
+        },
+        "totalTardiness": {
+          "mean": 6065.946,
+          "std": 938.1852659043416
+        },
+        "onTimeRate": {
+          "mean": 0.53153,
+          "std": 0.051420187345697865
+        },
+        "lateTasks": {
+          "mean": 64.5,
+          "std": 8.11377429642539
+        },
+        "meanFlowTime": {
+          "mean": 124.96599999999998,
+          "std": 6.438302398752157
+        },
+        "makespan": {
+          "mean": 250.05,
+          "std": 7.189691694827162
+        }
+      },
+      "wins": 1
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 11894.676000000001,
+          "std": 2814.4189395294766
+        },
+        "totalTardiness": {
+          "mean": 5026.455,
+          "std": 1073.9504905850074
+        },
+        "onTimeRate": {
+          "mean": 0.5686399999999999,
+          "std": 0.04587590023337114
+        },
+        "lateTasks": {
+          "mean": 59.5,
+          "std": 8.263036837493694
+        },
+        "meanFlowTime": {
+          "mean": 102.848,
+          "std": 5.088965841242533
+        },
+        "makespan": {
+          "mean": 249.25,
+          "std": 8.390636315427917
+        }
+      },
+      "wins": 9
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 16021.313999999998,
+          "std": 2492.1283253039396
+        },
+        "totalTardiness": {
+          "mean": 6799.982999999998,
+          "std": 1124.6394223438908
+        },
+        "onTimeRate": {
+          "mean": 0.44853000000000004,
+          "std": 0.0632846137171851
+        },
+        "lateTasks": {
+          "mean": 76.1,
+          "std": 11.347540115226147
+        },
+        "meanFlowTime": {
+          "mean": 124.47,
+          "std": 5.837893455691016
+        },
+        "makespan": {
+          "mean": 250.3,
+          "std": 7.004760286167305
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 14905.809,
+          "std": 3064.338777320122
+        },
+        "totalTardiness": {
+          "mean": 6176.61,
+          "std": 1230.283955931403
+        },
+        "onTimeRate": {
+          "mean": 0.6264799999999999,
+          "std": 0.05241417959123487
+        },
+        "lateTasks": {
+          "mean": 51.5,
+          "std": 8.329999333066533
+        },
+        "meanFlowTime": {
+          "mean": 124.516,
+          "std": 5.029002993746487
+        },
+        "makespan": {
+          "mean": 249.35,
+          "std": 8.670031398123333
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 12064.903000000002,
+          "std": 2586.3883581939335
+        },
+        "totalTardiness": {
+          "mean": 5408.782000000001,
+          "std": 1063.981118293198
+        },
+        "onTimeRate": {
+          "mean": 0.64171,
+          "std": 0.050492539602950796
+        },
+        "lateTasks": {
+          "mean": 49.5,
+          "std": 8.809716857601675
+        },
+        "meanFlowTime": {
+          "mean": 124.04399999999998,
+          "std": 5.669921026296967
+        },
+        "makespan": {
+          "mean": 250.35,
+          "std": 7.291738094888244
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 12332.218,
+          "std": 3025.9879917394105
+        },
+        "totalTardiness": {
+          "mean": 5090.113,
+          "std": 1166.1619469300897
+        },
+        "onTimeRate": {
+          "mean": 0.6680699999999999,
+          "std": 0.04208000448880415
+        },
+        "lateTasks": {
+          "mean": 45.8,
+          "std": 7.208020224413605
+        },
+        "meanFlowTime": {
+          "mean": 101.82500000000002,
+          "std": 7.122721468028293
+        },
+        "makespan": {
+          "mean": 250.65,
+          "std": 8.058983944780026
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 10747.57,
+          "std": 2429.4289032289967
+        },
+        "totalTardiness": {
+          "mean": 4436.960000000001,
+          "std": 917.4804179078942
+        },
+        "onTimeRate": {
+          "mean": 0.68288,
+          "std": 0.0402447180799336
+        },
+        "lateTasks": {
+          "mean": 43.7,
+          "std": 6.3604681868204915
+        },
+        "meanFlowTime": {
+          "mean": 124.96599999999998,
+          "std": 6.438302398752157
+        },
+        "makespan": {
+          "mean": 250.05,
+          "std": 7.189691694827162
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 8168.777,
+          "std": 2348.1473824984764
+        },
+        "totalTardiness": {
+          "mean": 3397.897,
+          "std": 854.6224060568763
+        },
+        "onTimeRate": {
+          "mean": 0.71717,
+          "std": 0.04462908991528583
+        },
+        "lateTasks": {
+          "mean": 39,
+          "std": 7.118052168020874
+        },
+        "meanFlowTime": {
+          "mean": 103.155,
+          "std": 5.323650063631155
+        },
+        "makespan": {
+          "mean": 249.2,
+          "std": 8.41031113177945
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 200,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 11592.329000000002,
+          "std": 2378.917416050372
+        },
+        "totalTardiness": {
+          "mean": 4891.277,
+          "std": 973.1707327545358
+        },
+        "onTimeRate": {
+          "mean": 0.6507000000000002,
+          "std": 0.055774167656521566
+        },
+        "lateTasks": {
+          "mean": 48.2,
+          "std": 9.016035098028894
+        },
+        "meanFlowTime": {
+          "mean": 124.47,
+          "std": 5.837893455691016
+        },
+        "makespan": {
+          "mean": 250.3,
+          "std": 7.004760286167305
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 3091315.824,
+          "std": 95197.16238728978
+        },
+        "totalTardiness": {
+          "mean": 1274213.5510000002,
+          "std": 40527.917075904195
+        },
+        "onTimeRate": {
+          "mean": 0.01514,
+          "std": 0.003508782631562627
+        },
+        "lateTasks": {
+          "mean": 690.5,
+          "std": 15.671984912930178
+        },
+        "meanFlowTime": {
+          "mean": 1858.8789999999997,
+          "std": 53.837647804404604
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2616077.329,
+          "std": 92601.65149276113
+        },
+        "totalTardiness": {
+          "mean": 1196243.6459999997,
+          "std": 45725.45795233162
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 1854.8920000000005,
+          "std": 51.55112754451751
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2457112.424,
+          "std": 157249.63121714513
+        },
+        "totalTardiness": {
+          "mean": 1021905.686,
+          "std": 60702.68993989973
+        },
+        "onTimeRate": {
+          "mean": 0.032130000000000006,
+          "std": 0.004427201272938821
+        },
+        "lateTasks": {
+          "mean": 678.6,
+          "std": 15.798734126505199
+        },
+        "meanFlowTime": {
+          "mean": 1501.047,
+          "std": 57.634255834143936
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2527131.829,
+          "std": 108873.6296057912
+        },
+        "totalTardiness": {
+          "mean": 1038001.6459999997,
+          "std": 42493.3478974115
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 1857.509,
+          "std": 57.639349878745534
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1982111.2859999998,
+          "std": 119207.80559024689
+        },
+        "totalTardiness": {
+          "mean": 839005.901,
+          "std": 47715.66511189508
+        },
+        "onTimeRate": {
+          "mean": 0.03754999999999999,
+          "std": 0.006505254286600435
+        },
+        "lateTasks": {
+          "mean": 674.8,
+          "std": 15.353609781850434
+        },
+        "meanFlowTime": {
+          "mean": 1547.2420000000002,
+          "std": 50.915459516514
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 120,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2583103.429,
+          "std": 95782.0637670245
+        },
+        "totalTardiness": {
+          "mean": 1128844.9459999998,
+          "std": 42446.14776554199
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 1856.7290000000005,
+          "std": 53.330252296421776
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 3009522.7420000006,
+          "std": 92696.09596817593
+        },
+        "totalTardiness": {
+          "mean": 1240553.569,
+          "std": 39704.0796799023
+        },
+        "onTimeRate": {
+          "mean": 0.03051,
+          "std": 0.0072710155182523625
+        },
+        "lateTasks": {
+          "mean": 679.7,
+          "std": 14.689754555093453
+        },
+        "meanFlowTime": {
+          "mean": 1858.8789999999997,
+          "std": 53.837647804404604
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2535750.109,
+          "std": 89143.80392677519
+        },
+        "totalTardiness": {
+          "mean": 1162417.373,
+          "std": 44791.83818993961
+        },
+        "onTimeRate": {
+          "mean": 0.03765999999999999,
+          "std": 0.012160701734137988
+        },
+        "lateTasks": {
+          "mean": 674.6,
+          "std": 11.739770961233537
+        },
+        "meanFlowTime": {
+          "mean": 1854.8920000000005,
+          "std": 51.55112754451751
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2379699.0100000002,
+          "std": 155418.0383853866
+        },
+        "totalTardiness": {
+          "mean": 989361.05,
+          "std": 60361.414493118034
+        },
+        "onTimeRate": {
+          "mean": 0.05524000000000001,
+          "std": 0.008967496863673832
+        },
+        "lateTasks": {
+          "mean": 662.4,
+          "std": 16.59451047117021
+        },
+        "meanFlowTime": {
+          "mean": 1501.047,
+          "std": 57.634255834143936
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2442353.654,
+          "std": 106342.47577325338
+        },
+        "totalTardiness": {
+          "mean": 1003062.6350000001,
+          "std": 41804.625319892875
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 1857.509,
+          "std": 57.639349878745534
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1903149.3689999997,
+          "std": 117593.97225843537
+        },
+        "totalTardiness": {
+          "mean": 806099.607,
+          "std": 47317.58233143294
+        },
+        "onTimeRate": {
+          "mean": 0.06834,
+          "std": 0.007739537741005238
+        },
+        "lateTasks": {
+          "mean": 653.2,
+          "std": 15.852094148373231
+        },
+        "meanFlowTime": {
+          "mean": 1547.342,
+          "std": 50.92146737869996
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 240,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2498325.254,
+          "std": 93738.64439708409
+        },
+        "totalTardiness": {
+          "mean": 1093905.935,
+          "std": 41858.217043477256
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 1856.7290000000005,
+          "std": 53.330252296421776
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2852147.7370000007,
+          "std": 88978.57492925477
+        },
+        "totalTardiness": {
+          "mean": 1175741.8960000002,
+          "std": 38251.220538798865
+        },
+        "onTimeRate": {
+          "mean": 0.05974999999999999,
+          "std": 0.006340215558901238
+        },
+        "lateTasks": {
+          "mean": 659.2,
+          "std": 14.35115171529991
+        },
+        "meanFlowTime": {
+          "mean": 1858.8789999999997,
+          "std": 53.837647804404604
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2384091.4639999997,
+          "std": 88104.9494503817
+        },
+        "totalTardiness": {
+          "mean": 1097013.774,
+          "std": 44147.45844262467
+        },
+        "onTimeRate": {
+          "mean": 0.048560000000000006,
+          "std": 0.009727418294011348
+        },
+        "lateTasks": {
+          "mean": 667,
+          "std": 13.089435944047908
+        },
+        "meanFlowTime": {
+          "mean": 1854.8920000000005,
+          "std": 51.55112754451751
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2235336.1389999995,
+          "std": 151528.15240360357
+        },
+        "totalTardiness": {
+          "mean": 928476.5020000001,
+          "std": 59599.24235776545
+        },
+        "onTimeRate": {
+          "mean": 0.11105000000000002,
+          "std": 0.013253699693125525
+        },
+        "lateTasks": {
+          "mean": 623.2,
+          "std": 13.950706871776147
+        },
+        "meanFlowTime": {
+          "mean": 1501.047,
+          "std": 57.634255834143936
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2272797.315,
+          "std": 101784.57889972288
+        },
+        "totalTardiness": {
+          "mean": 933184.6129999999,
+          "std": 40599.49566762815
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 1857.509,
+          "std": 57.639349878745534
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 1753731.691,
+          "std": 114343.57161083985
+        },
+        "totalTardiness": {
+          "mean": 743182.312,
+          "std": 46553.73437362411
+        },
+        "onTimeRate": {
+          "mean": 0.13611,
+          "std": 0.013113390103249425
+        },
+        "lateTasks": {
+          "mean": 605.7,
+          "std": 16.36425644167461
+        },
+        "meanFlowTime": {
+          "mean": 1548.274,
+          "std": 51.01422725301464
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 1000,
+      "workers": 1,
+      "horizonHours": 480,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 2328954.6890000002,
+          "std": 90119.31428345614
+        },
+        "totalTardiness": {
+          "mean": 1024083.9809999999,
+          "std": 40812.45371182551
+        },
+        "onTimeRate": {
+          "mean": 0.00933,
+          "std": 0.016804896773130015
+        },
+        "lateTasks": {
+          "mean": 694.6,
+          "std": 20.586943003326702
+        },
+        "meanFlowTime": {
+          "mean": 1856.7290000000005,
+          "std": 53.330252296421776
+        },
+        "makespan": {
+          "mean": 3709.25,
+          "std": 82.6529726560932
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 983370.1939999999,
+          "std": 30507.70688232081
+        },
+        "totalTardiness": {
+          "mean": 405362.4939999999,
+          "std": 12975.728547350061
+        },
+        "onTimeRate": {
+          "mean": 0.04474,
+          "std": 0.006678023659736464
+        },
+        "lateTasks": {
+          "mean": 669.7,
+          "std": 13.23337531479487
+        },
+        "meanFlowTime": {
+          "mean": 620.4540000000001,
+          "std": 17.941063513627057
+        },
+        "makespan": {
+          "mean": 1239.4,
+          "std": 27.238453211100907
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 827601.2390000001,
+          "std": 29730.311755791317
+        },
+        "totalTardiness": {
+          "mean": 379458.46199999994,
+          "std": 14800.924914345205
+        },
+        "onTimeRate": {
+          "mean": 0.045399999999999996,
+          "std": 0.009861034428496842
+        },
+        "lateTasks": {
+          "mean": 669.2,
+          "std": 12.523755205386458
+        },
+        "meanFlowTime": {
+          "mean": 619.1019999999999,
+          "std": 17.255654017033237
+        },
+        "makespan": {
+          "mean": 1240.3,
+          "std": 27.713013389220436
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 777557.898,
+          "std": 51606.83048966675
+        },
+        "totalTardiness": {
+          "mean": 323036.375,
+          "std": 20147.391278208397
+        },
+        "onTimeRate": {
+          "mean": 0.08084,
+          "std": 0.008185651402844425
+        },
+        "lateTasks": {
+          "mean": 644.4,
+          "std": 13.475904422338415
+        },
+        "meanFlowTime": {
+          "mean": 502.322,
+          "std": 19.355617502133292
+        },
+        "makespan": {
+          "mean": 1239.6,
+          "std": 27.235393638915276
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 794076.629,
+          "std": 34809.90456193162
+        },
+        "totalTardiness": {
+          "mean": 326098.64600000007,
+          "std": 13742.960881459925
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 620.021,
+          "std": 19.265587311173366
+        },
+        "makespan": {
+          "mean": 1240.35,
+          "std": 27.710858280945878
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 620152.3290000001,
+          "std": 38883.902814840556
+        },
+        "totalTardiness": {
+          "mean": 262664.108,
+          "std": 15655.56633443539
+        },
+        "onTimeRate": {
+          "mean": 0.10213000000000001,
+          "std": 0.009353911837657367
+        },
+        "lateTasks": {
+          "mean": 629.5,
+          "std": 14.245857097572067
+        },
+        "meanFlowTime": {
+          "mean": 517.3279999999999,
+          "std": 17.061842938101524
+        },
+        "makespan": {
+          "mean": 1239.8,
+          "std": 27.399513377673944
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 120,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 812578.9789999999,
+          "std": 30724.880559191202
+        },
+        "totalTardiness": {
+          "mean": 356159.946,
+          "std": 13765.840164608915
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 619.7920000000001,
+          "std": 17.78679835033711
+        },
+        "makespan": {
+          "mean": 1240.3,
+          "std": 27.757081178602974
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 907419.3899999999,
+          "std": 29238.562222285233
+        },
+        "totalTardiness": {
+          "mean": 374105.29299999995,
+          "std": 12435.882029646704
+        },
+        "onTimeRate": {
+          "mean": 0.08281,
+          "std": 0.007161385651146324
+        },
+        "lateTasks": {
+          "mean": 643,
+          "std": 12.463279397226612
+        },
+        "meanFlowTime": {
+          "mean": 620.4540000000001,
+          "std": 17.941063513627057
+        },
+        "makespan": {
+          "mean": 1239.4,
+          "std": 27.238453211100907
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 753686.553,
+          "std": 28913.53637886514
+        },
+        "totalTardiness": {
+          "mean": 347361.79999999993,
+          "std": 14376.577841112106
+        },
+        "onTimeRate": {
+          "mean": 0.08167,
+          "std": 0.020070821828935877
+        },
+        "lateTasks": {
+          "mean": 643.8,
+          "std": 18.413762968678256
+        },
+        "meanFlowTime": {
+          "mean": 619.1019999999999,
+          "std": 17.255654017033237
+        },
+        "makespan": {
+          "mean": 1240.3,
+          "std": 27.713013389220436
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 709811.262,
+          "std": 49418.67333438933
+        },
+        "totalTardiness": {
+          "mean": 294691.198,
+          "std": 19583.871874374236
+        },
+        "onTimeRate": {
+          "mean": 0.15682,
+          "std": 0.017332294840685245
+        },
+        "lateTasks": {
+          "mean": 591.1,
+          "std": 15.645020507070825
+        },
+        "meanFlowTime": {
+          "mean": 502.322,
+          "std": 19.355617502133292
+        },
+        "makespan": {
+          "mean": 1239.6,
+          "std": 27.235393638915276
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 709298.4539999999,
+          "std": 32855.22314855286
+        },
+        "totalTardiness": {
+          "mean": 291159.635,
+          "std": 13258.698766217387
+        },
+        "onTimeRate": {
+          "mean": 0,
+          "std": 0
+        },
+        "lateTasks": {
+          "mean": 701.1,
+          "std": 14.865695035513438
+        },
+        "meanFlowTime": {
+          "mean": 620.021,
+          "std": 19.265587311173366
+        },
+        "makespan": {
+          "mean": 1240.35,
+          "std": 27.710858280945878
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 552468.025,
+          "std": 37389.29605130627
+        },
+        "totalTardiness": {
+          "mean": 234146.33899999998,
+          "std": 15256.101382604236
+        },
+        "onTimeRate": {
+          "mean": 0.19199,
+          "std": 0.01711538943628089
+        },
+        "lateTasks": {
+          "mean": 566.4,
+          "std": 13.39319893743753
+        },
+        "meanFlowTime": {
+          "mean": 517.52,
+          "std": 17.083051379787044
+        },
+        "makespan": {
+          "mean": 1239.8,
+          "std": 27.399513377673944
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 240,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 737506.824,
+          "std": 27052.99921553049
+        },
+        "totalTardiness": {
+          "mean": 324122.661,
+          "std": 12499.373717285423
+        },
+        "onTimeRate": {
+          "mean": 0.11248,
+          "std": 0.03347323308754823
+        },
+        "lateTasks": {
+          "mean": 622.1,
+          "std": 23.283041038489795
+        },
+        "meanFlowTime": {
+          "mean": 619.7920000000001,
+          "std": 17.78679835033711
+        },
+        "makespan": {
+          "mean": 1240.3,
+          "std": 27.757081178602974
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "fifo",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 770404.681,
+          "std": 28749.631188271094
+        },
+        "totalTardiness": {
+          "mean": 317649.26,
+          "std": 12074.26348273882
+        },
+        "onTimeRate": {
+          "mean": 0.15985999999999997,
+          "std": 0.010992441847823341
+        },
+        "lateTasks": {
+          "mean": 588.9,
+          "std": 8.006247560499238
+        },
+        "meanFlowTime": {
+          "mean": 620.4540000000001,
+          "std": 17.941063513627057
+        },
+        "makespan": {
+          "mean": 1239.4,
+          "std": 27.238453211100907
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "priority",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 628259.2920000001,
+          "std": 26338.9282509621
+        },
+        "totalTardiness": {
+          "mean": 290485.70499999996,
+          "std": 13198.75652663137
+        },
+        "onTimeRate": {
+          "mean": 0.14916,
+          "std": 0.018483698523594
+        },
+        "lateTasks": {
+          "mean": 596.5,
+          "std": 17.4052993207369
+        },
+        "meanFlowTime": {
+          "mean": 619.1019999999999,
+          "std": 17.255654017033237
+        },
+        "makespan": {
+          "mean": 1240.3,
+          "std": 27.713013389220436
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "spt",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 596169.611,
+          "std": 43997.63289693649
+        },
+        "totalTardiness": {
+          "mean": 247338.204,
+          "std": 17784.6036863551
+        },
+        "onTimeRate": {
+          "mean": 0.26128,
+          "std": 0.017675834099445245
+        },
+        "lateTasks": {
+          "mean": 517.9,
+          "std": 16.12072510086869
+        },
+        "meanFlowTime": {
+          "mean": 502.322,
+          "std": 19.355617502133292
+        },
+        "makespan": {
+          "mean": 1239.6,
+          "std": 27.235393638915276
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "edf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 543001.002,
+          "std": 28852.685675181023
+        },
+        "totalTardiness": {
+          "mean": 222607.977,
+          "std": 11835.211035420303
+        },
+        "onTimeRate": {
+          "mean": 0.08016999999999999,
+          "std": 0.1020564119603576
+        },
+        "lateTasks": {
+          "mean": 645.2,
+          "std": 75.58924085697205
+        },
+        "meanFlowTime": {
+          "mean": 620.021,
+          "std": 19.265587311173366
+        },
+        "makespan": {
+          "mean": 1240.35,
+          "std": 27.710858280945878
+        }
+      },
+      "wins": 0
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "wsjf",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 440457.988,
+          "std": 33771.78384101003
+        },
+        "totalTardiness": {
+          "mean": 186959.203,
+          "std": 14002.308508348862
+        },
+        "onTimeRate": {
+          "mean": 0.32416,
+          "std": 0.022307905922938312
+        },
+        "lateTasks": {
+          "mean": 473.8,
+          "std": 17.868656605601018
+        },
+        "meanFlowTime": {
+          "mean": 519.229,
+          "std": 17.044455892361793
+        },
+        "makespan": {
+          "mean": 1239.8,
+          "std": 27.399513377673944
+        }
+      },
+      "wins": 10
+    },
+    {
+      "size": 1000,
+      "workers": 3,
+      "horizonHours": 480,
+      "policy": "eisenhower",
+      "n": 10,
+      "metrics": {
+        "weightedTardiness": {
+          "mean": 616222.735,
+          "std": 24927.028406544418
+        },
+        "totalTardiness": {
+          "mean": 268649.88099999994,
+          "std": 12174.062519770328
+        },
+        "onTimeRate": {
+          "mean": 0.16556,
+          "std": 0.01562741181386092
+        },
+        "lateTasks": {
+          "mean": 585,
+          "std": 15.81841402360623
+        },
+        "meanFlowTime": {
+          "mean": 619.7920000000001,
+          "std": 17.78679835033711
+        },
+        "makespan": {
+          "mean": 1240.3,
+          "std": 27.757081178602974
+        }
+      },
+      "wins": 0
+    }
+  ]
+}

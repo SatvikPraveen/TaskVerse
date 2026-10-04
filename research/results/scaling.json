@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-10-04T00:57:55.215Z",
+  "node": "v20.20.0",
+  "platform": "darwin-arm64",
+  "repeats": 3,
+  "rows": [
+    {
+      "size": 100,
+      "edges": 103,
+      "topologicalMs": 0.06325,
+      "criticalPathMs": 0.150084,
+      "wsjfMs": 0.682417,
+      "simulateMs": 4.898041
+    },
+    {
+      "size": 1000,
+      "edges": 822,
+      "topologicalMs": 1.610333,
+      "criticalPathMs": 5.074959,
+      "wsjfMs": 3.184083,
+      "simulateMs": 243.204709
+    },
+    {
+      "size": 5000,
+      "edges": 4113,
+      "topologicalMs": 2.068416,
+      "criticalPathMs": 3.7545,
+      "wsjfMs": 8.198042,
+      "simulateMs": 6816.461375
+    },
+    {
+      "size": 20000,
+      "edges": 16361,
+      "topologicalMs": 15.719708,
+      "criticalPathMs": 50.632,
+      "wsjfMs": 60.935042,
+      "simulateMs": null
+    }
+  ]
+}

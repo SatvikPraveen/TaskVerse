@@ -1,35 +1,51 @@
 {
   "name": "taskverse",
-  "version": "1.0.0",
-  "description": "Full-stack task management application with real-time features",
+  "version": "2.0.0",
+  "description": "Task management platform with a research-grade planning and flow-analytics engine",
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "research"
   ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
-    "lint": "turbo run lint",
+    "test:coverage": "npm run test:coverage --workspace=apps/api && npm run test:coverage --workspace=packages/scheduler",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "turbo run typecheck",
+    "bench": "npm run bench --workspace=research",
+    "e2e": "npm run e2e --workspace=apps/web",
     "clean": "turbo run clean && rm -rf node_modules",
-    "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
-    "docker:down": "docker-compose -f docker/docker-compose.yml down",
-    "e2e": "turbo run e2e"
+    "docker:up": "docker compose -f docker/docker-compose.yml --env-file docker/.env up --build -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml --env-file docker/.env down"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "globals": "^13.24.0",
     "prettier": "^3.0.0",
     "turbo": "^1.10.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "wait-on": "^7.2.0"
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=18.17.0",
     "npm": ">=9.0.0"
   },
-  "packageManager": "npm@9.8.1"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SatvikPraveen/TaskVerse.git"
+  },
+  "author": "Satvik Praveen <satvikpraveen707@gmail.com>",
+  "license": "MIT"
 }

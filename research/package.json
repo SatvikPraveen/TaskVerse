@@ -1,0 +1,22 @@
+{
+  "name": "@taskverse/research",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reproducible benchmark and calibration experiments for the TaskVerse planning engine",
+  "scripts": {
+    "bench": "npm run bench:policies && npm run bench:forecast && npm run bench:scaling",
+    "bench:policies": "tsx benchmarks/policy-comparison.ts",
+    "bench:forecast": "tsx benchmarks/forecast-calibration.ts",
+    "bench:scaling": "tsx benchmarks/scaling.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint benchmarks lib --ext .ts"
+  },
+  "dependencies": {
+    "@taskverse/scheduler": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3"
+  }
+}
