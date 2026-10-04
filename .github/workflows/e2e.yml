@@ -50,7 +50,7 @@ jobs:
       - name: Run E2E tests
         run: npx playwright test --project=chromium
         working-directory: apps/web
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
