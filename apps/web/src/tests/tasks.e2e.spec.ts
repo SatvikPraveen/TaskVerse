@@ -31,8 +31,9 @@ test.describe('Tasks, categories and planning', () => {
     // Planner ranks it
     await page.getByRole('link', { name: 'Planner', exact: true }).click();
     await expect(page).toHaveURL(/\/planner$/);
-    await expect(page.getByText('Write the methodology section')).toBeVisible();
-    await expect(page.getByText(/CoD/)).toBeVisible();
+    const recommendations = page.getByRole('region', { name: 'Recommendations' });
+    await expect(recommendations.getByText('Write the methodology section')).toBeVisible();
+    await expect(recommendations.getByText(/CoD/)).toBeVisible();
   });
 
   test('changes a task status from the drawer and the dashboard reflects it', async ({
