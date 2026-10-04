@@ -2,8 +2,10 @@
 import { Dialog, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
+  ChartBarIcon,
   ClipboardDocumentCheckIcon,
   HomeIcon,
+  LightBulbIcon,
   TagIcon,
   UserCircleIcon,
   XMarkIcon,
@@ -22,6 +24,8 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Tasks', href: '/tasks', icon: ClipboardDocumentCheckIcon },
   { name: 'Categories', href: '/categories', icon: TagIcon },
+  { name: 'Planner', href: '/planner', icon: LightBulbIcon },
+  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
 ];
 
 function SidebarNav() {

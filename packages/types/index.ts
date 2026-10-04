@@ -8,6 +8,7 @@ export * from './zod/common.schema';
 export * from './zod/auth.schema';
 export * from './zod/category.schema';
 export * from './zod/task.schema';
+export * from './zod/planning.types';
 
 import type { Pagination } from './zod/common.schema';
 import type { Task, TaskStatus } from './zod/task.schema';

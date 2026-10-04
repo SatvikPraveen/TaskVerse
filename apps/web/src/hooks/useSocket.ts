@@ -46,6 +46,9 @@ export const useSocket = (userId?: string) => {
     const invalidate = (taskId?: string) => {
       queryClient.invalidateQueries(taskKeys.lists());
       queryClient.invalidateQueries(taskKeys.stats());
+      // Planning and analytics are derived from tasks; refresh them too.
+      queryClient.invalidateQueries(['planning']);
+      queryClient.invalidateQueries(['analytics']);
       if (taskId) queryClient.invalidateQueries(taskKeys.detail(taskId));
     };
     const isSomeoneElse = (actorId: string) => actorId !== userId;

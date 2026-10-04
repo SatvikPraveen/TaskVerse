@@ -1,10 +1,12 @@
 // apps/web/src/routes/index.tsx
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import AnalyticsPage from '@/features/analytics/AnalyticsPage';
 import LoginPage from '@/features/auth/LoginPage';
 import RegisterPage from '@/features/auth/RegisterPage';
 import CategoriesPage from '@/features/categories/CategoriesPage';
 import DashboardPage from '@/features/dashboard/DashboardPage';
+import PlannerPage from '@/features/planning/PlannerPage';
 import TasksPage from '@/features/tasks/TasksPage';
 
 import ProtectedRoute from './ProtectedRoute';
@@ -27,6 +29,8 @@ export default function AppRoutes({ isAuthenticated }: AppRoutesProps) {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="tasks" element={<TasksPage />} />
         <Route path="categories" element={<CategoriesPage />} />
+        <Route path="planner" element={<PlannerPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
