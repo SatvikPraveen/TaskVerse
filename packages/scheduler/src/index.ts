@@ -15,3 +15,4 @@ export * from './policies';
 export * from './simulate';
 export * from './forecast';
 export * from './metrics';
+export * from './fixtures';

@@ -1,5 +1,5 @@
 // packages/scheduler/src/simulate.ts
-import { buildGraph } from './graph';
+import { buildGraph, transitiveDependentCount } from './graph';
 import { getPolicy, type Policy, type PolicyContext } from './policies';
 import { mean, round } from './stats';
 import { isTerminal, MS_PER_HOUR, type SchedulableTask } from './types';
@@ -68,6 +68,7 @@ export const simulate = (
 
   const pending = tasks.filter(t => !isTerminal(t.status));
   const graph = buildGraph(tasks);
+  const dependentCounts = new Map([...graph.nodes.keys()].map(id => [id, transitiveDependentCount(graph, id)]));
   const finished = new Set<string>(tasks.filter(t => isTerminal(t.status)).map(t => t.id));
   const started = new Set<string>();
   const workerFreeAt = new Array<number>(workers).fill(0);
@@ -105,7 +106,12 @@ export const simulate = (
       continue;
     }
 
-    const [top] = policy(candidates, { now: nowDate, defaultEstimateHours: defaultEstimate, ...options.context });
+    const [top] = policy(candidates, {
+      now: nowDate,
+      defaultEstimateHours: defaultEstimate,
+      dependentCounts,
+      ...options.context,
+    });
     const task = top.task;
     const duration = durationOf(task);
     const finishHour = now + duration;
