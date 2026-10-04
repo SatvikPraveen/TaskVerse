@@ -24,17 +24,30 @@ describe('Planning API', () => {
   });
 
   it('rejects an unknown policy', async () => {
-    const res = await session.auth(request(app).get('/api/planning/recommendations?policy=magic')).expect(400);
+    const res = await session
+      .auth(request(app).get('/api/planning/recommendations?policy=magic'))
+      .expect(400);
     expect(res.body.error).toBe('Validation Error');
   });
 
   describe('recommendations', () => {
     it('ranks ready tasks and hides blocked ones by default', async () => {
-      const prereq = await createTask(session, { title: 'Prereq', estimatedHours: 1, dueDate: hoursFromNow(100) });
-      await createTask(session, { title: 'Blocked', dependencies: [prereq._id], priority: 'urgent', dueDate: hoursFromNow(1) });
+      const prereq = await createTask(session, {
+        title: 'Prereq',
+        estimatedHours: 1,
+        dueDate: hoursFromNow(100),
+      });
+      await createTask(session, {
+        title: 'Blocked',
+        dependencies: [prereq._id],
+        priority: 'urgent',
+        dueDate: hoursFromNow(1),
+      });
       await createTask(session, { title: 'Overdue small', estimatedHours: 0.5, dueDate: hoursFromNow(-5) });
 
-      const res = await session.auth(request(app).get('/api/planning/recommendations?policy=wsjf')).expect(200);
+      const res = await session
+        .auth(request(app).get('/api/planning/recommendations?policy=wsjf'))
+        .expect(200);
       const { totals, recommendations } = res.body.data;
       expect(totals).toEqual({ open: 3, ready: 2, blocked: 1 });
       expect(recommendations.map((r: { title: string }) => r.title)).toEqual(['Overdue small', 'Prereq']);
@@ -110,14 +123,22 @@ describe('Planning API', () => {
         const t = await createTask(session, { title: `Done ${i}` });
         await Task.updateOne(
           { _id: t._id },
-          { status: 'completed', startedAt: new Date(Date.now() - i * day - 3_600_000), completedAt: new Date(Date.now() - i * day) }
+          {
+            status: 'completed',
+            startedAt: new Date(Date.now() - i * day - 3_600_000),
+            completedAt: new Date(Date.now() - i * day),
+          }
         );
       }
       await createTask(session, { title: 'Open 1' });
       await createTask(session, { title: 'Open 2' });
 
-      const first = await session.auth(request(app).get('/api/planning/forecast?lookbackDays=7&seed=7&trials=500')).expect(200);
-      const second = await session.auth(request(app).get('/api/planning/forecast?lookbackDays=7&seed=7&trials=500')).expect(200);
+      const first = await session
+        .auth(request(app).get('/api/planning/forecast?lookbackDays=7&seed=7&trials=500'))
+        .expect(200);
+      const second = await session
+        .auth(request(app).get('/api/planning/forecast?lookbackDays=7&seed=7&trials=500'))
+        .expect(200);
 
       expect(first.body.data.remainingItems).toBe(2);
       expect(first.body.data.throughput.samples.reduce((a: number, b: number) => a + b, 0)).toBe(3);
@@ -134,7 +155,9 @@ describe('Planning API', () => {
       await createTask(session, { title: 'Old big', estimatedHours: 8, dueDate: hoursFromNow(40) });
       await createTask(session, { title: 'New tiny urgent', estimatedHours: 0.5, dueDate: hoursFromNow(1) });
 
-      const res = await session.auth(request(app).get('/api/planning/simulate?policies=fifo,edf&workers=1')).expect(200);
+      const res = await session
+        .auth(request(app).get('/api/planning/simulate?policies=fifo,edf&workers=1'))
+        .expect(200);
       expect(res.body.data.pendingTasks).toBe(2);
       expect(res.body.data.runs.map((r: { policy: string }) => r.policy)).toEqual(['edf', 'fifo']);
       expect(res.body.data.recommendedPolicy).toBe('edf');

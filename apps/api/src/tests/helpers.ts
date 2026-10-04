@@ -12,7 +12,9 @@ export interface TestSession {
 let counter = 0;
 
 /** Registers a fresh user and returns a helper that attaches its bearer token. */
-export const registerUser = async (overrides: Partial<{ username: string; email: string; password: string }> = {}): Promise<TestSession> => {
+export const registerUser = async (
+  overrides: Partial<{ username: string; email: string; password: string }> = {}
+): Promise<TestSession> => {
   counter += 1;
   const body = {
     username: overrides.username ?? `user${counter}_${Date.now().toString(36)}`,

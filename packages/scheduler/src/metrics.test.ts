@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { agingWip, cumulativeFlow, cycleTimesHours, flowSummary, leadTimesHours, periodsBetween, throughputSeries } from './metrics';
+import {
+  agingWip,
+  cumulativeFlow,
+  cycleTimesHours,
+  flowSummary,
+  leadTimesHours,
+  periodsBetween,
+  throughputSeries,
+} from './metrics';
 import { percentile, summarize } from './stats';
 import { MS_PER_HOUR, type SchedulableTask } from './types';
 
@@ -48,9 +56,15 @@ describe('cycle and lead times', () => {
 describe('periodsBetween', () => {
   it('yields each day and aligns weeks to Monday', () => {
     const days = periodsBetween({ from: h(5), to: h(24 * 2 + 1), bucket: 'day' });
-    assert.deepEqual(days.map(d => d.toISOString().slice(0, 10)), ['2026-01-05', '2026-01-06', '2026-01-07']);
+    assert.deepEqual(
+      days.map(d => d.toISOString().slice(0, 10)),
+      ['2026-01-05', '2026-01-06', '2026-01-07']
+    );
     const weeks = periodsBetween({ from: h(24 * 3), to: h(24 * 10), bucket: 'week' });
-    assert.deepEqual(weeks.map(d => d.toISOString().slice(0, 10)), ['2026-01-05', '2026-01-12']);
+    assert.deepEqual(
+      weeks.map(d => d.toISOString().slice(0, 10)),
+      ['2026-01-05', '2026-01-12']
+    );
   });
 });
 
@@ -88,10 +102,17 @@ describe('cumulativeFlow', () => {
 describe('agingWip', () => {
   it('lists open work oldest first with in-progress age', () => {
     const items = agingWip(
-      [task('old', { createdAt: h(-48), status: 'in_progress', startedAt: h(-24) }), task('new', { createdAt: h(-1) }), task('done', { status: 'completed' })],
+      [
+        task('old', { createdAt: h(-48), status: 'in_progress', startedAt: h(-24) }),
+        task('new', { createdAt: h(-1) }),
+        task('done', { status: 'completed' }),
+      ],
       h(0)
     );
-    assert.deepEqual(items.map(i => i.id), ['old', 'new']);
+    assert.deepEqual(
+      items.map(i => i.id),
+      ['old', 'new']
+    );
     assert.equal(items[0].inProgressHours, 24);
     assert.equal(items[1].inProgressHours, null);
   });
@@ -100,8 +121,20 @@ describe('agingWip', () => {
 describe('flowSummary', () => {
   it('derives throughput, Little’s Law and on-time rate', () => {
     const tasks = [
-      task('a', { createdAt: h(0), status: 'completed', startedAt: h(2), completedAt: h(12), dueDate: h(24) }),
-      task('b', { createdAt: h(0), status: 'completed', startedAt: h(2), completedAt: h(30), dueDate: h(24) }),
+      task('a', {
+        createdAt: h(0),
+        status: 'completed',
+        startedAt: h(2),
+        completedAt: h(12),
+        dueDate: h(24),
+      }),
+      task('b', {
+        createdAt: h(0),
+        status: 'completed',
+        startedAt: h(2),
+        completedAt: h(30),
+        dueDate: h(24),
+      }),
       task('c', { createdAt: h(0) }),
       task('d', { createdAt: h(0), status: 'in_progress', startedAt: h(1) }),
     ];

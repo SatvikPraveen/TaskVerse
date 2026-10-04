@@ -20,15 +20,15 @@ documents to `SchedulableTask`; the research harness generates them.
 
 ## Alternatives considered
 
-* **Implement planning inside API services** — simplest, but then benchmarks
+- **Implement planning inside API services** — simplest, but then benchmarks
   need a database and results depend on `Date.now()`.
-* **Use `Math.random()`** — not reproducible across runs or platforms.
+- **Use `Math.random()`** — not reproducible across runs or platforms.
 
 ## Consequences
 
-* Unit tests cover the CPM example with known slack values, EDF beating FIFO
+- Unit tests cover the CPM example with known slack values, EDF beating FIFO
   under deadline conflicts, cycle handling and determinism in milliseconds.
-* The same code path serves `/api/planning/*`, the research benchmarks and,
+- The same code path serves `/api/planning/*`, the research benchmarks and,
   potentially, the browser.
-* Adapting data is an explicit step (`toSchedulable`), which is where any
+- Adapting data is an explicit step (`toSchedulable`), which is where any
   mismatch between storage and algorithm assumptions becomes visible.

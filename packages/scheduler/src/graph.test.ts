@@ -11,7 +11,11 @@ import {
 } from './graph';
 import type { SchedulableTask } from './types';
 
-const task = (id: string, dependencies: string[] = [], status: SchedulableTask['status'] = 'todo'): SchedulableTask => ({
+const task = (
+  id: string,
+  dependencies: string[] = [],
+  status: SchedulableTask['status'] = 'todo'
+): SchedulableTask => ({
   id,
   priorityWeight: 2,
   createdAt: new Date('2026-01-01T00:00:00Z'),
@@ -105,6 +109,11 @@ describe('readyTasks', () => {
       task('cancelledDep', [], 'cancelled'),
       task('alsoReady', ['cancelledDep']),
     ]);
-    assert.deepEqual(readyTasks(g).map(t => t.id).sort(), ['alsoReady', 'ready']);
+    assert.deepEqual(
+      readyTasks(g)
+        .map(t => t.id)
+        .sort(),
+      ['alsoReady', 'ready']
+    );
   });
 });

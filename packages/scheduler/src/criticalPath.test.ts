@@ -16,7 +16,12 @@ const task = (id: string, estimatedHours: number, dependencies: string[] = []): 
 describe('criticalPath', () => {
   it('computes the textbook example correctly', () => {
     // a(3) → b(2) → d(4) ; a(3) → c(1) → d(4). Longest chain a-b-d = 9.
-    const result = criticalPath([task('a', 3), task('b', 2, ['a']), task('c', 1, ['a']), task('d', 4, ['b', 'c'])]);
+    const result = criticalPath([
+      task('a', 3),
+      task('b', 2, ['a']),
+      task('c', 1, ['a']),
+      task('d', 4, ['b', 'c']),
+    ]);
     assert.equal(result.cycle, null);
     assert.equal(result.makespan, 9);
     assert.deepEqual(result.criticalPath, ['a', 'b', 'd']);

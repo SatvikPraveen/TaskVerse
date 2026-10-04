@@ -34,29 +34,29 @@ export const unique = <T>(array: T[]): T[] => {
   return [...new Set(array)];
 };
 
-export const groupBy = <T, K extends keyof any>(
-  array: T[],
-  key: (item: T) => K
-): Record<K, T[]> => {
-  return array.reduce((groups, item) => {
-    const groupKey = key(item);
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-    groups[groupKey].push(item);
-    return groups;
-  }, {} as Record<K, T[]>);
+export const groupBy = <T, K extends PropertyKey>(array: T[], key: (item: T) => K): Record<K, T[]> => {
+  return array.reduce(
+    (groups, item) => {
+      const groupKey = key(item);
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(item);
+      return groups;
+    },
+    {} as Record<K, T[]>
+  );
 };
 
 export const sortBy = <T>(
   array: T[],
-  key: keyof T | ((item: T) => any),
+  key: keyof T | ((item: T) => unknown),
   order: 'asc' | 'desc' = 'asc'
 ): T[] => {
   return [...array].sort((a, b) => {
-    const aValue = typeof key === 'function' ? key(a) : a[key];
-    const bValue = typeof key === 'function' ? key(b) : b[key];
-    
+    const aValue = (typeof key === 'function' ? key(a) : a[key]) as number | string;
+    const bValue = (typeof key === 'function' ? key(b) : b[key]) as number | string;
+
     if (aValue < bValue) return order === 'asc' ? -1 : 1;
     if (aValue > bValue) return order === 'asc' ? 1 : -1;
     return 0;
@@ -64,10 +64,7 @@ export const sortBy = <T>(
 };
 
 // Object utilities
-export const pick = <T extends Record<string, any>, K extends keyof T>(
-  obj: T,
-  keys: K[]
-): Pick<T, K> => {
+export const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
   const result = {} as Pick<T, K>;
   keys.forEach(key => {
     if (key in obj) {
@@ -77,10 +74,7 @@ export const pick = <T extends Record<string, any>, K extends keyof T>(
   return result;
 };
 
-export const omit = <T extends Record<string, any>, K extends keyof T>(
-  obj: T,
-  keys: K[]
-): Omit<T, K> => {
+export const omit = <T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
   const result = { ...obj };
   keys.forEach(key => {
     delete result[key];
@@ -88,8 +82,8 @@ export const omit = <T extends Record<string, any>, K extends keyof T>(
   return result;
 };
 
-export const isEmpty = (value: any): boolean => {
-  if (value == null) return true;
+export const isEmpty = (value: unknown): boolean => {
+  if (value === null) return true;
   if (typeof value === 'string') return value.trim().length === 0;
   if (Array.isArray(value)) return value.length === 0;
   if (typeof value === 'object') return Object.keys(value).length === 0;
@@ -116,17 +110,17 @@ export const formatFileSize = (bytes: number): string => {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
   let size = bytes;
   let unitIndex = 0;
-  
+
   while (size >= 1024 && unitIndex < units.length - 1) {
     size /= 1024;
     unitIndex++;
   }
-  
+
   return `${round(size, 1)} ${units[unitIndex]}`;
 };
 
 export const getFileExtension = (filename: string): string => {
-  return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
+  return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2);
 };
 
 export const isImageFile = (filename: string): boolean => {
@@ -135,9 +129,9 @@ export const isImageFile = (filename: string): boolean => {
 };
 
 // URL utilities
-export const buildQueryString = (params: Record<string, any>): string => {
+export const buildQueryString = (params: Record<string, unknown>): string => {
   const searchParams = new URLSearchParams();
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== null && value !== undefined && value !== '') {
       if (Array.isArray(value)) {
@@ -147,14 +141,14 @@ export const buildQueryString = (params: Record<string, any>): string => {
       }
     }
   });
-  
+
   return searchParams.toString();
 };
 
-export const parseQueryString = (queryString: string): Record<string, any> => {
+export const parseQueryString = (queryString: string): Record<string, string | string[]> => {
   const params = new URLSearchParams(queryString);
-  const result: Record<string, any> = {};
-  
+  const result: Record<string, string | string[]> = {};
+
   for (const [key, value] of params.entries()) {
     if (result[key]) {
       if (Array.isArray(result[key])) {
@@ -166,7 +160,7 @@ export const parseQueryString = (queryString: string): Record<string, any> => {
       result[key] = value;
     }
   }
-  
+
   return result;
 };
 
@@ -185,18 +179,18 @@ export const hexToRgb = (hex: string): { r: number; g: number; b: number } | nul
 export const getContrastColor = (hex: string): string => {
   const rgb = hexToRgb(hex);
   if (!rgb) return '#000000';
-  
+
   const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
   return brightness > 128 ? '#000000' : '#ffffff';
 };
 
 // Debounce utility
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: never[]) => unknown>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
   let timeout: NodeJS.Timeout;
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
@@ -204,12 +198,12 @@ export const debounce = <T extends (...args: any[]) => any>(
 };
 
 // Throttle utility
-export const throttle = <T extends (...args: any[]) => any>(
+export const throttle = <T extends (...args: never[]) => unknown>(
   func: T,
   limit: number
 ): ((...args: Parameters<T>) => void) => {
   let inThrottle: boolean;
-  
+
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func.apply(this, args);
@@ -236,7 +230,7 @@ export const storage = {
   get: <T>(key: string, defaultValue?: T): T | null => {
     try {
       const item = resolveStorage()?.getItem(key);
-      return item ? (JSON.parse(item) as T) : defaultValue ?? null;
+      return item ? (JSON.parse(item) as T) : (defaultValue ?? null);
     } catch {
       return defaultValue ?? null;
     }
@@ -268,22 +262,22 @@ export const storage = {
 };
 
 // Type guards
-export const isString = (value: any): value is string => {
+export const isString = (value: unknown): value is string => {
   return typeof value === 'string';
 };
 
-export const isNumber = (value: any): value is number => {
+export const isNumber = (value: unknown): value is number => {
   return typeof value === 'number' && !isNaN(value);
 };
 
-export const isBoolean = (value: any): value is boolean => {
+export const isBoolean = (value: unknown): value is boolean => {
   return typeof value === 'boolean';
 };
 
-export const isObject = (value: any): value is object => {
+export const isObject = (value: unknown): value is object => {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 };
 
-export const isArray = <T>(value: any): value is T[] => {
+export const isArray = <T>(value: unknown): value is T[] => {
   return Array.isArray(value);
 };

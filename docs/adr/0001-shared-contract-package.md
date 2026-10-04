@@ -22,14 +22,14 @@ Node and ESM for the Vite bundle from one source.
 
 ## Alternatives considered
 
-* **Generate types from OpenAPI** — attractive, but the OpenAPI document is
+- **Generate types from OpenAPI** — attractive, but the OpenAPI document is
   hand-maintained and would then be the source of truth for validation as
   well; Zod gives runtime validation for free.
-* **tRPC** — would remove the REST surface that external clients and the
+- **tRPC** — would remove the REST surface that external clients and the
   research harness rely on.
 
 ## Consequences
 
-* A route change that alters a payload is a compile error in the client.
-* The OpenAPI document is still separate; its completeness is enforced by a
+- A route change that alters a payload is a compile error in the client.
+- The OpenAPI document is still separate; its completeness is enforced by a
   test (ADR 0006 covers the docs route), not by generation.

@@ -80,9 +80,15 @@ describe('Socket.IO bridge', () => {
     viewerClient.emit('task:join', task._id);
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    const fromAssignee = waitFor<{ oldStatus: string; newStatus: string }>(assigneeClient, 'task:status_changed');
+    const fromAssignee = waitFor<{ oldStatus: string; newStatus: string }>(
+      assigneeClient,
+      'task:status_changed'
+    );
     const fromViewer = waitFor<{ taskId: string }>(viewerClient, 'task:status_changed');
-    await session.auth(request(app).put(`/api/tasks/${task._id}`)).send({ status: 'completed' }).expect(200);
+    await session
+      .auth(request(app).put(`/api/tasks/${task._id}`))
+      .send({ status: 'completed' })
+      .expect(200);
 
     expect(await fromAssignee).toMatchObject({ oldStatus: 'todo', newStatus: 'completed' });
     expect((await fromViewer).taskId).toBe(task._id);

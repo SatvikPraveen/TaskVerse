@@ -15,7 +15,10 @@ export const writeJson = (name: string, data: unknown): string => {
   return file;
 };
 
-export const writeCsv = (name: string, rows: Array<Record<string, string | number | boolean | null>>): string => {
+export const writeCsv = (
+  name: string,
+  rows: Array<Record<string, string | number | boolean | null>>
+): string => {
   ensureResultsDir();
   const file = path.join(RESULTS_DIR, `${name}.csv`);
   if (rows.length === 0) {
@@ -50,7 +53,8 @@ export const fmt = (value: number, decimals = 2): string =>
 export const meanStd = (values: number[]): { mean: number; std: number } => {
   if (values.length === 0) return { mean: Number.NaN, std: Number.NaN };
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.length > 1 ? values.reduce((acc, v) => acc + (v - mean) ** 2, 0) / (values.length - 1) : 0;
+  const variance =
+    values.length > 1 ? values.reduce((acc, v) => acc + (v - mean) ** 2, 0) / (values.length - 1) : 0;
   return { mean, std: Math.sqrt(variance) };
 };
 
@@ -66,7 +70,12 @@ export const parseArgs = (argv: string[]): Record<string, string | true> => {
 };
 
 export const numberList = (value: string | true | undefined, fallback: number[]): number[] =>
-  typeof value === 'string' ? value.split(',').map(Number).filter(n => Number.isFinite(n)) : fallback;
+  typeof value === 'string'
+    ? value
+        .split(',')
+        .map(Number)
+        .filter(n => Number.isFinite(n))
+    : fallback;
 
 export const environmentStamp = () => ({
   generatedAt: new Date().toISOString(),

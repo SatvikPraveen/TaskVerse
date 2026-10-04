@@ -8,15 +8,34 @@
 // same workload instance, so differences are attributable to the policy
 // alone (a paired design). Reported: mean ± sample SD across seeds, and the
 // number of instances each policy "wins" (lowest weighted tardiness).
-import { generateWorkload, POLICY_NAMES, type PolicyName, simulate, type SimulationMetrics } from '@taskverse/scheduler';
+import {
+  generateWorkload,
+  POLICY_NAMES,
+  type PolicyName,
+  simulate,
+  type SimulationMetrics,
+} from '@taskverse/scheduler';
 
-import { environmentStamp, fmt, markdownTable, meanStd, numberList, parseArgs, writeCsv, writeJson, writeMarkdown } from '../lib/report';
+import {
+  environmentStamp,
+  fmt,
+  markdownTable,
+  meanStd,
+  numberList,
+  parseArgs,
+  writeCsv,
+  writeJson,
+  writeMarkdown,
+} from '../lib/report';
 
 const args = parseArgs(process.argv.slice(2));
 const SIZES = numberList(args.sizes, [50, 200, 1000]);
 const WORKERS = numberList(args.workers, [1, 3]);
 const HORIZONS = numberList(args.horizons, [120, 240, 480]);
-const SEEDS = numberList(args.seeds, Array.from({ length: 10 }, (_, i) => i + 1));
+const SEEDS = numberList(
+  args.seeds,
+  Array.from({ length: 10 }, (_, i) => i + 1)
+);
 const START = new Date('2026-01-05T09:00:00.000Z');
 
 type MetricKey = keyof SimulationMetrics;
@@ -50,7 +69,8 @@ for (const size of SIZES) {
           const t0 = process.hrtime.bigint();
           const result = simulate(tasks, { policy, start: START, workers });
           const elapsedMs = Number(process.hrtime.bigint() - t0) / 1e6;
-          if (result.unscheduled.length > 0) throw new Error(`${policy} left ${result.unscheduled.length} tasks unscheduled`);
+          if (result.unscheduled.length > 0)
+            throw new Error(`${policy} left ${result.unscheduled.length} tasks unscheduled`);
           rows.push({
             size,
             workers,
@@ -78,13 +98,16 @@ interface Cell {
   wins: number;
 }
 
-const groupKey = (r: { size: number; workers: number; horizonHours: number }) => `${r.size}|${r.workers}|${r.horizonHours}`;
+const groupKey = (r: { size: number; workers: number; horizonHours: number }) =>
+  `${r.size}|${r.workers}|${r.horizonHours}`;
 const cells = new Map<string, Cell>();
 
 for (const size of SIZES) {
   for (const workers of WORKERS) {
     for (const horizonHours of HORIZONS) {
-      const instanceRows = rows.filter(r => r.size === size && r.workers === workers && r.horizonHours === horizonHours);
+      const instanceRows = rows.filter(
+        r => r.size === size && r.workers === workers && r.horizonHours === horizonHours
+      );
       for (const policy of POLICY_NAMES) {
         const mine = instanceRows.filter(r => r.policy === policy);
         const metrics = {} as Cell['metrics'];
@@ -119,7 +142,10 @@ for (const size of SIZES)
     for (const horizonHours of HORIZONS)
       for (const seed of SEEDS) {
         const perInstance = rows
-          .filter(r => r.size === size && r.workers === workers && r.horizonHours === horizonHours && r.seed === seed)
+          .filter(
+            r =>
+              r.size === size && r.workers === workers && r.horizonHours === horizonHours && r.seed === seed
+          )
           .sort((a, b) => a.weightedTardiness - b.weightedTardiness);
         perInstance.forEach((r, i) => rankSums.set(r.policy, rankSums.get(r.policy)! + i + 1));
         instances += 1;
@@ -145,7 +171,13 @@ sections.push('## Overall ranking (by mean rank on weighted tardiness)');
 sections.push(
   markdownTable(
     ['Rank', 'Policy', 'Mean rank', 'Instance wins', 'Mean runtime (ms)'],
-    overall.map((o, i) => [i + 1, o.policy, fmt(o.meanRank), `${o.wins}/${instances}`, fmt(o.meanElapsedMs, 3)])
+    overall.map((o, i) => [
+      i + 1,
+      o.policy,
+      fmt(o.meanRank),
+      `${o.wins}/${instances}`,
+      fmt(o.meanElapsedMs, 3),
+    ])
   )
 );
 
@@ -153,15 +185,18 @@ for (const size of SIZES) {
   for (const workers of WORKERS) {
     for (const horizonHours of HORIZONS) {
       sections.push(`## n = ${size}, workers = ${workers}, horizon = ${horizonHours} h`);
-      const groupCells = POLICY_NAMES.map(p => cells.get(`${groupKey({ size, workers, horizonHours })}|${p}`)!).sort(
-        (a, b) => a.metrics.weightedTardiness.mean - b.metrics.weightedTardiness.mean
-      );
+      const groupCells = POLICY_NAMES.map(p =>
+        cells.get(`${groupKey({ size, workers, horizonHours })}|${p}`)!
+      ).sort((a, b) => a.metrics.weightedTardiness.mean - b.metrics.weightedTardiness.mean);
       sections.push(
         markdownTable(
           ['Policy', ...REPORTED.map(m => m.label + (m.lowerIsBetter ? '' : ' ↑')), 'Wins'],
           groupCells.map(c => [
             c.policy,
-            ...REPORTED.map(m => `${fmt(c.metrics[m.key].mean, m.key === 'onTimeRate' ? 3 : 1)} ± ${fmt(c.metrics[m.key].std, m.key === 'onTimeRate' ? 3 : 1)}`),
+            ...REPORTED.map(
+              m =>
+                `${fmt(c.metrics[m.key].mean, m.key === 'onTimeRate' ? 3 : 1)} ± ${fmt(c.metrics[m.key].std, m.key === 'onTimeRate' ? 3 : 1)}`
+            ),
             `${c.wins}/${SEEDS.length}`,
           ])
         )
@@ -171,9 +206,13 @@ for (const size of SIZES) {
 }
 
 sections.push('## Reproduce');
-sections.push('```bash\nnpm run bench:policies --workspace=research -- --sizes=50,200,1000 --workers=1,3 --horizons=120,240,480 --seeds=1,2,3,4,5,6,7,8,9,10\n```');
+sections.push(
+  '```bash\nnpm run bench:policies --workspace=research -- --sizes=50,200,1000 --workers=1,3 --horizons=120,240,480 --seeds=1,2,3,4,5,6,7,8,9,10\n```'
+);
 const stamp = environmentStamp();
-sections.push(`Generated ${stamp.generatedAt} on ${stamp.platform}, Node ${stamp.node}, in ${((Date.now() - started) / 1000).toFixed(1)} s.`);
+sections.push(
+  `Generated ${stamp.generatedAt} on ${stamp.platform}, Node ${stamp.node}, in ${((Date.now() - started) / 1000).toFixed(1)} s.`
+);
 
 const md = writeMarkdown('policy-comparison', sections.join('\n\n'));
 const json = writeJson('policy-comparison', {

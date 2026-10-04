@@ -63,8 +63,14 @@ describe('Task dependencies', () => {
 
   it('records status transitions and start/complete timestamps', async () => {
     const a = await createTask(session, { title: 'A' });
-    await session.auth(request(app).put(`/api/tasks/${a._id}`)).send({ status: 'in_progress' }).expect(200);
-    const done = await session.auth(request(app).put(`/api/tasks/${a._id}`)).send({ status: 'completed' }).expect(200);
+    await session
+      .auth(request(app).put(`/api/tasks/${a._id}`))
+      .send({ status: 'in_progress' })
+      .expect(200);
+    const done = await session
+      .auth(request(app).put(`/api/tasks/${a._id}`))
+      .send({ status: 'completed' })
+      .expect(200);
 
     const task = done.body.data.task;
     expect(task.startedAt).toBeTruthy();
@@ -75,7 +81,10 @@ describe('Task dependencies', () => {
 
   it('does not log a transition when the status is unchanged', async () => {
     const a = await createTask(session, { title: 'A' });
-    const res = await session.auth(request(app).put(`/api/tasks/${a._id}`)).send({ status: 'todo', title: 'A2' }).expect(200);
+    const res = await session
+      .auth(request(app).put(`/api/tasks/${a._id}`))
+      .send({ status: 'todo', title: 'A2' })
+      .expect(200);
     expect(res.body.data.task.statusHistory).toHaveLength(1);
   });
 });

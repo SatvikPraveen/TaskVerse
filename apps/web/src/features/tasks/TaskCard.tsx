@@ -1,6 +1,7 @@
 // apps/web/src/features/tasks/TaskCard.tsx
 import { CalendarIcon, ChatBubbleLeftIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
+
 import type { Task } from '@/api/tasks.api';
 import { formatDueDate } from '@/utils/date';
 
@@ -46,9 +47,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-medium text-gray-900 truncate">
-            {task.title}
-          </h3>
+          <h3 className="text-lg font-medium text-gray-900 truncate">{task.title}</h3>
           <span
             className={clsx(
               'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1',
@@ -58,33 +57,26 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
             {statusLabels[task.status]}
           </span>
         </div>
-        
+
         {task.category && (
           <div className="flex items-center gap-2 ml-3">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: task.category.color }}
-            />
-            <span className="text-sm text-gray-600 truncate max-w-20">
-              {task.category.name}
-            </span>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: task.category.color }} />
+            <span className="text-sm text-gray-600 truncate max-w-20">{task.category.name}</span>
           </div>
         )}
       </div>
 
       {/* Description */}
-      {task.description && (
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-          {task.description}
-        </p>
-      )}
+      {task.description && <p className="text-sm text-gray-600 mb-4 line-clamp-2">{task.description}</p>}
 
       {/* Progress Bar (if has subtasks) */}
       {totalSubtasks > 0 && (
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
             <span>Progress</span>
-            <span>{completedSubtasks}/{totalSubtasks}</span>
+            <span>
+              {completedSubtasks}/{totalSubtasks}
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
@@ -98,7 +90,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
       {/* Tags */}
       {task.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-4">
-          {task.tags.slice(0, 3).map((tag) => (
+          {task.tags.slice(0, 3).map(tag => (
             <span
               key={tag}
               className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700"
@@ -107,9 +99,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
             </span>
           ))}
           {task.tags.length > 3 && (
-            <span className="text-xs text-gray-500">
-              +{task.tags.length - 3} more
-            </span>
+            <span className="text-xs text-gray-500">+{task.tags.length - 3} more</span>
           )}
         </div>
       )}
@@ -123,7 +113,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
               <span>{task.comments.length}</span>
             </div>
           )}
-          
+
           {task.attachments.length > 0 && (
             <div className="flex items-center gap-1">
               <PaperClipIcon className="h-4 w-4" />
@@ -135,9 +125,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
         {dueDate && (
           <div className="flex items-center gap-1">
             <CalendarIcon className="h-4 w-4 text-gray-400" />
-            <span className={clsx('text-sm', dueDate.color)}>
-              {dueDate.text}
-            </span>
+            <span className={clsx('text-sm', dueDate.color)}>{dueDate.text}</span>
           </div>
         )}
       </div>

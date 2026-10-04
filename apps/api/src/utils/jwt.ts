@@ -15,8 +15,7 @@ const ISSUER = 'taskverse-api';
 const AUDIENCE = 'taskverse-client';
 
 /** jsonwebtoken types `expiresIn` as a template literal union; env strings need a cast. */
-const expiresIn = (value: string): SignOptions['expiresIn'] =>
-  value as unknown as SignOptions['expiresIn'];
+const expiresIn = (value: string): SignOptions['expiresIn'] => value as unknown as SignOptions['expiresIn'];
 
 export const generateAccessToken = (userId: string): string =>
   jwt.sign({ userId, type: 'access' } satisfies JwtPayload, env.JWT_SECRET, {

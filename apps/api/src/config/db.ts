@@ -5,8 +5,7 @@ import { env } from './env';
 import { logger } from './logger';
 
 export const connectDB = async (): Promise<void> => {
-  const mongoURI =
-    env.NODE_ENV === 'test' ? env.MONGODB_TEST_URI || env.MONGODB_URI : env.MONGODB_URI;
+  const mongoURI = env.NODE_ENV === 'test' ? env.MONGODB_TEST_URI || env.MONGODB_URI : env.MONGODB_URI;
 
   mongoose.connection.on('connected', () => logger.info('MongoDB connected'));
   mongoose.connection.on('error', err => logger.error({ err }, 'MongoDB connection error'));

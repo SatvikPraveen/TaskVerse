@@ -1,5 +1,6 @@
 // apps/web/src/api/auth.api.ts
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+
 import type {
   AuthResponse,
   ChangePasswordInput,
@@ -19,8 +20,7 @@ export const authApi = {
   login: (data: LoginInput) => api.post<AuthResponse>('/auth/login', data),
   logout: (refreshToken: string) => api.post('/auth/logout', { refreshToken }),
   logoutAll: () => api.post('/auth/logout-all'),
-  refreshToken: (refreshToken: string) =>
-    api.post<{ tokens: TokenPair }>('/auth/refresh', { refreshToken }),
+  refreshToken: (refreshToken: string) => api.post<{ tokens: TokenPair }>('/auth/refresh', { refreshToken }),
   getProfile: () => api.get<{ user: User }>('/users/profile'),
   changePassword: (data: ChangePasswordInput) => api.post('/auth/change-password', data),
   getSessions: () => api.get<{ sessions: Session[] }>('/auth/sessions'),

@@ -57,9 +57,7 @@ export class AuthService {
     deviceInfo?: string,
     ipAddress?: string
   ): Promise<LoginResult> {
-    const user = await User.findOne({ email: email.toLowerCase(), isActive: true }).select(
-      '+password'
-    );
+    const user = await User.findOne({ email: email.toLowerCase(), isActive: true }).select('+password');
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw createError('Invalid credentials', 401);
     }
@@ -108,11 +106,7 @@ export class AuthService {
     await RefreshToken.updateMany({ userId, isRevoked: false }, { isRevoked: true });
   }
 
-  static async changePassword(
-    userId: string,
-    currentPassword: string,
-    newPassword: string
-  ): Promise<void> {
+  static async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
     const user = await User.findById(userId).select('+password');
     if (!user) {
       throw createError('User not found', 404);

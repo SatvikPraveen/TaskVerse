@@ -7,14 +7,14 @@ reproducible bit-for-bit.
 
 ## What it provides
 
-| Module | Algorithm | Reference |
-| --- | --- | --- |
-| `graph` | Dependency DAG, Kahn topological sort, three-colour cycle detection, cycle-safe edge insertion, transitive fan-out | Kahn (1962) |
-| `criticalPath` | Critical Path Method: forward/backward pass, slack, critical chain | Kelley & Walker (1959) |
-| `policies` | FIFO, static priority, Shortest Processing Time, Earliest Deadline First, Weighted Shortest Job First, Eisenhower matrix | Smith (1956); Liu & Layland (1973); Reinertsen (2009); Covey (1989) |
-| `simulate` | Non-preemptive list scheduling on *k* workers with dependency constraints; makespan, flow time, (weighted) tardiness, on-time rate | Graham (1966) |
-| `forecast` | Monte Carlo completion forecast by bootstrap resampling of throughput | Vacanti (2015) |
-| `metrics` | Cycle time, lead time, throughput, cumulative flow, aging WIP, Little's Law | Little (1961) |
+| Module         | Algorithm                                                                                                                          | Reference                                                           |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `graph`        | Dependency DAG, Kahn topological sort, three-colour cycle detection, cycle-safe edge insertion, transitive fan-out                 | Kahn (1962)                                                         |
+| `criticalPath` | Critical Path Method: forward/backward pass, slack, critical chain                                                                 | Kelley & Walker (1959)                                              |
+| `policies`     | FIFO, static priority, Shortest Processing Time, Earliest Deadline First, Weighted Shortest Job First, Eisenhower matrix           | Smith (1956); Liu & Layland (1973); Reinertsen (2009); Covey (1989) |
+| `simulate`     | Non-preemptive list scheduling on _k_ workers with dependency constraints; makespan, flow time, (weighted) tardiness, on-time rate | Graham (1966)                                                       |
+| `forecast`     | Monte Carlo completion forecast by bootstrap resampling of throughput                                                              | Vacanti (2015)                                                      |
+| `metrics`      | Cycle time, lead time, throughput, cumulative flow, aging WIP, Little's Law                                                        | Little (1961)                                                       |
 
 ## Usage
 

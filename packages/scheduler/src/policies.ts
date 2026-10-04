@@ -45,7 +45,8 @@ export type Policy = (tasks: readonly SchedulableTask[], ctx: PolicyContext) => 
 
 const jobSize = (task: SchedulableTask, ctx: PolicyContext): number => {
   const estimate = task.estimatedHours;
-  const hours = estimate !== undefined && estimate !== null && estimate > 0 ? estimate : ctx.defaultEstimateHours ?? 2;
+  const hours =
+    estimate !== undefined && estimate !== null && estimate > 0 ? estimate : (ctx.defaultEstimateHours ?? 2);
   return Math.max(0.25, hours);
 };
 

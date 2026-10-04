@@ -1,24 +1,25 @@
 // apps/web/src/features/tasks/TaskDrawer.tsx
-import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { 
-  XMarkIcon, 
-  CalendarIcon, 
+import {
+  XMarkIcon,
+  CalendarIcon,
   ChatBubbleLeftIcon,
   PaperClipIcon,
   CheckCircleIcon,
   PencilIcon,
-  TrashIcon
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
-import type { TaskPriority, TaskStatus } from '@taskverse/types';
-import type { Task } from '@/api/tasks.api';
-import { useUpdateTask, useDeleteTask, useAddComment, useUpdateSubtask } from '@/api/tasks.api';
-import { formatDate, formatTimeAgo } from '@/utils/date';
-import Button from '@/components/Button';
-import Input from '@/components/Input';
+import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+
+import { useUpdateTask, useDeleteTask, useAddComment, useUpdateSubtask } from '@/api/tasks.api';
+import type { Task } from '@/api/tasks.api';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
+import { formatDate, formatTimeAgo } from '@/utils/date';
+import type { TaskPriority, TaskStatus } from '@taskverse/types';
 
 interface TaskDrawerProps {
   task: Task | null;
@@ -47,13 +48,18 @@ interface CommentForm {
 export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingPriority, setEditingPriority] = useState(false);
-  
+
   const updateTaskMutation = useUpdateTask();
   const deleteTaskMutation = useDeleteTask();
   const addCommentMutation = useAddComment();
   const updateSubtaskMutation = useUpdateSubtask();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CommentForm>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CommentForm>();
 
   if (!task) return null;
 
@@ -61,7 +67,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
     try {
       await updateTaskMutation.mutateAsync({
         taskId: task._id,
-        data: { status: newStatus as TaskStatus }
+        data: { status: newStatus as TaskStatus },
       });
       setEditingStatus(false);
       toast.success('Task status updated');
@@ -74,7 +80,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
     try {
       await updateTaskMutation.mutateAsync({
         taskId: task._id,
-        data: { priority: newPriority as TaskPriority }
+        data: { priority: newPriority as TaskPriority },
       });
       setEditingPriority(false);
       toast.success('Task priority updated');
@@ -85,7 +91,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
 
   const handleDeleteTask = async () => {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
-    
+
     try {
       await deleteTaskMutation.mutateAsync(task._id);
       onClose();
@@ -100,7 +106,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
       await updateSubtaskMutation.mutateAsync({
         taskId: task._id,
         subtaskId,
-        data: { isCompleted }
+        data: { isCompleted },
       });
     } catch (error) {
       toast.error('Failed to update subtask');
@@ -111,7 +117,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
     try {
       await addCommentMutation.mutateAsync({
         taskId: task._id,
-        data: { content: data.content }
+        data: { content: data.content },
       });
       reset();
       toast.success('Comment added');
@@ -174,18 +180,14 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                     <div className="relative mt-6 flex-1 px-4 sm:px-6 space-y-6">
                       {/* Title and Category */}
                       <div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                          {task.title}
-                        </h1>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">{task.title}</h1>
                         {task.category && (
                           <div className="flex items-center gap-2">
                             <div
                               className="w-3 h-3 rounded-full"
                               style={{ backgroundColor: task.category.color }}
                             />
-                            <span className="text-sm text-gray-600">
-                              {task.category.name}
-                            </span>
+                            <span className="text-sm text-gray-600">{task.category.name}</span>
                           </div>
                         )}
                       </div>
@@ -193,14 +195,12 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                       {/* Status and Priority */}
                       <div className="flex gap-4">
                         <div>
-                          <label className="text-sm font-medium text-gray-700 block mb-1">
-                            Status
-                          </label>
+                          <label className="text-sm font-medium text-gray-700 block mb-1">Status</label>
                           {editingStatus ? (
                             <select
                               className="rounded-md border-gray-300 text-sm"
                               value={task.status}
-                              onChange={(e) => handleStatusChange(e.target.value)}
+                              onChange={e => handleStatusChange(e.target.value)}
                               onBlur={() => setEditingStatus(false)}
                               autoFocus
                             >
@@ -225,14 +225,12 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                         </div>
 
                         <div>
-                          <label className="text-sm font-medium text-gray-700 block mb-1">
-                            Priority
-                          </label>
+                          <label className="text-sm font-medium text-gray-700 block mb-1">Priority</label>
                           {editingPriority ? (
                             <select
                               className="rounded-md border-gray-300 text-sm"
                               value={task.priority}
-                              onChange={(e) => handlePriorityChange(e.target.value)}
+                              onChange={e => handlePriorityChange(e.target.value)}
                               onBlur={() => setEditingPriority(false)}
                               autoFocus
                             >
@@ -260,12 +258,8 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                       {/* Description */}
                       {task.description && (
                         <div>
-                          <h3 className="text-sm font-medium text-gray-700 mb-2">
-                            Description
-                          </h3>
-                          <p className="text-sm text-gray-900 whitespace-pre-wrap">
-                            {task.description}
-                          </p>
+                          <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
+                          <p className="text-sm text-gray-900 whitespace-pre-wrap">{task.description}</p>
                         </div>
                       )}
 
@@ -298,7 +292,8 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                       {task.subtasks.length > 0 && (
                         <div>
                           <h3 className="text-sm font-medium text-gray-700 mb-2">
-                            Subtasks ({task.subtasks.filter(s => s.isCompleted).length}/{task.subtasks.length})
+                            Subtasks ({task.subtasks.filter(s => s.isCompleted).length}/{task.subtasks.length}
+                            )
                           </h3>
                           <div className="space-y-2">
                             {task.subtasks.map(subtask => (
@@ -312,14 +307,14 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                                       : 'border-gray-300 hover:border-gray-400'
                                   )}
                                 >
-                                  {subtask.isCompleted && (
-                                    <CheckCircleIcon className="w-3 h-3 text-white" />
-                                  )}
+                                  {subtask.isCompleted && <CheckCircleIcon className="w-3 h-3 text-white" />}
                                 </button>
-                                <span className={clsx(
-                                  'text-sm',
-                                  subtask.isCompleted ? 'text-gray-500 line-through' : 'text-gray-900'
-                                )}>
+                                <span
+                                  className={clsx(
+                                    'text-sm',
+                                    subtask.isCompleted ? 'text-gray-500 line-through' : 'text-gray-900'
+                                  )}
+                                >
                                   {subtask.title}
                                 </span>
                               </div>
@@ -334,7 +329,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                           <ChatBubbleLeftIcon className="h-4 w-4" />
                           Comments ({task.comments.length})
                         </h3>
-                        
+
                         {/* Add Comment */}
                         <form onSubmit={handleSubmit(onCommentSubmit)} className="mb-4">
                           <Input
@@ -378,9 +373,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                                     {formatTimeAgo(comment.createdAt)}
                                   </span>
                                 </div>
-                                <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                                  {comment.content}
-                                </p>
+                                <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.content}</p>
                               </div>
                             </div>
                           ))}
@@ -404,9 +397,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                                 className="flex items-center gap-2 p-2 rounded border hover:bg-gray-50"
                               >
                                 <PaperClipIcon className="h-4 w-4 text-gray-400" />
-                                <span className="text-sm text-gray-900">
-                                  {attachment.originalName}
-                                </span>
+                                <span className="text-sm text-gray-900">{attachment.originalName}</span>
                                 <span className="text-xs text-gray-500 ml-auto">
                                   {(attachment.size / 1024).toFixed(1)} KB
                                 </span>

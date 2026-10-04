@@ -1,9 +1,9 @@
 // apps/web/src/features/categories/CategoryForm.tsx
 import { useForm } from 'react-hook-form';
-import { CATEGORY_COLORS, type Category, type CreateCategoryInput } from '@taskverse/types';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { CATEGORY_COLORS, type Category, type CreateCategoryInput } from '@taskverse/types';
 
 interface CategoryFormProps {
   initialData?: Category;
@@ -90,9 +90,7 @@ export default function CategoryForm({ initialData, onSubmit, onCancel, isLoadin
             maxLength: { value: 500, message: 'Description must not exceed 500 characters' },
           })}
         />
-        {errors.description && (
-          <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
-        )}
+        {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>}
       </div>
 
       <div>

@@ -2,8 +2,8 @@
 ├── .editorconfig
 ├── .github
 │   └── workflows
-│       ├── ci.yml
-│       └── e2e.yml
+│   ├── ci.yml
+│   └── e2e.yml
 ├── .gitignore
 ├── .prettierrc
 ├── apps
@@ -42,9 +42,9 @@
 │   │   │   │   │   ├── upload.controller.ts
 │   │   │   │   │   └── upload.routes.ts
 │   │   │   │   └── users
-│   │   │   │       ├── user.controller.ts
-│   │   │   │       ├── user.model.ts
-│   │   │   │       └── user.routes.ts
+│   │   │   │   ├── user.controller.ts
+│   │   │   │   ├── user.model.ts
+│   │   │   │   └── user.routes.ts
 │   │   │   ├── server.ts
 │   │   │   ├── sockets
 │   │   │   │   ├── init.ts
@@ -55,67 +55,67 @@
 │   │   │   │   ├── setup.ts
 │   │   │   │   └── tasks.int.test.ts
 │   │   │   └── utils
-│   │   │       ├── jwt.ts
-│   │   │       ├── pagination.ts
-│   │   │       └── passwords.ts
+│   │   │   ├── jwt.ts
+│   │   │   ├── pagination.ts
+│   │   │   └── passwords.ts
 │   │   └── tsconfig.json
 │   └── web
-│       ├── .env.example
-│       ├── index.html
-│       ├── package.json
-│       ├── playwright.config.ts
-│       ├── postcss.config.js
-│       ├── public
-│       ├── src
-│       │   ├── api
-│       │   │   ├── auth.api.ts
-│       │   │   ├── categories.api.ts
-│       │   │   ├── client.ts
-│       │   │   └── tasks.api.ts
-│       │   ├── App.tsx
-│       │   ├── components
-│       │   │   ├── Button.tsx
-│       │   │   ├── Input.tsx
-│       │   │   ├── Layout.tsx
-│       │   │   ├── Modal.tsx
-│       │   │   └── Toaster.tsx
-│       │   ├── features
-│       │   │   ├── auth
-│       │   │   │   ├── LoginPage.tsx
-│       │   │   │   └── RegisterPage.tsx
-│       │   │   ├── categories
-│       │   │   │   ├── CategoriesPage.tsx
-│       │   │   │   └── CategoryForm.tsx
-│       │   │   ├── dashboard
-│       │   │   │   ├── charts
-│       │   │   │   │   ├── CategoryDistribution.tsx
-│       │   │   │   │   └── TaskOverview.tsx
-│       │   │   │   └── DashboardPage.tsx
-│       │   │   └── tasks
-│       │   │       ├── CreateTasksForm.tsx
-│       │   │       ├── FiltersBar.tsx
-│       │   │       ├── TaskCard.tsx
-│       │   │       ├── TaskDrawer.tsx
-│       │   │       └── TasksPage.tsx
-│       │   ├── hooks
-│       │   │   └── useSocket.ts
-│       │   ├── main.tsx
-│       │   ├── routes
-│       │   │   ├── index.tsx
-│       │   │   └── ProtectedRoute.tsx
-│       │   ├── store
-│       │   │   └── auth.store.ts
-│       │   ├── styles
-│       │   │   └── tailwind.css
-│       │   ├── tests
-│       │   │   ├── auth.e2e.spec.ts
-│       │   │   └── setup.ts
-│       │   └── utils
-│       │       ├── date.ts
-│       │       └── zod-helpers.ts
-│       ├── tailwind.config.js
-│       ├── tsconfig.json
-│       └── vite.config.ts
+│   ├── .env.example
+│   ├── index.html
+│   ├── package.json
+│   ├── playwright.config.ts
+│   ├── postcss.config.js
+│   ├── public
+│   ├── src
+│   │   ├── api
+│   │   │   ├── auth.api.ts
+│   │   │   ├── categories.api.ts
+│   │   │   ├── client.ts
+│   │   │   └── tasks.api.ts
+│   │   ├── App.tsx
+│   │   ├── components
+│   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── Layout.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   └── Toaster.tsx
+│   │   ├── features
+│   │   │   ├── auth
+│   │   │   │   ├── LoginPage.tsx
+│   │   │   │   └── RegisterPage.tsx
+│   │   │   ├── categories
+│   │   │   │   ├── CategoriesPage.tsx
+│   │   │   │   └── CategoryForm.tsx
+│   │   │   ├── dashboard
+│   │   │   │   ├── charts
+│   │   │   │   │   ├── CategoryDistribution.tsx
+│   │   │   │   │   └── TaskOverview.tsx
+│   │   │   │   └── DashboardPage.tsx
+│   │   │   └── tasks
+│   │   │   ├── CreateTasksForm.tsx
+│   │   │   ├── FiltersBar.tsx
+│   │   │   ├── TaskCard.tsx
+│   │   │   ├── TaskDrawer.tsx
+│   │   │   └── TasksPage.tsx
+│   │   ├── hooks
+│   │   │   └── useSocket.ts
+│   │   ├── main.tsx
+│   │   ├── routes
+│   │   │   ├── index.tsx
+│   │   │   └── ProtectedRoute.tsx
+│   │   ├── store
+│   │   │   └── auth.store.ts
+│   │   ├── styles
+│   │   │   └── tailwind.css
+│   │   ├── tests
+│   │   │   ├── auth.e2e.spec.ts
+│   │   │   └── setup.ts
+│   │   └── utils
+│   │   ├── date.ts
+│   │   └── zod-helpers.ts
+│   ├── tailwind.config.js
+│   ├── tsconfig.json
+│   └── vite.config.ts
 ├── docker
 │   ├── .env.example
 │   └── docker-compose.yml
@@ -136,14 +136,14 @@
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── zod
-│   │       ├── auth.schema.ts
-│   │       ├── category.schema.ts
-│   │       └── task.schema.ts
+│   │   ├── auth.schema.ts
+│   │   ├── category.schema.ts
+│   │   └── task.schema.ts
 │   └── utils
-│       ├── date.ts
-│       ├── index.ts
-│       ├── package.json
-│       └── tsconfig.json
+│   ├── date.ts
+│   ├── index.ts
+│   ├── package.json
+│   └── tsconfig.json
 ├── PROJECT_STRUCTURE.md
 ├── README.md
 ├── tsconfig.base.json

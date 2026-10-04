@@ -1,7 +1,9 @@
 // apps/api/src/modules/categories/category.routes.ts
 import { Router } from 'express';
-import { CategoryController } from './category.controller';
+
 import { authenticateToken } from '@/middleware/auth';
+
+import { CategoryController } from './category.controller';
 
 const router = Router();
 

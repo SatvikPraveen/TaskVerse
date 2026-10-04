@@ -12,9 +12,18 @@ describe('Activity log', () => {
 
   it('records task lifecycle events with the actor and audience', async () => {
     const task = await createTask(session, { title: 'Write paper' });
-    await session.auth(request(app).put(`/api/tasks/${task._id}`)).send({ status: 'in_progress' }).expect(200);
-    await session.auth(request(app).put(`/api/tasks/${task._id}`)).send({ title: 'Write the paper', priority: 'high' }).expect(200);
-    await session.auth(request(app).post(`/api/tasks/${task._id}/comments`)).send({ content: 'Draft ready' }).expect(201);
+    await session
+      .auth(request(app).put(`/api/tasks/${task._id}`))
+      .send({ status: 'in_progress' })
+      .expect(200);
+    await session
+      .auth(request(app).put(`/api/tasks/${task._id}`))
+      .send({ title: 'Write the paper', priority: 'high' })
+      .expect(200);
+    await session
+      .auth(request(app).post(`/api/tasks/${task._id}/comments`))
+      .send({ content: 'Draft ready' })
+      .expect(201);
 
     const entries = await Activity.find({ entityId: task._id }).sort({ _id: 1 });
     expect(entries.map(e => e.event)).toEqual([

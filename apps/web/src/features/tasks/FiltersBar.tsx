@@ -1,8 +1,8 @@
 // apps/web/src/features/tasks/FiltersBar.tsx
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import type { Category, TaskPriority, TaskSortBy, TaskStatus } from '@taskverse/types';
 
 import type { TaskFilters } from '@/api/tasks.api';
+import type { Category, TaskPriority, TaskSortBy, TaskStatus } from '@taskverse/types';
 
 interface FiltersBarProps {
   filters: TaskFilters;

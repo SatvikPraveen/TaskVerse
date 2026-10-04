@@ -7,9 +7,24 @@
 // routines are O(V + E) and should grow linearly; the list scheduler re-ranks
 // the ready set at every decision and is expected to be super-linear, which
 // is the motivation for capping /api/planning/simulate at per-user backlogs.
-import { buildGraph, criticalPath, generateWorkload, simulate, topologicalOrder, wsjf } from '@taskverse/scheduler';
+import {
+  buildGraph,
+  criticalPath,
+  generateWorkload,
+  simulate,
+  topologicalOrder,
+  wsjf,
+} from '@taskverse/scheduler';
 
-import { environmentStamp, fmt, markdownTable, numberList, parseArgs, writeJson, writeMarkdown } from '../lib/report';
+import {
+  environmentStamp,
+  fmt,
+  markdownTable,
+  numberList,
+  parseArgs,
+  writeJson,
+  writeMarkdown,
+} from '../lib/report';
 
 const args = parseArgs(process.argv.slice(2));
 const SIZES = numberList(args.sizes, [100, 1000, 5000, 20000]);
@@ -60,11 +75,20 @@ sections.push(`Median of ${REPEATS} repetitions per cell, single thread. Times i
 sections.push(
   markdownTable(
     ['Tasks', 'Edges', 'Topological sort', 'Critical path', 'WSJF ranking', 'Simulation (1 worker)'],
-    rows.map(r => [r.size, r.edges, fmt(r.topologicalMs, 2), fmt(r.criticalPathMs, 2), fmt(r.wsjfMs, 2), r.simulateMs === null ? 'skipped' : fmt(r.simulateMs, 1)])
+    rows.map(r => [
+      r.size,
+      r.edges,
+      fmt(r.topologicalMs, 2),
+      fmt(r.criticalPathMs, 2),
+      fmt(r.wsjfMs, 2),
+      r.simulateMs === null ? 'skipped' : fmt(r.simulateMs, 1),
+    ])
   )
 );
 sections.push('## Reproduce');
-sections.push('```bash\nnpm run bench:scaling --workspace=research -- --sizes=100,1000,5000,20000 --repeats=5\n```');
+sections.push(
+  '```bash\nnpm run bench:scaling --workspace=research -- --sizes=100,1000,5000,20000 --repeats=5\n```'
+);
 const stamp = environmentStamp();
 sections.push(`Generated ${stamp.generatedAt} on ${stamp.platform}, Node ${stamp.node}.`);
 

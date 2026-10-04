@@ -15,8 +15,17 @@ import { logger } from '@/config/logger';
 import { createError } from '@/middleware/error';
 
 export interface ObjectStorage {
-  getPresignedUploadUrl(key: string, contentType: string, expiresIn?: number): Promise<{ uploadUrl: string; publicUrl: string }>;
-  uploadFile(key: string, body: Buffer, contentType: string, metadata?: Record<string, string>): Promise<string>;
+  getPresignedUploadUrl(
+    key: string,
+    contentType: string,
+    expiresIn?: number
+  ): Promise<{ uploadUrl: string; publicUrl: string }>;
+  uploadFile(
+    key: string,
+    body: Buffer,
+    contentType: string,
+    metadata?: Record<string, string>
+  ): Promise<string>;
   deleteFile(key: string): Promise<void>;
   getFileInfo(key: string): Promise<HeadObjectCommandOutput>;
   generateFileKey(userId: string, originalName: string, prefix?: string): string;
@@ -92,7 +101,13 @@ class S3Storage implements ObjectStorage {
   async uploadFile(key: string, body: Buffer, contentType: string, metadata?: Record<string, string>) {
     try {
       await this.s3.send(
-        new PutObjectCommand({ Bucket: this.bucket, Key: key, Body: body, ContentType: contentType, Metadata: metadata })
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          Body: body,
+          ContentType: contentType,
+          Metadata: metadata,
+        })
       );
       return this.publicUrlFor(key);
     } catch (error) {

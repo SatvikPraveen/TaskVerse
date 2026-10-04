@@ -1,6 +1,6 @@
 // apps/web/src/components/Input.tsx
-import { InputHTMLAttributes, forwardRef, ReactNode } from 'react';
 import { clsx } from 'clsx';
+import { type InputHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -12,17 +12,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({
-    label,
-    error,
-    helperText,
-    leftIcon,
-    rightIcon,
-    fullWidth = true,
-    className,
-    id,
-    ...props
-  }, ref) => {
+  ({ label, error, helperText, leftIcon, rightIcon, fullWidth = true, className, id, ...props }, ref) => {
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
     const inputClasses = clsx(
@@ -39,10 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={clsx(fullWidth && 'w-full')}>
         {label && (
-          <label
-            htmlFor={inputId}
-            className="block text-sm font-medium leading-6 text-gray-900 mb-2"
-          >
+          <label htmlFor={inputId} className="block text-sm font-medium leading-6 text-gray-900 mb-2">
             {label}
           </label>
         )}
@@ -52,24 +39,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               <span className="text-gray-400 sm:text-sm">{leftIcon}</span>
             </div>
           )}
-          <input
-            ref={ref}
-            id={inputId}
-            className={inputClasses}
-            {...props}
-          />
+          <input ref={ref} id={inputId} className={inputClasses} {...props} />
           {rightIcon && (
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
               <span className="text-gray-400 sm:text-sm">{rightIcon}</span>
             </div>
           )}
         </div>
-        {error && (
-          <p className="mt-2 text-sm text-red-600">{error}</p>
-        )}
-        {helperText && !error && (
-          <p className="mt-2 text-sm text-gray-500">{helperText}</p>
-        )}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {helperText && !error && <p className="mt-2 text-sm text-gray-500">{helperText}</p>}
       </div>
     );
   }

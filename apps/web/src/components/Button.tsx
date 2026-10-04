@@ -1,6 +1,6 @@
 // apps/web/src/components/Button.tsx
-import { ButtonHTMLAttributes, forwardRef, ReactNode } from 'react';
 import { clsx } from 'clsx';
+import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -12,20 +12,24 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({
-    variant = 'primary',
-    size = 'md',
-    isLoading = false,
-    leftIcon,
-    rightIcon,
-    fullWidth = false,
-    className,
-    children,
-    disabled,
-    ...props
-  }, ref) => {
-    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
-    
+  (
+    {
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      leftIcon,
+      rightIcon,
+      fullWidth = false,
+      className,
+      children,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
+    const baseClasses =
+      'inline-flex items-center justify-center font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+
     const variantClasses = {
       primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
       secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
@@ -33,7 +37,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-indigo-500',
       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     };
-    
+
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',
       md: 'px-4 py-2 text-sm',
@@ -52,12 +56,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     );
 
     return (
-      <button
-        ref={ref}
-        className={classes}
-        disabled={disabled || isLoading}
-        {...props}
-      >
+      <button ref={ref} className={classes} disabled={disabled || isLoading} {...props}>
         {isLoading && (
           <svg
             className="animate-spin -ml-1 mr-2 h-4 w-4"
@@ -65,14 +64,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             fill="none"
             viewBox="0 0 24 24"
           >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path
               className="opacity-75"
               fill="currentColor"
@@ -80,13 +72,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             />
           </svg>
         )}
-        {!isLoading && leftIcon && (
-          <span className="-ml-1 mr-2">{leftIcon}</span>
-        )}
+        {!isLoading && leftIcon && <span className="-ml-1 mr-2">{leftIcon}</span>}
         {children}
-        {!isLoading && rightIcon && (
-          <span className="ml-2 -mr-1">{rightIcon}</span>
-        )}
+        {!isLoading && rightIcon && <span className="ml-2 -mr-1">{rightIcon}</span>}
       </button>
     );
   }

@@ -342,7 +342,16 @@ paths:
         - { name: dueAfter, in: query, schema: { type: string, format: date-time } }
         - { name: dueBefore, in: query, schema: { type: string, format: date-time } }
         - { name: archived, in: query, schema: { type: string, enum: ['true', 'false'], default: 'false' } }
-        - { name: sortBy, in: query, schema: { type: string, enum: [createdAt, updatedAt, dueDate, priority, title, position], default: position } }
+        - {
+            name: sortBy,
+            in: query,
+            schema:
+              {
+                type: string,
+                enum: [createdAt, updatedAt, dueDate, priority, title, position],
+                default: position,
+              },
+          }
         - { name: sortOrder, in: query, schema: { type: string, enum: [asc, desc], default: asc } }
         - { $ref: '#/components/parameters/Page' }
         - { $ref: '#/components/parameters/Limit' }
@@ -521,7 +530,13 @@ paths:
       tags: [Uploads]
       summary: Delete an uploaded object the caller owns
       parameters:
-        - { name: fileKey, in: path, required: true, schema: { type: string }, description: 'Object key, e.g. uploads/{userId}/{name}' }
+        - {
+            name: fileKey,
+            in: path,
+            required: true,
+            schema: { type: string },
+            description: 'Object key, e.g. uploads/{userId}/{name}',
+          }
       responses:
         '200': { $ref: '#/components/responses/Message' }
         '403': { $ref: '#/components/responses/Forbidden' }
@@ -561,7 +576,12 @@ paths:
         ready set) under the chosen policy. Each entry carries a score, its
         components and a one-line rationale.
       parameters:
-        - { name: policy, in: query, schema: { $ref: '#/components/schemas/PolicyName' }, description: Default wsjf }
+        - {
+            name: policy,
+            in: query,
+            schema: { $ref: '#/components/schemas/PolicyName' },
+            description: Default wsjf,
+          }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
         - { name: includeBlocked, in: query, schema: { type: boolean, default: false } }
       responses:
@@ -636,7 +656,12 @@ paths:
       summary: What-if comparison of policies on the caller's backlog
       parameters:
         - { name: workers, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 1 } }
-        - { name: policies, in: query, schema: { type: string }, description: Comma-separated policy names; default all }
+        - {
+            name: policies,
+            in: query,
+            schema: { type: string },
+            description: Comma-separated policy names; default all,
+          }
       responses:
         '200':
           description: One run per policy, sorted by weighted tardiness then makespan
@@ -704,7 +729,12 @@ paths:
       summary: Personal activity feed
       parameters:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 30 } }
-        - { name: before, in: query, schema: { $ref: '#/components/schemas/ObjectId' }, description: Cursor from nextCursor }
+        - {
+            name: before,
+            in: query,
+            schema: { $ref: '#/components/schemas/ObjectId' },
+            description: Cursor from nextCursor,
+          }
         - { name: event, in: query, schema: { type: string } }
       responses:
         '200':
@@ -749,9 +779,11 @@ components:
     Days: { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 365, default: 30 } }
     Bucket: { name: bucket, in: query, schema: { type: string, enum: [day, week], default: day } }
     TaskId: { name: taskId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
-    CategoryId: { name: categoryId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+    CategoryId:
+      { name: categoryId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
     UserId: { name: userId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
-    SessionId: { name: sessionId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+    SessionId:
+      { name: sessionId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
 
   responses:
     Message:

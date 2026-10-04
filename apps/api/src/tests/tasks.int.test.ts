@@ -1,13 +1,12 @@
 // apps/api/src/tests/tasks.int.test.ts
 import request from 'supertest';
-import app from '../app';
-import { User } from '@/modules/users/user.model';
-import { Category } from '@/modules/categories/category.model';
+
 import { Task } from '@/modules/tasks/task.model';
+
+import app from '../app';
 
 describe('Tasks Integration Tests', () => {
   let accessToken: string;
-  let userId: string;
   let categoryId: string;
 
   const testUser = {
@@ -18,12 +17,9 @@ describe('Tasks Integration Tests', () => {
 
   beforeEach(async () => {
     // Register and login user
-    const registerResponse = await request(app)
-      .post('/api/auth/register')
-      .send(testUser);
+    const registerResponse = await request(app).post('/api/auth/register').send(testUser);
 
     accessToken = registerResponse.body.data.tokens.accessToken;
-    userId = registerResponse.body.data.user.id;
 
     // Create a test category
     const categoryResponse = await request(app)
@@ -118,10 +114,7 @@ describe('Tasks Integration Tests', () => {
       ];
 
       for (const task of tasks) {
-        await request(app)
-          .post('/api/tasks')
-          .set('Authorization', `Bearer ${accessToken}`)
-          .send(task);
+        await request(app).post('/api/tasks').set('Authorization', `Bearer ${accessToken}`).send(task);
       }
     });
 
@@ -350,10 +343,7 @@ describe('Tasks Integration Tests', () => {
       ];
 
       for (const task of tasks) {
-        await request(app)
-          .post('/api/tasks')
-          .set('Authorization', `Bearer ${accessToken}`)
-          .send(task);
+        await request(app).post('/api/tasks').set('Authorization', `Bearer ${accessToken}`).send(task);
       }
     });
 

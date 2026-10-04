@@ -57,17 +57,23 @@ describe('simulate', () => {
   });
 
   it('EDF beats FIFO on tardiness when deadlines conflict with arrival order', () => {
-    const tasks = [task('old', 4, { dueDate: hours(20), createdAt: hours(-10) }), task('new', 1, { dueDate: hours(1), createdAt: hours(-1) })];
+    const tasks = [
+      task('old', 4, { dueDate: hours(20), createdAt: hours(-10) }),
+      task('new', 1, { dueDate: hours(1), createdAt: hours(-1) }),
+    ];
     const fifoRun = simulate(tasks, { policy: 'fifo', start });
     const edfRun = simulate(tasks, { policy: 'edf', start });
     assert.ok(edfRun.metrics.totalTardiness < fifoRun.metrics.totalTardiness);
   });
 
   it('leaves tasks stuck in a cycle unscheduled instead of looping forever', () => {
-    const result = simulate([task('a', 1, { dependencies: ['b'] }), task('b', 1, { dependencies: ['a'] }), task('c', 1)], {
-      policy: 'fifo',
-      start,
-    });
+    const result = simulate(
+      [task('a', 1, { dependencies: ['b'] }), task('b', 1, { dependencies: ['a'] }), task('c', 1)],
+      {
+        policy: 'fifo',
+        start,
+      }
+    );
     assert.deepEqual(result.unscheduled.sort(), ['a', 'b']);
     assert.equal(result.metrics.scheduledTasks, 1);
   });

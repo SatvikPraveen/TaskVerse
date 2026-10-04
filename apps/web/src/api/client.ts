@@ -1,13 +1,9 @@
 // apps/web/src/api/client.ts
-import axios, {
-  type AxiosError,
-  type AxiosRequestConfig,
-  type InternalAxiosRequestConfig,
-} from 'axios';
+import axios, { type AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
 import toast from 'react-hot-toast';
-import type { ApiErrorResponse, ApiResponse, TokenPair } from '@taskverse/types';
 
 import { tokenStorage } from '@/store/tokens';
+import type { ApiErrorResponse, ApiResponse, TokenPair } from '@taskverse/types';
 
 export type { ApiResponse } from '@taskverse/types';
 

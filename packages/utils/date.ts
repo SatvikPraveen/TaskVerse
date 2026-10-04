@@ -47,7 +47,7 @@ export const formatDateTime = (date: Date | string, pattern = 'MMM dd, yyyy h:mm
 export const formatRelativeTime = (date: Date | string): string => {
   const dateObj = typeof date === 'string' ? parseISO(date) : date;
   if (!isValid(dateObj)) return 'Invalid Date';
-  
+
   return formatDistanceToNow(dateObj, { addSuffix: true });
 };
 
@@ -61,11 +61,11 @@ export const getDateDescription = (date: Date | string): string => {
   if (isToday(dateObj)) return 'Today';
   if (isTomorrow(dateObj)) return 'Tomorrow';
   if (isYesterday(dateObj)) return 'Yesterday';
-  
+
   const daysDiff = differenceInDays(dateObj, new Date());
   if (daysDiff > 0 && daysDiff <= 7) return `In ${daysDiff} days`;
   if (daysDiff < 0 && daysDiff >= -7) return `${Math.abs(daysDiff)} days ago`;
-  
+
   return formatDate(dateObj);
 };
 
@@ -84,7 +84,7 @@ export const isOverdue = (date: Date | string): boolean => {
 export const isDueSoon = (date: Date | string, days = 3): boolean => {
   const dateObj = typeof date === 'string' ? parseISO(date) : date;
   if (!isValid(dateObj)) return false;
-  
+
   const now = new Date();
   const soonThreshold = addDays(now, days);
   return isAfter(dateObj, now) && isBefore(dateObj, soonThreshold);
@@ -108,7 +108,7 @@ export const getDueDatePriority = (date: Date | string): 'high' | 'medium' | 'lo
  */
 export const getDateRangePresets = () => {
   const now = new Date();
-  
+
   return {
     today: {
       start: startOfDay(now),
@@ -163,7 +163,9 @@ export const toISOString = (date: Date): string => {
 /**
  * Get time remaining until a date
  */
-export const getTimeRemaining = (date: Date | string): {
+export const getTimeRemaining = (
+  date: Date | string
+): {
   days: number;
   hours: number;
   minutes: number;
@@ -171,7 +173,7 @@ export const getTimeRemaining = (date: Date | string): {
 } => {
   const dateObj = typeof date === 'string' ? parseISO(date) : date;
   const now = new Date();
-  
+
   if (!isValid(dateObj)) {
     return { days: 0, hours: 0, minutes: 0, isOverdue: false };
   }
@@ -197,7 +199,7 @@ export const getTimeRemaining = (date: Date | string): {
  */
 export const formatTimeRemaining = (date: Date | string): string => {
   const timeRemaining = getTimeRemaining(date);
-  
+
   if (timeRemaining.isOverdue) {
     if (timeRemaining.days > 0) return `${timeRemaining.days} days overdue`;
     if (timeRemaining.hours > 0) return `${timeRemaining.hours} hours overdue`;
@@ -217,7 +219,7 @@ export const getTimezoneOffset = (): string => {
   const hours = Math.floor(Math.abs(offset) / 60);
   const minutes = Math.abs(offset) % 60;
   const sign = offset > 0 ? '-' : '+';
-  
+
   return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 };
 
@@ -227,9 +229,9 @@ export const getTimezoneOffset = (): string => {
 export const isSameDay = (date1: Date | string, date2: Date | string): boolean => {
   const d1 = typeof date1 === 'string' ? parseISO(date1) : date1;
   const d2 = typeof date2 === 'string' ? parseISO(date2) : date2;
-  
+
   if (!isValid(d1) || !isValid(d2)) return false;
-  
+
   return format(d1, 'yyyy-MM-dd') === format(d2, 'yyyy-MM-dd');
 };
 
@@ -241,21 +243,21 @@ export const getCalendarWeeks = (date: Date): Date[][] => {
   const monthEnd = endOfMonth(date);
   const calendarStart = startOfWeek(monthStart);
   const calendarEnd = endOfWeek(monthEnd);
-  
+
   const weeks: Date[][] = [];
   let currentWeek: Date[] = [];
   let currentDate = calendarStart;
-  
+
   while (isBefore(currentDate, calendarEnd) || isSameDay(currentDate, calendarEnd)) {
     currentWeek.push(new Date(currentDate));
-    
+
     if (currentWeek.length === 7) {
       weeks.push(currentWeek);
       currentWeek = [];
     }
-    
+
     currentDate = addDays(currentDate, 1);
   }
-  
+
   return weeks;
 };

@@ -1,10 +1,10 @@
 // apps/web/src/store/auth.store.ts
 import toast from 'react-hot-toast';
 import { create } from 'zustand';
-import type { LoginInput, RegisterInput, User } from '@taskverse/types';
 
 import { authApi } from '@/api/auth.api';
 import { getErrorMessage } from '@/api/client';
+import type { LoginInput, RegisterInput, User } from '@taskverse/types';
 
 import { tokenStorage } from './tokens';
 

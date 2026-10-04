@@ -1,7 +1,9 @@
 // apps/api/src/modules/tasks/task.routes.ts
 import { Router } from 'express';
-import { TaskController } from './task.controller';
+
 import { authenticateToken } from '@/middleware/auth';
+
+import { TaskController } from './task.controller';
 
 const router = Router();
 

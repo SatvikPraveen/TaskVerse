@@ -40,7 +40,10 @@ export type Subscriber<K extends DomainEventName> = (
   name: K
 ) => void | Promise<void>;
 
-type AnySubscriber = (payload: DomainEventMap[DomainEventName], name: DomainEventName) => void | Promise<void>;
+type AnySubscriber = (
+  payload: DomainEventMap[DomainEventName],
+  name: DomainEventName
+) => void | Promise<void>;
 
 class DomainEventBus {
   private readonly subscribers = new Map<DomainEventName | '*', Set<AnySubscriber>>();

@@ -1,5 +1,6 @@
 // apps/web/src/features/dashboard/charts/CategoryDistribution.tsx
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+
 import type { CategoryStats } from '@taskverse/types';
 
 interface CategoryDistributionProps {
@@ -43,7 +44,15 @@ export default function CategoryDistribution({ stats, isLoading }: CategoryDistr
       <figcaption className="sr-only">Share of tasks per category</figcaption>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-          <Pie data={data} cx="50%" cy="45%" innerRadius={45} outerRadius={80} paddingAngle={2} dataKey="value">
+          <Pie
+            data={data}
+            cx="50%"
+            cy="45%"
+            innerRadius={45}
+            outerRadius={80}
+            paddingAngle={2}
+            dataKey="value"
+          >
             {data.map(entry => (
               <Cell key={entry.name} fill={entry.color} stroke="#ffffff" strokeWidth={2} />
             ))}

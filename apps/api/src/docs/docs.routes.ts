@@ -14,7 +14,11 @@ router.use(
   '/',
   swaggerUi.serve,
   swaggerUi.setup(undefined, {
-    swaggerOptions: { url: '/api/docs/openapi.json', displayRequestDuration: true, persistAuthorization: true },
+    swaggerOptions: {
+      url: '/api/docs/openapi.json',
+      displayRequestDuration: true,
+      persistAuthorization: true,
+    },
     customSiteTitle: 'TaskVerse API reference',
   })
 );

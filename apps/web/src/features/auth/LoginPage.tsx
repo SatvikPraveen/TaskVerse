@@ -1,11 +1,12 @@
 // apps/web/src/features/auth/LoginPage.tsx
-import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { useAuthStore } from '@/store/auth.store';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { useAuthStore } from '@/store/auth.store';
 
 interface LoginForm {
   email: string;
@@ -17,7 +18,7 @@ export default function LoginPage() {
   const { login, isSubmitting } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const from = location.state?.from?.pathname || '/dashboard';
 
   const {
@@ -43,15 +44,10 @@ export default function LoginPage() {
           <div className="mx-auto h-12 w-auto flex items-center justify-center">
             <span className="text-3xl font-bold text-indigo-600">TaskVerse</span>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
-            <Link
-              to="/register"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
+            <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
               create a new account
             </Link>
           </p>
@@ -86,16 +82,11 @@ export default function LoginPage() {
                   className="text-gray-400 hover:text-gray-600"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                 </button>
               }
               {...register('password', {
                 required: 'Password is required',
-
               })}
             />
           </div>
@@ -121,15 +112,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <Button
-              type="submit"
-              fullWidth
-              isLoading={isSubmitting}
-            >
+            <Button type="submit" fullWidth isLoading={isSubmitting}>
               Sign in
             </Button>
           </div>
-
         </form>
       </div>
     </div>

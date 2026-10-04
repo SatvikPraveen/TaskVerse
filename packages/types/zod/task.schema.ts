@@ -100,14 +100,7 @@ export const UpdateTaskSchema = CreateTaskSchema.partial().extend({
   position: z.number().optional(),
 });
 
-export const TaskSortByEnum = z.enum([
-  'createdAt',
-  'updatedAt',
-  'dueDate',
-  'priority',
-  'title',
-  'position',
-]);
+export const TaskSortByEnum = z.enum(['createdAt', 'updatedAt', 'dueDate', 'priority', 'title', 'position']);
 
 /** Query-string filters accepted by GET /api/tasks. */
 export const TaskFiltersSchema = PaginationQuerySchema.extend({

@@ -1,7 +1,8 @@
 // apps/web/src/components/Modal.tsx
-import { Fragment, ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Fragment, type ReactNode } from 'react';
+
 import Button from './Button';
 
 interface ModalProps {
@@ -72,17 +73,12 @@ export default function Modal({
 
                 <div>
                   {title && (
-                    <Dialog.Title
-                      as="h3"
-                      className="text-base font-semibold leading-6 text-gray-900 mb-4"
-                    >
+                    <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900 mb-4">
                       {title}
                     </Dialog.Title>
                   )}
-                  
-                  <div className="mt-2">
-                    {children}
-                  </div>
+
+                  <div className="mt-2">{children}</div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
@@ -94,18 +90,8 @@ export default function Modal({
 }
 
 // Modal footer component for consistent button layouts
-export function ModalFooter({
-  children,
-  className = '',
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`mt-5 sm:mt-6 flex gap-3 ${className}`}>
-      {children}
-    </div>
-  );
+export function ModalFooter({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <div className={`mt-5 sm:mt-6 flex gap-3 ${className}`}>{children}</div>;
 }
 
 // Common modal actions
@@ -126,20 +112,10 @@ export function ModalActions({
 }) {
   return (
     <ModalFooter>
-      <Button
-        variant="outline"
-        onClick={onCancel}
-        disabled={isLoading}
-        fullWidth
-      >
+      <Button variant="outline" onClick={onCancel} disabled={isLoading} fullWidth>
         {cancelText}
       </Button>
-      <Button
-        variant={confirmVariant}
-        onClick={onConfirm}
-        isLoading={isLoading}
-        fullWidth
-      >
+      <Button variant={confirmVariant} onClick={onConfirm} isLoading={isLoading} fullWidth>
         {confirmText}
       </Button>
     </ModalFooter>

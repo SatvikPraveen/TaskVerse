@@ -1,11 +1,11 @@
 // apps/api/src/modules/analytics/analytics.controller.ts
-import { agingWip, cumulativeFlow, flowSummary, MS_PER_DAY, throughputSeries } from '@taskverse/scheduler';
 import type { Response } from 'express';
 import { z } from 'zod';
 
 import type { AuthRequest } from '@/middleware/auth';
 import { asyncHandler } from '@/middleware/error';
 import { loadPlanningTasks, toSchedulable } from '@/modules/tasks/task.service';
+import { agingWip, cumulativeFlow, flowSummary, MS_PER_DAY, throughputSeries } from '@taskverse/scheduler';
 
 const windowQuery = z.object({
   days: z.coerce.number().int().min(1).max(365).default(30),
@@ -32,7 +32,12 @@ export class AnalyticsController {
     const tasks = (await loadPlanningTasks(req.user!.id, { since: from })).map(toSchedulable);
     res.json({
       success: true,
-      data: { from: from.toISOString(), to: to.toISOString(), bucket, series: throughputSeries(tasks, { from, to, bucket }) },
+      data: {
+        from: from.toISOString(),
+        to: to.toISOString(),
+        bucket,
+        series: throughputSeries(tasks, { from, to, bucket }),
+      },
     });
   });
 
@@ -43,7 +48,12 @@ export class AnalyticsController {
     const tasks = (await loadPlanningTasks(req.user!.id, { includeArchived: true })).map(toSchedulable);
     res.json({
       success: true,
-      data: { from: from.toISOString(), to: to.toISOString(), bucket, series: cumulativeFlow(tasks, { from, to, bucket }) },
+      data: {
+        from: from.toISOString(),
+        to: to.toISOString(),
+        bucket,
+        series: cumulativeFlow(tasks, { from, to, bucket }),
+      },
     });
   });
 

@@ -21,10 +21,26 @@ describe('Analytics API', () => {
 
   const seedHistory = async () => {
     // Two completed (A on time, B late), one in progress, one todo, one cancelled.
-    const a = await createTask(session, { title: 'A', dueDate: new Date(Date.now() - 1 * DAY).toISOString() });
-    await seedRaw(a._id, { status: 'completed', createdAt: new Date(Date.now() - 5 * DAY), startedAt: new Date(Date.now() - 4 * DAY), completedAt: new Date(Date.now() - 2 * DAY) });
-    const b = await createTask(session, { title: 'B', dueDate: new Date(Date.now() - 3 * DAY).toISOString() });
-    await seedRaw(b._id, { status: 'completed', createdAt: new Date(Date.now() - 6 * DAY), startedAt: new Date(Date.now() - 3 * DAY), completedAt: new Date(Date.now() - 1 * DAY) });
+    const a = await createTask(session, {
+      title: 'A',
+      dueDate: new Date(Date.now() - 1 * DAY).toISOString(),
+    });
+    await seedRaw(a._id, {
+      status: 'completed',
+      createdAt: new Date(Date.now() - 5 * DAY),
+      startedAt: new Date(Date.now() - 4 * DAY),
+      completedAt: new Date(Date.now() - 2 * DAY),
+    });
+    const b = await createTask(session, {
+      title: 'B',
+      dueDate: new Date(Date.now() - 3 * DAY).toISOString(),
+    });
+    await seedRaw(b._id, {
+      status: 'completed',
+      createdAt: new Date(Date.now() - 6 * DAY),
+      startedAt: new Date(Date.now() - 3 * DAY),
+      completedAt: new Date(Date.now() - 1 * DAY),
+    });
     const c = await createTask(session, { title: 'C' });
     await seedRaw(c._id, { status: 'in_progress', startedAt: new Date(Date.now() - 10 * HOUR) });
     await createTask(session, { title: 'D' });
@@ -52,7 +68,9 @@ describe('Analytics API', () => {
 
   it('returns a throughput series with one point per bucket', async () => {
     await seedHistory();
-    const res = await session.auth(request(app).get('/api/analytics/throughput?days=7&bucket=day')).expect(200);
+    const res = await session
+      .auth(request(app).get('/api/analytics/throughput?days=7&bucket=day'))
+      .expect(200);
     const series = res.body.data.series as Array<{ completed: number; created: number }>;
     expect(series.length).toBeGreaterThanOrEqual(7);
     expect(series.reduce((sum, p) => sum + p.completed, 0)).toBe(2);
@@ -68,7 +86,11 @@ describe('Analytics API', () => {
   it('lists aging work in progress, oldest first', async () => {
     await seedHistory();
     const res = await session.auth(request(app).get('/api/analytics/aging')).expect(200);
-    const items = res.body.data.items as Array<{ title: string; status: string; inProgressHours: number | null }>;
+    const items = res.body.data.items as Array<{
+      title: string;
+      status: string;
+      inProgressHours: number | null;
+    }>;
     expect(items.map(i => i.title).sort()).toEqual(['C', 'D']);
     expect(items.find(i => i.title === 'C')!.inProgressHours).toBeGreaterThanOrEqual(10);
     expect(items.find(i => i.title === 'D')!.inProgressHours).toBeNull();

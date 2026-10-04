@@ -1,5 +1,5 @@
 // apps/web/src/utils/zod-helpers.ts
-import { ZodError, ZodSchema } from 'zod';
+import { ZodError, type ZodSchema } from 'zod';
 
 export interface ValidationError {
   field: string;
@@ -33,7 +33,7 @@ export function safeParseWithZod<T>(
   data: unknown
 ): { success: true; data: T } | { success: false; errors: ValidationError[] } {
   const result = schema.safeParse(data);
-  
+
   if (result.success) {
     return { success: true, data: result.data };
   } else {
@@ -47,12 +47,12 @@ export function getFirstError(errors: ValidationError[], field: string): string 
 
 export function getFieldErrors(errors: ValidationError[]): Record<string, string> {
   const fieldErrors: Record<string, string> = {};
-  
+
   errors.forEach(error => {
     if (!fieldErrors[error.field]) {
       fieldErrors[error.field] = error.message;
     }
   });
-  
+
   return fieldErrors;
 }

@@ -1,11 +1,12 @@
 // apps/web/src/features/auth/RegisterPage.tsx
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { useAuthStore } from '@/store/auth.store';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { useAuthStore } from '@/store/auth.store';
 
 interface RegisterForm {
   firstName: string;
@@ -59,15 +60,10 @@ export default function RegisterPage() {
           <div className="mx-auto h-12 w-auto flex items-center justify-center">
             <span className="text-3xl font-bold text-indigo-600">TaskVerse</span>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
-            <Link
-              to="/login"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
+            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
               sign in to your existing account
             </Link>
           </p>
@@ -149,11 +145,7 @@ export default function RegisterPage() {
                   className="text-gray-400 hover:text-gray-600"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                 </button>
               }
               {...register('password', {
@@ -185,8 +177,7 @@ export default function RegisterPage() {
               }
               {...register('confirmPassword', {
                 required: 'Please confirm your password',
-                validate: (value) =>
-                  value === password || 'Passwords do not match',
+                validate: value => value === password || 'Passwords do not match',
               })}
             />
           </div>
@@ -211,16 +202,10 @@ export default function RegisterPage() {
               </a>
             </label>
           </div>
-          {errors.agreeTerms && (
-            <p className="text-sm text-red-600">{errors.agreeTerms.message}</p>
-          )}
+          {errors.agreeTerms && <p className="text-sm text-red-600">{errors.agreeTerms.message}</p>}
 
           <div>
-            <Button
-              type="submit"
-              fullWidth
-              isLoading={isSubmitting}
-            >
+            <Button type="submit" fullWidth isLoading={isSubmitting}>
               Create account
             </Button>
           </div>

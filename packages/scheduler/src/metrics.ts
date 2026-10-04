@@ -29,7 +29,7 @@ export const periodsBetween = (window: PeriodWindow): Date[] => {
   const bucket = window.bucket ?? 'day';
   const periods: Date[] = [];
   const end = window.to.getTime();
-  for (let cursor = bucketStart(window.from, bucket); cursor.getTime() <= end; ) {
+  for (let cursor = bucketStart(window.from, bucket); cursor.getTime() <= end;) {
     periods.push(cursor);
     cursor = new Date(cursor.getTime() + bucketLength(bucket));
   }
@@ -161,7 +161,8 @@ export interface FlowSummary {
 export const flowSummary = (tasks: readonly SchedulableTask[], window: PeriodWindow): FlowSummary => {
   const days = Math.max(1, (window.to.getTime() - window.from.getTime()) / MS_PER_DAY);
   const completedInWindow = tasks.filter(
-    t => t.status === 'completed' && t.completedAt && t.completedAt >= window.from && t.completedAt <= window.to
+    t =>
+      t.status === 'completed' && t.completedAt && t.completedAt >= window.from && t.completedAt <= window.to
   );
   const wip = tasks.filter(t => t.status === 'todo' || t.status === 'in_progress').length;
   const throughputPerDay = completedInWindow.length / days;

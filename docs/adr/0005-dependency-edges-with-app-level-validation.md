@@ -19,16 +19,16 @@ list so the graph never references a missing node.
 
 ## Alternatives considered
 
-* **Separate edges collection** — cleaner for very large graphs and
+- **Separate edges collection** — cleaner for very large graphs and
   bidirectional queries, but adds a join to every task read; the per-user
   graphs here are small (hundreds of nodes).
-* **Graph database** — disproportionate for the scale.
-* **Validate only at read time** — would let cycles into storage and push
+- **Graph database** — disproportionate for the scale.
+- **Validate only at read time** — would let cycles into storage and push
   the failure to the planning endpoints.
 
 ## Consequences
 
-* Validation costs one query over the user's planning projection per edit
+- Validation costs one query over the user's planning projection per edit
   with dependencies; acceptable at current scale and measured in
   `research/results/scaling.md`.
-* Cross-user dependencies are limited to tasks the caller can see.
+- Cross-user dependencies are limited to tasks the caller can see.

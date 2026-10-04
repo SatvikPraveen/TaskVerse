@@ -2,10 +2,10 @@
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import type { Category, CreateTaskInput, TaskPriority, TaskStatus } from '@taskverse/types';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import type { Category, CreateTaskInput, TaskPriority, TaskStatus } from '@taskverse/types';
 
 interface CreateTaskFormProps {
   categories: Category[];
@@ -95,7 +95,10 @@ export default function CreateTaskForm({ categories, onSubmit, onCancel, isLoadi
         label="Title"
         placeholder="Enter task title"
         error={errors.title?.message}
-        {...register('title', { required: 'Title is required', maxLength: { value: 200, message: 'Too long' } })}
+        {...register('title', {
+          required: 'Title is required',
+          maxLength: { value: 200, message: 'Too long' },
+        })}
       />
 
       <div>
@@ -197,7 +200,12 @@ export default function CreateTaskForm({ categories, onSubmit, onCancel, isLoadi
                 <button
                   type="button"
                   aria-label={`Remove tag ${tag}`}
-                  onClick={() => setValue('tags', tags.filter(t => t !== tag))}
+                  onClick={() =>
+                    setValue(
+                      'tags',
+                      tags.filter(t => t !== tag)
+                    )
+                  }
                   className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-indigo-200"
                 >
                   <XMarkIcon className="h-3 w-3" />
@@ -230,7 +238,13 @@ export default function CreateTaskForm({ categories, onSubmit, onCancel, isLoadi
                 className={`${selectClass} flex-1`}
                 {...register(`subtasks.${index}.title` as const)}
               />
-              <Button type="button" variant="ghost" size="sm" aria-label="Remove subtask" onClick={() => remove(index)}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                aria-label="Remove subtask"
+                onClick={() => remove(index)}
+              >
                 <XMarkIcon className="h-4 w-4" />
               </Button>
             </div>

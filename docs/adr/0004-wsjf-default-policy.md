@@ -21,14 +21,14 @@ see `docs/research/methodology.md` §3; it is not fitted to data.
 
 ## Alternatives considered
 
-* **EDF** — ignores value and effort; a trivial overdue task outranks a
+- **EDF** — ignores value and effort; a trivial overdue task outranks a
   critical one due in an hour.
-* **Priority** — ignores deadlines and effort; starves small urgent work.
+- **Priority** — ignores deadlines and effort; starves small urgent work.
 
 ## Consequences
 
-* Users with no estimates get the default 2 h job size, so WSJF degrades to
+- Users with no estimates get the default 2 h job size, so WSJF degrades to
   value + urgency + unblocking. This is stated in the API docs.
-* The policy choice is a query parameter; the benchmark in
+- The policy choice is a query parameter; the benchmark in
   `research/results/policy-comparison.md` is the evidence base for revisiting
   the default.

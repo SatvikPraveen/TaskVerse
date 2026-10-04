@@ -1,8 +1,10 @@
 // apps/api/src/tests/auth.int.test.ts
 import request from 'supertest';
-import app from '../app';
-import { User } from '@/modules/users/user.model';
+
 import { RefreshToken } from '@/modules/auth/auth.model';
+import { User } from '@/modules/users/user.model';
+
+import app from '../app';
 
 describe('Auth Integration Tests', () => {
   const testUser = {
@@ -15,10 +17,7 @@ describe('Auth Integration Tests', () => {
 
   describe('POST /api/auth/register', () => {
     it('should register a new user successfully', async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send(testUser)
-        .expect(201);
+      const response = await request(app).post('/api/auth/register').send(testUser).expect(201);
 
       expect(response.body).toMatchObject({
         success: true,
@@ -48,10 +47,7 @@ describe('Auth Integration Tests', () => {
       await request(app).post('/api/auth/register').send(testUser);
 
       // Try to register again with same email
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send(testUser)
-        .expect(409);
+      const response = await request(app).post('/api/auth/register').send(testUser).expect(409);
 
       expect(response.body).toMatchObject({
         error: 'Conflict',
@@ -60,10 +56,7 @@ describe('Auth Integration Tests', () => {
     });
 
     it('should validate required fields', async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({})
-        .expect(400);
+      const response = await request(app).post('/api/auth/register').send({}).expect(400);
 
       expect(response.body.error).toBe('Validation Error');
     });
@@ -135,18 +128,13 @@ describe('Auth Integration Tests', () => {
     let refreshToken: string;
 
     beforeEach(async () => {
-      const registerResponse = await request(app)
-        .post('/api/auth/register')
-        .send(testUser);
-      
+      const registerResponse = await request(app).post('/api/auth/register').send(testUser);
+
       refreshToken = registerResponse.body.data.tokens.refreshToken;
     });
 
     it('should refresh tokens successfully', async () => {
-      const response = await request(app)
-        .post('/api/auth/refresh')
-        .send({ refreshToken })
-        .expect(200);
+      const response = await request(app).post('/api/auth/refresh').send({ refreshToken }).expect(200);
 
       expect(response.body).toMatchObject({
         success: true,
@@ -181,18 +169,13 @@ describe('Auth Integration Tests', () => {
     let refreshToken: string;
 
     beforeEach(async () => {
-      const registerResponse = await request(app)
-        .post('/api/auth/register')
-        .send(testUser);
-      
+      const registerResponse = await request(app).post('/api/auth/register').send(testUser);
+
       refreshToken = registerResponse.body.data.tokens.refreshToken;
     });
 
     it('should logout successfully', async () => {
-      const response = await request(app)
-        .post('/api/auth/logout')
-        .send({ refreshToken })
-        .expect(200);
+      const response = await request(app).post('/api/auth/logout').send({ refreshToken }).expect(200);
 
       expect(response.body).toMatchObject({
         success: true,
@@ -209,10 +192,8 @@ describe('Auth Integration Tests', () => {
     let accessToken: string;
 
     beforeEach(async () => {
-      const registerResponse = await request(app)
-        .post('/api/auth/register')
-        .send(testUser);
-      
+      const registerResponse = await request(app).post('/api/auth/register').send(testUser);
+
       accessToken = registerResponse.body.data.tokens.accessToken;
     });
 
@@ -235,9 +216,7 @@ describe('Auth Integration Tests', () => {
     });
 
     it('should reject request without token', async () => {
-      const response = await request(app)
-        .get('/api/auth/profile')
-        .expect(401);
+      const response = await request(app).get('/api/auth/profile').expect(401);
 
       expect(response.body).toMatchObject({
         error: 'Access Denied',

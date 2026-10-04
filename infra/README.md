@@ -7,21 +7,25 @@ This directory contains infrastructure as code (IaC) configurations for deployin
 ## Planned Infrastructure
 
 ### Docker Compose (Current)
+
 - Local development environment
 - Single-machine deployment
 - Located in `/docker` directory
 
 ### Kubernetes (Planned)
+
 - Production-ready orchestration
 - Horizontal scaling capabilities
 - Helm charts for easy deployment
 
 ### Terraform (Planned)
+
 - Cloud infrastructure provisioning
 - Support for AWS, Azure, GCP
 - Environment-specific configurations
 
 ### CI/CD (Planned)
+
 - GitHub Actions deployment workflows
 - Automated testing and deployment
 - Multi-environment support (dev, staging, prod)
@@ -45,13 +49,17 @@ infra/
 ## Deployment Options
 
 ### Development
+
 Use Docker Compose from the root directory:
+
 ```bash
 npm run docker:up
 ```
 
 ### Production (Future)
+
 Options will include:
+
 - Kubernetes with Helm
 - Cloud-native services (AWS ECS, Azure Container Instances, GCP Cloud Run)
 - Serverless deployments
@@ -59,6 +67,7 @@ Options will include:
 ## Contributing
 
 When adding infrastructure configurations:
+
 1. Follow the directory structure above
 2. Include environment-specific configurations
 3. Add documentation for deployment steps

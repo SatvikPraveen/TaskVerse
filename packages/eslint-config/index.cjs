@@ -37,7 +37,7 @@ module.exports = {
     // TypeScript rules
     '@typescript-eslint/no-unused-vars': [
       'error',
-      { 
+      {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
         caughtErrorsIgnorePattern: '^_',
@@ -49,11 +49,8 @@ module.exports = {
     '@typescript-eslint/no-inferrable-types': 'error',
     '@typescript-eslint/prefer-const': 'error',
     '@typescript-eslint/no-var-requires': 'error',
-    '@typescript-eslint/consistent-type-imports': [
-      'error',
-      { prefer: 'type-imports' },
-    ],
-    
+    '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+
     // React rules
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
@@ -64,23 +61,16 @@ module.exports = {
     'react/jsx-no-duplicate-props': 'error',
     'react/jsx-no-undef': 'error',
     'react/no-unescaped-entities': 'warn',
-    
+
     // React Hooks rules
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    
+
     // Import rules
     'import/order': [
       'error',
       {
-        groups: [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index',
-        ],
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
         'newlines-between': 'always',
         alphabetize: {
           order: 'asc',
@@ -91,7 +81,7 @@ module.exports = {
     'import/no-unresolved': 'error',
     'import/no-duplicates': 'error',
     'import/no-unused-modules': 'warn',
-    
+
     // General rules
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
@@ -106,7 +96,7 @@ module.exports = {
     'no-multiple-empty-lines': ['error', { max: 1 }],
     'eol-last': 'error',
     'comma-dangle': ['error', 'es5'],
-    'semi': ['error', 'always'],
+    semi: ['error', 'always'],
   },
   overrides: [
     // Node.js specific rules
@@ -148,13 +138,5 @@ module.exports = {
       },
     },
   ],
-  ignorePatterns: [
-    'dist/',
-    'build/',
-    'node_modules/',
-    '.turbo/',
-    'coverage/',
-    '*.min.js',
-    '*.bundle.js',
-  ],
+  ignorePatterns: ['dist/', 'build/', 'node_modules/', '.turbo/', 'coverage/', '*.min.js', '*.bundle.js'],
 };

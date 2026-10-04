@@ -12,7 +12,15 @@
 // the history was too short or the process non-stationary.
 import { createRng, forecastCompletion } from '@taskverse/scheduler';
 
-import { environmentStamp, fmt, markdownTable, numberList, parseArgs, writeJson, writeMarkdown } from '../lib/report';
+import {
+  environmentStamp,
+  fmt,
+  markdownTable,
+  numberList,
+  parseArgs,
+  writeJson,
+  writeMarkdown,
+} from '../lib/report';
 
 const args = parseArgs(process.argv.slice(2));
 const HISTORY_DAYS = numberList(args.history, [14, 30, 60, 120]);
@@ -75,7 +83,12 @@ for (const drift of [false, true]) {
         const history: number[] = [];
         for (let day = 0; day < historyDays; day += 1) history.push(next(day));
 
-        const forecast = forecastCompletion({ remainingItems: backlog, throughputSamples: history, trials: TRIALS, seed });
+        const forecast = forecastCompletion({
+          remainingItems: backlog,
+          throughputSamples: history,
+          trials: TRIALS,
+          seed,
+        });
         if (!forecast) {
           skipped += 1;
           continue;
@@ -130,7 +143,17 @@ for (const drift of [false, true]) {
   sections.push(`## ${drift ? 'Non-stationary process (drifting level)' : 'Stationary process'}`);
   sections.push(
     markdownTable(
-      ['History (days)', 'Backlog', 'Cov. @50', 'Cov. @70', 'Cov. @85', 'Cov. @95', 'Mean actual (d)', 'Mean P50 (d)', 'Mean P85 (d)'],
+      [
+        'History (days)',
+        'Backlog',
+        'Cov. @50',
+        'Cov. @70',
+        'Cov. @85',
+        'Cov. @95',
+        'Mean actual (d)',
+        'Mean P50 (d)',
+        'Mean P85 (d)',
+      ],
       outcomes
         .filter(o => o.drift === drift)
         .map(o => [
@@ -149,13 +172,21 @@ for (const drift of [false, true]) {
 }
 
 const worst = outcomes.reduce((acc, o) => Math.max(acc, Math.abs(o.covered[85] - 0.85)), 0);
-sections.push(`Largest absolute deviation from nominal at the 85 % level across all configurations: ${fmt(worst, 3)}.`);
+sections.push(
+  `Largest absolute deviation from nominal at the 85 % level across all configurations: ${fmt(worst, 3)}.`
+);
 sections.push('## Reproduce');
-sections.push('```bash\nnpm run bench:forecast --workspace=research -- --history=14,30,60,120 --backlog=10,40,120 --runs=300 --trials=4000\n```');
+sections.push(
+  '```bash\nnpm run bench:forecast --workspace=research -- --history=14,30,60,120 --backlog=10,40,120 --runs=300 --trials=4000\n```'
+);
 const stamp = environmentStamp();
 sections.push(`Generated ${stamp.generatedAt} on ${stamp.platform}, Node ${stamp.node}.`);
 
 const md = writeMarkdown('forecast-calibration', sections.join('\n\n'));
-const json = writeJson('forecast-calibration', { ...stamp, design: { HISTORY_DAYS, BACKLOGS, RUNS, TRIALS }, outcomes });
+const json = writeJson('forecast-calibration', {
+  ...stamp,
+  design: { HISTORY_DAYS, BACKLOGS, RUNS, TRIALS },
+  outcomes,
+});
 // eslint-disable-next-line no-console
 console.log(`Wrote\n  ${md}\n  ${json}`);

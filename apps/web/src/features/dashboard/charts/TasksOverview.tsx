@@ -1,5 +1,6 @@
 // apps/web/src/features/dashboard/charts/TasksOverview.tsx
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
 import type { TaskStats, TaskStatus } from '@taskverse/types';
 
 interface TasksOverviewProps {
@@ -48,7 +49,12 @@ export default function TasksOverview({ stats, isLoading }: TasksOverviewProps) 
         <BarChart data={data} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
           <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={{ stroke: '#e5e7eb' }} />
-          <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} allowDecimals={false} />
+          <YAxis
+            tick={{ fontSize: 12, fill: '#6b7280' }}
+            axisLine={false}
+            tickLine={false}
+            allowDecimals={false}
+          />
           <Tooltip
             cursor={{ fill: 'rgba(99, 102, 241, 0.08)' }}
             contentStyle={{ border: '1px solid #e5e7eb', borderRadius: 6 }}

@@ -46,9 +46,3 @@ export interface ApiErrorResponse {
   details?: unknown;
   requestId?: string;
 }
-
-export interface Paginated<K extends string, T> {
-  pagination: Pagination;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-}

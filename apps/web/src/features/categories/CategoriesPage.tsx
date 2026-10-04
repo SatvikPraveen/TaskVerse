@@ -2,7 +2,6 @@
 import { PencilIcon, PlusIcon, TagIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import type { CreateCategoryInput, UpdateCategoryInput } from '@taskverse/types';
 
 import {
   type Category,
@@ -14,6 +13,7 @@ import {
 import { getErrorMessage } from '@/api/client';
 import Button from '@/components/Button';
 import Modal, { ModalActions } from '@/components/Modal';
+import type { CreateCategoryInput, UpdateCategoryInput } from '@taskverse/types';
 
 import CategoryForm from './CategoryForm';
 
@@ -187,8 +187,8 @@ export default function CategoriesPage() {
         </p>
         {(deleting?.taskCount ?? 0) > 0 && (
           <p className="mt-3 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
-            {deleting?.taskCount} task{deleting?.taskCount === 1 ? '' : 's'} will be left without a
-            category. The tasks themselves are kept.
+            {deleting?.taskCount} task{deleting?.taskCount === 1 ? '' : 's'} will be left without a category.
+            The tasks themselves are kept.
           </p>
         )}
         <ModalActions

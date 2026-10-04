@@ -67,11 +67,7 @@ export class UserController {
       if (value !== undefined) $set[`preferences.notifications.${key}`] = value;
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.user!.id,
-      { $set },
-      { new: true, runValidators: true }
-    );
+    const user = await User.findByIdAndUpdate(req.user!.id, { $set }, { new: true, runValidators: true });
     if (!user) throw createError('User not found', 404);
     res.json({ success: true, message: 'Preferences updated successfully', data: { user } });
   });
@@ -82,12 +78,7 @@ export class UserController {
     const filter: Record<string, unknown> = { isActive: true };
     if (query) {
       const pattern = { $regex: escapeRegex(query), $options: 'i' };
-      filter.$or = [
-        { username: pattern },
-        { firstName: pattern },
-        { lastName: pattern },
-        { email: pattern },
-      ];
+      filter.$or = [{ username: pattern }, { firstName: pattern }, { lastName: pattern }, { email: pattern }];
     }
 
     const { offset, pagination } = getPaginationParams(page, limit);

@@ -16,7 +16,10 @@ const typescriptRules = {
   ],
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-non-null-assertion': 'off',
-  '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports', fixStyle: 'inline-type-imports' }],
+  '@typescript-eslint/consistent-type-imports': [
+    'error',
+    { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
+  ],
 };
 
 const importRules = {
@@ -89,11 +92,17 @@ module.exports = [
   {
     files: ['**/*.test.ts', '**/tests/**/*.ts', '**/*.spec.ts', 'research/**/*.ts'],
     languageOptions: { globals: { ...globals.node, ...globals.jest } },
-    rules: { 'no-console': 'off' },
+    rules: { 'no-console': 'off', '@typescript-eslint/no-explicit-any': 'off' },
   },
   // Config files
   {
-    files: ['**/*.config.{js,cjs,mjs,ts}', '**/vite.config.ts', '**/playwright.config.ts', '**/tailwind.config.js', '**/postcss.config.js'],
+    files: [
+      '**/*.config.{js,cjs,mjs,ts}',
+      '**/vite.config.ts',
+      '**/playwright.config.ts',
+      '**/tailwind.config.js',
+      '**/postcss.config.js',
+    ],
     languageOptions: { globals: { ...globals.node } },
     rules: { 'no-console': 'off', '@typescript-eslint/no-var-requires': 'off' },
   },

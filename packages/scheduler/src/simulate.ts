@@ -56,10 +56,7 @@ export interface SimulationResult {
  * the ready set (prerequisites finished, not yet started) and the highest
  * ranked task is assigned to the first free worker. Non-preemptive.
  */
-export const simulate = (
-  tasks: readonly SchedulableTask[],
-  options: SimulationOptions
-): SimulationResult => {
+export const simulate = (tasks: readonly SchedulableTask[], options: SimulationOptions): SimulationResult => {
   const policy = typeof options.policy === 'string' ? getPolicy(options.policy) : options.policy;
   const policyName = typeof options.policy === 'string' ? options.policy : policy.name || 'custom';
   const start = options.start ?? new Date();
@@ -68,7 +65,9 @@ export const simulate = (
 
   const pending = tasks.filter(t => !isTerminal(t.status));
   const graph = buildGraph(tasks);
-  const dependentCounts = new Map([...graph.nodes.keys()].map(id => [id, transitiveDependentCount(graph, id)]));
+  const dependentCounts = new Map(
+    [...graph.nodes.keys()].map(id => [id, transitiveDependentCount(graph, id)])
+  );
   const finished = new Set<string>(tasks.filter(t => isTerminal(t.status)).map(t => t.id));
   const started = new Set<string>();
   const workerFreeAt = new Array<number>(workers).fill(0);

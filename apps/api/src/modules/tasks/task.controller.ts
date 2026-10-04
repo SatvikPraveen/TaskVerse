@@ -30,14 +30,12 @@ const createTaskSchema = z.object({
     .default([]),
 });
 
-const updateTaskSchema = createTaskSchema
-  .partial()
-  .extend({
-    assignedTo: objectId.nullable().optional(),
-    actualHours: z.number().min(0).optional(),
-    isArchived: z.boolean().optional(),
-    position: z.number().optional(),
-  });
+const updateTaskSchema = createTaskSchema.partial().extend({
+  assignedTo: objectId.nullable().optional(),
+  actualHours: z.number().min(0).optional(),
+  isArchived: z.boolean().optional(),
+  position: z.number().optional(),
+});
 
 const getTasksSchema = z.object({
   status: z.enum(TASK_STATUSES).optional(),
@@ -54,9 +52,7 @@ const getTasksSchema = z.object({
     .transform(v => v === 'true'),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
-  sortBy: z
-    .enum(['createdAt', 'updatedAt', 'dueDate', 'priority', 'title', 'position'])
-    .default('position'),
+  sortBy: z.enum(['createdAt', 'updatedAt', 'dueDate', 'priority', 'title', 'position']).default('position'),
   sortOrder: z.enum(['asc', 'desc']).default('asc'),
 });
 
@@ -79,7 +75,12 @@ export class TaskController {
     if (q.category) filter.category = q.category;
     if (q.assignedTo) filter.assignedTo = q.assignedTo;
     if (q.tags) {
-      filter.tags = { $in: q.tags.split(',').map(tag => tag.trim()).filter(Boolean) };
+      filter.tags = {
+        $in: q.tags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean),
+      };
     }
     if (q.dueAfter || q.dueBefore) {
       filter.dueDate = {
@@ -135,14 +136,23 @@ export class TaskController {
     });
     // Route the initial status through the transition log too.
     if (input.status !== 'todo') applyStatusTransition(task, input.status, userId);
-    else task.statusHistory.push({ from: null, to: 'todo', at: new Date(), by: new mongoose.Types.ObjectId(userId) });
+    else
+      task.statusHistory.push({
+        from: null,
+        to: 'todo',
+        at: new Date(),
+        by: new mongoose.Types.ObjectId(userId),
+      });
 
     await task.save();
     await task.populate(TASK_POPULATE);
 
     await publishTaskEvent('task.created', task, userId, { task: task.toJSON() });
     if (input.assignedTo && input.assignedTo !== userId) {
-      await publishTaskEvent('task.assigned', task, userId, { task: task.toJSON(), assignedTo: input.assignedTo });
+      await publishTaskEvent('task.assigned', task, userId, {
+        task: task.toJSON(),
+        assignedTo: input.assignedTo,
+      });
     }
 
     res.status(201).json({ success: true, message: 'Task created successfully', data: { task } });
@@ -177,7 +187,9 @@ export class TaskController {
 
     const snapshot = task.toJSON();
     const statusChanged = status !== undefined && status !== previousStatus;
-    const newAssignee = task.assignedTo ? String((task.assignedTo as { _id?: unknown })._id ?? task.assignedTo) : null;
+    const newAssignee = task.assignedTo
+      ? String((task.assignedTo as { _id?: unknown })._id ?? task.assignedTo)
+      : null;
     const assigneeChanged = assignedTo !== undefined && newAssignee !== previousAssignee;
 
     if (statusChanged) {
@@ -230,9 +242,7 @@ export class TaskController {
 
   static updateSubtask = asyncHandler<AuthRequest>(async (req, res: Response) => {
     const userId = req.user!.id;
-    const { taskId, subtaskId } = z
-      .object({ taskId: objectId, subtaskId: objectId })
-      .parse(req.params);
+    const { taskId, subtaskId } = z.object({ taskId: objectId, subtaskId: objectId }).parse(req.params);
     const { isCompleted } = z.object({ isCompleted: z.boolean() }).parse(req.body);
 
     const task = await Task.findOneAndUpdate(
@@ -242,7 +252,11 @@ export class TaskController {
     ).populate(TASK_POPULATE);
     if (!task) throw createError('Task or subtask not found', 404);
 
-    await publishTaskEvent('task.subtask_updated', task, userId, { task: task.toJSON(), subtaskId, isCompleted });
+    await publishTaskEvent('task.subtask_updated', task, userId, {
+      task: task.toJSON(),
+      subtaskId,
+      isCompleted,
+    });
     res.json({ success: true, message: 'Subtask updated successfully', data: { task } });
   });
 

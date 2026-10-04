@@ -1,4 +1,10 @@
 // apps/api/src/modules/planning/planning.controller.ts
+import type { Response } from 'express';
+import { z } from 'zod';
+
+import type { AuthRequest } from '@/middleware/auth';
+import { asyncHandler } from '@/middleware/error';
+import { loadPlanningTasks, toSchedulable } from '@/modules/tasks/task.service';
 import {
   buildGraph,
   classifyEisenhower,
@@ -14,12 +20,6 @@ import {
   throughputSeries,
   transitiveDependentCount,
 } from '@taskverse/scheduler';
-import type { Response } from 'express';
-import { z } from 'zod';
-
-import type { AuthRequest } from '@/middleware/auth';
-import { asyncHandler } from '@/middleware/error';
-import { loadPlanningTasks, toSchedulable } from '@/modules/tasks/task.service';
 
 const policyEnum = z.enum(POLICY_NAMES as [PolicyName, ...PolicyName[]]);
 
@@ -42,7 +42,14 @@ const simulateQuery = z.object({
   policies: z
     .string()
     .optional()
-    .transform(v => (v ? v.split(',').map(s => s.trim()).filter(Boolean) : [...POLICY_NAMES]))
+    .transform(v =>
+      v
+        ? v
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
+        : [...POLICY_NAMES]
+    )
     .pipe(z.array(policyEnum).min(1)),
 });
 
@@ -162,7 +169,10 @@ export class PlanningController {
       .map(toSchedulable)
       .filter(t => t.status === 'todo' || t.status === 'in_progress');
 
-    const quadrants: Record<EisenhowerQuadrant, Array<{ taskId: string; title?: string; dueDate: string | null; priorityWeight: number }>> = {
+    const quadrants: Record<
+      EisenhowerQuadrant,
+      Array<{ taskId: string; title?: string; dueDate: string | null; priorityWeight: number }>
+    > = {
       do_first: [],
       schedule: [],
       delegate: [],
@@ -178,7 +188,9 @@ export class PlanningController {
       });
     }
     for (const list of Object.values(quadrants)) {
-      list.sort((a, b) => (a.dueDate ?? '9').localeCompare(b.dueDate ?? '9') || b.priorityWeight - a.priorityWeight);
+      list.sort(
+        (a, b) => (a.dueDate ?? '9').localeCompare(b.dueDate ?? '9') || b.priorityWeight - a.priorityWeight
+      );
     }
 
     res.json({ success: true, data: { generatedAt: now.toISOString(), quadrants } });
@@ -194,7 +206,12 @@ export class PlanningController {
     const series = throughputSeries(all, { from, to: now, bucket: q.bucket });
     const samples = series.map(p => p.completed);
 
-    const result = forecastCompletion({ remainingItems: remaining, throughputSamples: samples, trials: q.trials, seed: q.seed });
+    const result = forecastCompletion({
+      remainingItems: remaining,
+      throughputSamples: samples,
+      trials: q.trials,
+      seed: q.seed,
+    });
     const periodMs = q.bucket === 'week' ? 7 * MS_PER_DAY : MS_PER_DAY;
     const toDate = (periods: number) => new Date(now.getTime() + periods * periodMs).toISOString();
 
@@ -203,8 +220,16 @@ export class PlanningController {
       data: {
         generatedAt: now.toISOString(),
         remainingItems: remaining,
-        lookback: { from: from.toISOString(), to: now.toISOString(), bucket: q.bucket, periods: samples.length },
-        throughput: { samples, mean: samples.length ? Number((samples.reduce((a, b) => a + b, 0) / samples.length).toFixed(3)) : 0 },
+        lookback: {
+          from: from.toISOString(),
+          to: now.toISOString(),
+          bucket: q.bucket,
+          periods: samples.length,
+        },
+        throughput: {
+          samples,
+          mean: samples.length ? Number((samples.reduce((a, b) => a + b, 0) / samples.length).toFixed(3)) : 0,
+        },
         forecast: result
           ? {
               trials: result.trials,
@@ -233,10 +258,18 @@ export class PlanningController {
 
     const runs = q.policies.map(policy => {
       const result = simulate(all, { policy, start, workers: q.workers });
-      return { policy, ...POLICY_CATALOGUE[policy], metrics: result.metrics, unscheduled: result.unscheduled };
+      return {
+        policy,
+        ...POLICY_CATALOGUE[policy],
+        metrics: result.metrics,
+        unscheduled: result.unscheduled,
+      };
     });
     // Lowest weighted tardiness wins; makespan as the tie-break.
-    runs.sort((a, b) => a.metrics.weightedTardiness - b.metrics.weightedTardiness || a.metrics.makespan - b.metrics.makespan);
+    runs.sort(
+      (a, b) =>
+        a.metrics.weightedTardiness - b.metrics.weightedTardiness || a.metrics.makespan - b.metrics.makespan
+    );
 
     res.json({
       success: true,

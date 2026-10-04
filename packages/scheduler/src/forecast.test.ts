@@ -13,7 +13,11 @@ describe('forecastCompletion', () => {
   });
 
   it('produces monotone percentiles under variable throughput', () => {
-    const result = forecastCompletion({ remainingItems: 40, throughputSamples: [0, 1, 1, 2, 3, 5], seed: 7 })!;
+    const result = forecastCompletion({
+      remainingItems: 40,
+      throughputSamples: [0, 1, 1, 2, 3, 5],
+      seed: 7,
+    })!;
     const { p50, p70, p85, p95 } = result.percentiles;
     assert.ok(p50 <= p70 && p70 <= p85 && p85 <= p95);
     assert.ok(p50 >= 40 / 5 && p95 <= 40 / 1 + 1);

@@ -26,9 +26,7 @@ const extractBearer = (req: Request): string | undefined => {
 export const resolveUserFromToken = async (token: string): Promise<AuthUser | null> => {
   const decoded = verifyAccessToken(token);
   if (decoded.type !== 'access') return null;
-  const user = await User.findOne({ _id: decoded.userId, isActive: true }).select(
-    'email username'
-  );
+  const user = await User.findOne({ _id: decoded.userId, isActive: true }).select('email username');
   if (!user) return null;
   return { id: user._id.toString(), email: user.email, username: user.username };
 };
@@ -65,11 +63,7 @@ export const authenticateToken = async (
   }
 };
 
-export const optionalAuth = async (
-  req: AuthRequest,
-  _res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const optionalAuth = async (req: AuthRequest, _res: Response, next: NextFunction): Promise<void> => {
   const token = extractBearer(req);
   if (!token) return next();
   try {

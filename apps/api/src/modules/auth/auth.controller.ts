@@ -1,13 +1,19 @@
 // apps/api/src/modules/auth/auth.controller.ts
-import { Request, Response } from 'express';
+import { type Request, type Response } from 'express';
 import { z } from 'zod';
-import { AuthService } from './auth.service';
+
+import { type AuthRequest } from '@/middleware/auth';
 import { asyncHandler } from '@/middleware/error';
-import { AuthRequest } from '@/middleware/auth';
+
+import { AuthService } from './auth.service';
 
 // Validation schemas
 const registerSchema = z.object({
-  username: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_-]+$/),
+  username: z
+    .string()
+    .min(3)
+    .max(20)
+    .regex(/^[a-zA-Z0-9_-]+$/),
   email: z.string().email(),
   password: z.string().min(6),
   firstName: z.string().min(1).max(50).optional(),
@@ -31,7 +37,7 @@ const changePasswordSchema = z.object({
 export class AuthController {
   static register = asyncHandler(async (req: Request, res: Response) => {
     const validatedData = registerSchema.parse(req.body);
-    
+
     const result = await AuthService.register(validatedData);
 
     res.status(201).json({
@@ -43,7 +49,7 @@ export class AuthController {
 
   static login = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = loginSchema.parse(req.body);
-    
+
     const deviceInfo = req.headers['user-agent'];
     const ipAddress = req.ip;
 

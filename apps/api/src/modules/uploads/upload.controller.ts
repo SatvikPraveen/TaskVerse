@@ -134,9 +134,7 @@ export class UploadController {
 
   static removeAttachmentFromTask = asyncHandler<AuthRequest>(async (req, res: Response) => {
     const userId = req.user!.id;
-    const { taskId, attachmentId } = z
-      .object({ taskId: objectId, attachmentId: objectId })
-      .parse(req.params);
+    const { taskId, attachmentId } = z.object({ taskId: objectId, attachmentId: objectId }).parse(req.params);
 
     const task = await Task.findOneAndUpdate(
       {

@@ -40,7 +40,8 @@ export const generateWorkload = (options: WorkloadOptions): SchedulableTask[] =>
     const id = `t${String(i + 1).padStart(4, '0')}`;
     const ageHours = rng.next() * 24 * 30; // created within the last 30 days
     const createdAt = new Date(now.getTime() - ageHours * MS_PER_HOUR);
-    const estimate = rng.next() < estimateRate ? Math.round((0.5 + Math.exp(rng.next() * 2.2)) * 2) / 2 : null;
+    const estimate =
+      rng.next() < estimateRate ? Math.round((0.5 + Math.exp(rng.next() * 2.2)) * 2) / 2 : null;
     const hasDue = rng.next() < dueDateRate;
     // 15% of dated tasks are already overdue.
     const dueOffset = hasDue ? (rng.next() < 0.15 ? -rng.next() * 72 : 1 + rng.next() * horizon) : null;

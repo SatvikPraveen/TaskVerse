@@ -25,7 +25,12 @@ const envSchema = z.object({
   ALLOWED_ORIGINS: z
     .string()
     .default('http://localhost:5173')
-    .transform(val => val.split(',').map(origin => origin.trim()).filter(Boolean)),
+    .transform(val =>
+      val
+        .split(',')
+        .map(origin => origin.trim())
+        .filter(Boolean)
+    ),
 
   // Rate limiting
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(15 * 60 * 1000),

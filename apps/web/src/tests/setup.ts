@@ -8,17 +8,17 @@ export const test = base.extend<{
   authenticatedPage: async ({ page }, use) => {
     // Mock authentication for tests
     await page.goto('/login');
-    
+
     // Fill in test credentials
     await page.fill('input[type="email"]', 'test@example.com');
     await page.fill('input[type="password"]', 'testpass123');
-    
+
     // Click login button
     await page.click('button[type="submit"]');
-    
+
     // Wait for dashboard to load
     await page.waitForURL('/dashboard');
-    
+
     await use(page);
   },
 });
@@ -49,21 +49,21 @@ export const createTestTask = async (page: Page, taskData: Record<string, string
 
   await page.click('button:has-text("New Task")');
   await page.fill('input[placeholder*="title"]', defaultTask.title);
-  
+
   if (defaultTask.description) {
     await page.fill('textarea[placeholder*="description"]', defaultTask.description);
   }
-  
+
   await page.selectOption('select', defaultTask.priority);
   await page.click('button[type="submit"]');
-  
+
   // Wait for task to be created
   await page.waitForSelector(`text=${defaultTask.title}`);
-  
+
   return defaultTask;
 };
 
-export const createTestCategory = async (page: any, categoryData: any = {}) => {
+export const createTestCategory = async (page: Page, categoryData: Record<string, string> = {}) => {
   const defaultCategory = {
     name: 'Test Category',
     description: 'Test category description',
@@ -73,15 +73,15 @@ export const createTestCategory = async (page: any, categoryData: any = {}) => {
 
   await page.click('button:has-text("New Category")');
   await page.fill('input[placeholder*="name"]', defaultCategory.name);
-  
+
   if (defaultCategory.description) {
     await page.fill('textarea[placeholder*="description"]', defaultCategory.description);
   }
-  
+
   await page.click('button[type="submit"]');
-  
+
   // Wait for category to be created
   await page.waitForSelector(`text=${defaultCategory.name}`);
-  
+
   return defaultCategory;
 };

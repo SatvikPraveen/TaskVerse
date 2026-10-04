@@ -1,7 +1,17 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { classifyEisenhower, edf, eisenhower, fifo, getPolicy, POLICY_NAMES, priority, spt, wsjf } from './policies';
+import {
+  classifyEisenhower,
+  edf,
+  eisenhower,
+  fifo,
+  getPolicy,
+  POLICY_NAMES,
+  priority,
+  spt,
+  wsjf,
+} from './policies';
 import { MS_PER_HOUR, type SchedulableTask } from './types';
 
 const now = new Date('2026-01-05T09:00:00.000Z');
@@ -27,7 +37,10 @@ describe('policy registry', () => {
 
   it('assigns dense, 1-based ranks', () => {
     const ranked = fifo([task(), task(), task()], { now });
-    assert.deepEqual(ranked.map(r => r.rank), [1, 2, 3]);
+    assert.deepEqual(
+      ranked.map(r => r.rank),
+      [1, 2, 3]
+    );
   });
 });
 
@@ -35,7 +48,10 @@ describe('fifo', () => {
   it('orders by creation time, oldest first', () => {
     const old = task({ id: 'old', createdAt: hours(-100) });
     const young = task({ id: 'young', createdAt: hours(-1) });
-    assert.deepEqual(fifo([young, old], { now }).map(r => r.task.id), ['old', 'young']);
+    assert.deepEqual(
+      fifo([young, old], { now }).map(r => r.task.id),
+      ['old', 'young']
+    );
   });
 });
 
@@ -44,7 +60,10 @@ describe('priority', () => {
     const a = task({ id: 'a', priorityWeight: 4 });
     const b = task({ id: 'b', priorityWeight: 2, dueDate: hours(5) });
     const c = task({ id: 'c', priorityWeight: 2, dueDate: hours(1) });
-    assert.deepEqual(priority([b, c, a], { now }).map(r => r.task.id), ['a', 'c', 'b']);
+    assert.deepEqual(
+      priority([b, c, a], { now }).map(r => r.task.id),
+      ['a', 'c', 'b']
+    );
   });
 });
 
@@ -54,7 +73,10 @@ describe('spt', () => {
     const small = task({ id: 'small', estimatedHours: 1 });
     const unknown = task({ id: 'unknown' });
     const ranked = spt([big, unknown, small], { now, defaultEstimateHours: 3 });
-    assert.deepEqual(ranked.map(r => r.task.id), ['small', 'unknown', 'big']);
+    assert.deepEqual(
+      ranked.map(r => r.task.id),
+      ['small', 'unknown', 'big']
+    );
   });
 });
 
@@ -64,7 +86,10 @@ describe('edf', () => {
     const soon = task({ id: 'soon', dueDate: hours(3) });
     const later = task({ id: 'later', dueDate: hours(30) });
     const none = task({ id: 'none', priorityWeight: 4 });
-    assert.deepEqual(edf([none, later, soon, late], { now }).map(r => r.task.id), ['late', 'soon', 'later', 'none']);
+    assert.deepEqual(
+      edf([none, later, soon, late], { now }).map(r => r.task.id),
+      ['late', 'soon', 'later', 'none']
+    );
   });
 
   it('explains overdue tasks', () => {
@@ -109,9 +134,18 @@ describe('wsjf', () => {
 
 describe('eisenhower', () => {
   it('classifies quadrants from importance and urgency', () => {
-    assert.equal(classifyEisenhower(task({ priorityWeight: 4, dueDate: hours(10) }), { now }).quadrant, 'do_first');
-    assert.equal(classifyEisenhower(task({ priorityWeight: 4, dueDate: hours(200) }), { now }).quadrant, 'schedule');
-    assert.equal(classifyEisenhower(task({ priorityWeight: 1, dueDate: hours(10) }), { now }).quadrant, 'delegate');
+    assert.equal(
+      classifyEisenhower(task({ priorityWeight: 4, dueDate: hours(10) }), { now }).quadrant,
+      'do_first'
+    );
+    assert.equal(
+      classifyEisenhower(task({ priorityWeight: 4, dueDate: hours(200) }), { now }).quadrant,
+      'schedule'
+    );
+    assert.equal(
+      classifyEisenhower(task({ priorityWeight: 1, dueDate: hours(10) }), { now }).quadrant,
+      'delegate'
+    );
     assert.equal(classifyEisenhower(task({ priorityWeight: 1 }), { now }).quadrant, 'eliminate');
   });
 
@@ -121,6 +155,9 @@ describe('eisenhower', () => {
     const q2 = task({ id: 'q2', priorityWeight: 4 });
     const q3 = task({ id: 'q3', priorityWeight: 1, dueDate: hours(1) });
     const q4 = task({ id: 'q4', priorityWeight: 1 });
-    assert.deepEqual(eisenhower([q4, q3, q2, q1, q1earlier], { now }).map(r => r.task.id), ['q1e', 'q1', 'q2', 'q3', 'q4']);
+    assert.deepEqual(
+      eisenhower([q4, q3, q2, q1, q1earlier], { now }).map(r => r.task.id),
+      ['q1e', 'q1', 'q2', 'q3', 'q4']
+    );
   });
 });

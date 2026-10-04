@@ -30,8 +30,6 @@ export const MS_PER_DAY = 24 * MS_PER_HOUR;
 export const isTerminal = (status: SchedulableStatus): boolean =>
   status === 'completed' || status === 'cancelled';
 
-export const hoursBetween = (from: Date, to: Date): number =>
-  (to.getTime() - from.getTime()) / MS_PER_HOUR;
+export const hoursBetween = (from: Date, to: Date): number => (to.getTime() - from.getTime()) / MS_PER_HOUR;
 
-export const clamp = (value: number, min: number, max: number): number =>
-  Math.min(max, Math.max(min, value));
+export const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));

@@ -1,5 +1,6 @@
 // apps/web/src/api/categories.api.ts
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+
 import type {
   Category,
   CategoryStats,

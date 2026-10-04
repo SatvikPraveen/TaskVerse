@@ -3,13 +3,13 @@ import { FunnelIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
-import type { CreateTaskInput, TaskPriority, TaskStatus } from '@taskverse/types';
 
 import { useCategories } from '@/api/categories.api';
 import { getErrorMessage } from '@/api/client';
 import { type TaskFilters, useCreateTask, useTasks } from '@/api/tasks.api';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
+import type { CreateTaskInput, TaskPriority, TaskStatus } from '@taskverse/types';
 
 import CreateTaskForm from './CreateTaskForm';
 import FiltersBar from './FiltersBar';
@@ -88,9 +88,7 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {showFilters && (
-        <FiltersBar filters={filters} onFiltersChange={setFilters} categories={categories} />
-      )}
+      {showFilters && <FiltersBar filters={filters} onFiltersChange={setFilters} categories={categories} />}
 
       {isLoading ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" aria-hidden="true">

@@ -34,13 +34,9 @@ export const getPaginationParams = (page: number = 1, limit: number = 20): Pagin
   };
 };
 
-export const buildPaginationResult = (
-  page: number,
-  limit: number,
-  total: number
-): PaginationResult => {
+export const buildPaginationResult = (page: number, limit: number, total: number): PaginationResult => {
   const totalPages = Math.ceil(total / limit);
-  
+
   return {
     page,
     limit,
@@ -55,10 +51,10 @@ export const getPaginationMeta = (
   page: number,
   limit: number,
   total: number,
-  items: any[]
+  items: unknown[]
 ): PaginationResult & { count: number } => {
   const result = buildPaginationResult(page, limit, total);
-  
+
   return {
     ...result,
     count: items.length,
@@ -76,22 +72,22 @@ export const buildCursorQuery = (
   cursor: string | undefined,
   sortField: string,
   sortOrder: 'asc' | 'desc'
-): any => {
+): Record<string, Record<string, unknown>> => {
   if (!cursor) return {};
-  
+
   try {
     const decodedCursor = JSON.parse(Buffer.from(cursor, 'base64').toString());
     const operator = sortOrder === 'asc' ? '$gt' : '$lt';
-    
+
     return {
-      [sortField]: { [operator]: decodedCursor[sortField] }
+      [sortField]: { [operator]: decodedCursor[sortField] },
     };
   } catch {
     return {};
   }
 };
 
-export const encodeCursor = (item: any, sortField: string): string => {
+export const encodeCursor = (item: Record<string, unknown>, sortField: string): string => {
   return Buffer.from(JSON.stringify({ [sortField]: item[sortField] })).toString('base64');
 };
 
@@ -103,6 +99,6 @@ export interface OffsetLimitParams {
 export const normalizeOffsetLimit = (params: OffsetLimitParams) => {
   const offset = Math.max(0, params.offset || 0);
   const limit = Math.max(1, Math.min(100, params.limit || 20));
-  
+
   return { offset, limit };
 };

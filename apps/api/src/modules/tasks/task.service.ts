@@ -1,8 +1,8 @@
 // apps/api/src/modules/tasks/task.service.ts
-import { buildGraph, type SchedulableTask, wouldCreateCycle } from '@taskverse/scheduler';
 import mongoose, { type FilterQuery } from 'mongoose';
 
 import { createError } from '@/middleware/error';
+import { buildGraph, type SchedulableTask, wouldCreateCycle } from '@taskverse/scheduler';
 
 import { type ITask, Task, type TaskStatus } from './task.model';
 
@@ -58,7 +58,13 @@ export const loadPlanningTasks = async (
   if (!options.includeArchived) filter.isArchived = false;
   if (options.since) {
     filter.$and = [
-      { $or: [{ createdAt: { $gte: options.since } }, { completedAt: { $gte: options.since } }, { status: { $in: ['todo', 'in_progress'] } }] },
+      {
+        $or: [
+          { createdAt: { $gte: options.since } },
+          { completedAt: { $gte: options.since } },
+          { status: { $in: ['todo', 'in_progress'] } },
+        ],
+      },
     ];
   }
   return Task.find(filter).select(PLANNING_PROJECTION).lean<PlanningTask[]>();

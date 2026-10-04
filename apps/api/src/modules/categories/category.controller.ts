@@ -57,9 +57,7 @@ export class CategoryController {
       recipients: [req.user!.id],
       timestamp: new Date().toISOString(),
     });
-    res
-      .status(201)
-      .json({ success: true, message: 'Category created successfully', data: { category } });
+    res.status(201).json({ success: true, message: 'Category created successfully', data: { category } });
   });
 
   static updateCategory = asyncHandler<AuthRequest>(async (req, res: Response) => {

@@ -1,8 +1,10 @@
 // apps/api/src/modules/auth/auth.routes.ts
 import { Router } from 'express';
-import { AuthController } from './auth.controller';
+
 import { authenticateToken } from '@/middleware/auth';
 import { authRateLimitMiddleware } from '@/middleware/rateLimit';
+
+import { AuthController } from './auth.controller';
 
 const router = Router();
 

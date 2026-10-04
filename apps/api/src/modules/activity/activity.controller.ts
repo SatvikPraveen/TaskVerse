@@ -39,7 +39,10 @@ export class ActivityController {
     const filter: FilterQuery<IActivity> = { audience: req.user!.id };
     if (q.event) filter.event = q.event;
     const result = await page(filter, q.limit, q.before);
-    res.json({ success: true, data: { activity: result.items, hasMore: result.hasMore, nextCursor: result.nextCursor } });
+    res.json({
+      success: true,
+      data: { activity: result.items, hasMore: result.hasMore, nextCursor: result.nextCursor },
+    });
   });
 
   /** History of a single task the user can see. */
@@ -51,6 +54,9 @@ export class ActivityController {
     if (!visible) throw createError('Task not found', 404);
 
     const result = await page({ entityType: 'task', entityId: taskId }, q.limit, q.before);
-    res.json({ success: true, data: { activity: result.items, hasMore: result.hasMore, nextCursor: result.nextCursor } });
+    res.json({
+      success: true,
+      data: { activity: result.items, hasMore: result.hasMore, nextCursor: result.nextCursor },
+    });
   });
 }

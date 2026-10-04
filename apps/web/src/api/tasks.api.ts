@@ -1,5 +1,6 @@
 // apps/web/src/api/tasks.api.ts
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+
 import type {
   Comment,
   CommentInput,
@@ -30,8 +31,7 @@ export const tasksApi = {
   getTasks: (filters: TaskFilters = {}) => api.get<PaginatedTasks>(`/tasks${toQueryString(filters)}`),
   getTask: (taskId: string) => api.get<{ task: Task }>(`/tasks/${taskId}`),
   createTask: (data: CreateTaskInput) => api.post<{ task: Task }>('/tasks', data),
-  updateTask: (taskId: string, data: UpdateTaskInput) =>
-    api.put<{ task: Task }>(`/tasks/${taskId}`, data),
+  updateTask: (taskId: string, data: UpdateTaskInput) => api.put<{ task: Task }>(`/tasks/${taskId}`, data),
   deleteTask: (taskId: string) => api.delete(`/tasks/${taskId}`),
   getTaskStats: () => api.get<{ stats: TaskStats }>('/tasks/stats'),
   addComment: (taskId: string, data: CommentInput) =>
@@ -60,8 +60,7 @@ export const useTask = (taskId: string | null) =>
     enabled: !!taskId,
   });
 
-export const useTaskStats = () =>
-  useQuery(taskKeys.stats(), tasksApi.getTaskStats, { staleTime: 60 * 1000 });
+export const useTaskStats = () => useQuery(taskKeys.stats(), tasksApi.getTaskStats, { staleTime: 60 * 1000 });
 
 const useInvalidateTasks = () => {
   const queryClient = useQueryClient();
@@ -80,8 +79,7 @@ export const useCreateTask = () => {
 export const useUpdateTask = () => {
   const invalidate = useInvalidateTasks();
   return useMutation(
-    ({ taskId, data }: { taskId: string; data: UpdateTaskInput }) =>
-      tasksApi.updateTask(taskId, data),
+    ({ taskId, data }: { taskId: string; data: UpdateTaskInput }) => tasksApi.updateTask(taskId, data),
     { onSuccess: (_res, { taskId }) => invalidate(taskId) }
   );
 };

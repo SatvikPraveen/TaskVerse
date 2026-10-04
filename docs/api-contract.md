@@ -7,6 +7,7 @@ Base URL: `http://localhost:3001/api/v1`
 ## Authentication
 
 All protected endpoints require a Bearer token in the Authorization header:
+
 ```
 Authorization: Bearer <access_token>
 ```
@@ -16,9 +17,11 @@ Authorization: Bearer <access_token>
 ### Authentication
 
 #### POST /auth/register
+
 Register a new user account.
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -28,6 +31,7 @@ Register a new user account.
 ```
 
 **Response (201):**
+
 ```json
 {
   "user": {
@@ -41,9 +45,11 @@ Register a new user account.
 ```
 
 #### POST /auth/login
+
 Authenticate user and return tokens.
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -52,6 +58,7 @@ Authenticate user and return tokens.
 ```
 
 **Response (200):**
+
 ```json
 {
   "user": {
@@ -65,9 +72,11 @@ Authenticate user and return tokens.
 ```
 
 #### POST /auth/refresh
+
 Refresh access token using refresh token.
 
 **Request Body:**
+
 ```json
 {
   "refreshToken": "jwt_refresh_token"
@@ -75,6 +84,7 @@ Refresh access token using refresh token.
 ```
 
 **Response (200):**
+
 ```json
 {
   "accessToken": "new_jwt_access_token"
@@ -82,9 +92,11 @@ Refresh access token using refresh token.
 ```
 
 #### POST /auth/logout
+
 Invalidate refresh token.
 
 **Request Body:**
+
 ```json
 {
   "refreshToken": "jwt_refresh_token"
@@ -92,6 +104,7 @@ Invalidate refresh token.
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Logged out successfully"
@@ -101,9 +114,11 @@ Invalidate refresh token.
 ### Users
 
 #### GET /users/profile
+
 Get current user profile. **[Protected]**
 
 **Response (200):**
+
 ```json
 {
   "id": "user_id",
@@ -115,9 +130,11 @@ Get current user profile. **[Protected]**
 ```
 
 #### PUT /users/profile
+
 Update current user profile. **[Protected]**
 
 **Request Body:**
+
 ```json
 {
   "name": "Updated Name",
@@ -128,13 +145,16 @@ Update current user profile. **[Protected]**
 ### Categories
 
 #### GET /categories
+
 Get all categories for the current user. **[Protected]**
 
 **Query Parameters:**
+
 - `limit` (optional): Number of categories to return (default: 50)
 - `offset` (optional): Number of categories to skip (default: 0)
 
 **Response (200):**
+
 ```json
 {
   "categories": [
@@ -154,9 +174,11 @@ Get all categories for the current user. **[Protected]**
 ```
 
 #### POST /categories
+
 Create a new category. **[Protected]**
 
 **Request Body:**
+
 ```json
 {
   "name": "Work",
@@ -165,9 +187,11 @@ Create a new category. **[Protected]**
 ```
 
 #### PUT /categories/:id
+
 Update a category. **[Protected]**
 
 **Request Body:**
+
 ```json
 {
   "name": "Updated Work",
@@ -176,9 +200,11 @@ Update a category. **[Protected]**
 ```
 
 #### DELETE /categories/:id
+
 Delete a category. **[Protected]**
 
 **Response (200):**
+
 ```json
 {
   "message": "Category deleted successfully"
@@ -188,9 +214,11 @@ Delete a category. **[Protected]**
 ### Tasks
 
 #### GET /tasks
+
 Get all tasks for the current user. **[Protected]**
 
 **Query Parameters:**
+
 - `limit` (optional): Number of tasks to return (default: 20)
 - `offset` (optional): Number of tasks to skip (default: 0)
 - `status` (optional): Filter by status (`pending`, `completed`)
@@ -201,6 +229,7 @@ Get all tasks for the current user. **[Protected]**
 - `sortOrder` (optional): Sort order (`asc`, `desc`, default: `desc`)
 
 **Response (200):**
+
 ```json
 {
   "tasks": [
@@ -238,9 +267,11 @@ Get all tasks for the current user. **[Protected]**
 ```
 
 #### POST /tasks
+
 Create a new task. **[Protected]**
 
 **Request Body:**
+
 ```json
 {
   "title": "New task",
@@ -252,12 +283,15 @@ Create a new task. **[Protected]**
 ```
 
 #### GET /tasks/:id
+
 Get a specific task. **[Protected]**
 
 #### PUT /tasks/:id
+
 Update a task. **[Protected]**
 
 **Request Body:**
+
 ```json
 {
   "title": "Updated task",
@@ -270,14 +304,17 @@ Update a task. **[Protected]**
 ```
 
 #### DELETE /tasks/:id
+
 Delete a task. **[Protected]**
 
 ### File Uploads
 
 #### POST /uploads/presign
+
 Get presigned URL for file upload. **[Protected]**
 
 **Request Body:**
+
 ```json
 {
   "filename": "document.pdf",
@@ -286,6 +323,7 @@ Get presigned URL for file upload. **[Protected]**
 ```
 
 **Response (200):**
+
 ```json
 {
   "uploadUrl": "https://s3.bucket.com/presigned-url",
@@ -295,9 +333,11 @@ Get presigned URL for file upload. **[Protected]**
 ```
 
 #### POST /tasks/:id/attachments
+
 Add attachment to task. **[Protected]**
 
 **Request Body:**
+
 ```json
 {
   "fileId": "generated_file_id",
@@ -312,7 +352,9 @@ Add attachment to task. **[Protected]**
 Connect to: `ws://localhost:3001`
 
 ### Authentication
+
 Send authentication token after connection:
+
 ```json
 {
   "type": "auth",
@@ -323,25 +365,31 @@ Send authentication token after connection:
 ### Task Events
 
 #### task:created
+
 Emitted when a task is created.
+
 ```json
 {
   "type": "task:created",
-  "data": { /* task object */ }
+  "data": {/* task object */}
 }
 ```
 
 #### task:updated
+
 Emitted when a task is updated.
+
 ```json
 {
-  "type": "task:updated", 
-  "data": { /* updated task object */ }
+  "type": "task:updated",
+  "data": {/* updated task object */}
 }
 ```
 
 #### task:deleted
+
 Emitted when a task is deleted.
+
 ```json
 {
   "type": "task:deleted",
@@ -366,6 +414,7 @@ All error responses follow this format:
 ```
 
 ### Common HTTP Status Codes:
+
 - `400` - Bad Request
 - `401` - Unauthorized
 - `403` - Forbidden

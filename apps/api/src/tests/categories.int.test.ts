@@ -1,7 +1,9 @@
 // apps/api/src/tests/categories.int.test.ts
 import request from 'supertest';
-import app from '../app';
+
 import { Category } from '@/modules/categories/category.model';
+
+import app from '../app';
 
 describe('Categories Integration Tests', () => {
   let accessToken: string;
@@ -15,9 +17,7 @@ describe('Categories Integration Tests', () => {
 
   beforeEach(async () => {
     // Register and login user
-    const registerResponse = await request(app)
-      .post('/api/auth/register')
-      .send(testUser);
+    const registerResponse = await request(app).post('/api/auth/register').send(testUser);
 
     accessToken = registerResponse.body.data.tokens.accessToken;
     userId = registerResponse.body.data.user.id;
@@ -144,7 +144,7 @@ describe('Categories Integration Tests', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.categories).toHaveLength(3);
-      
+
       // Should be sorted by sortOrder
       expect(response.body.data.categories[0].name).toBe('Work');
       expect(response.body.data.categories[1].name).toBe('Personal');
@@ -346,8 +346,7 @@ describe('Categories Integration Tests', () => {
       });
 
       // Verify new order
-      const categories = await Category.find({ createdBy: userId, isActive: true })
-        .sort({ sortOrder: 1 });
+      const categories = await Category.find({ createdBy: userId, isActive: true }).sort({ sortOrder: 1 });
 
       expect(categories[0].name).toBe('Third');
       expect(categories[1].name).toBe('First');

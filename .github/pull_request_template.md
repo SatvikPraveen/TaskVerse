@@ -16,4 +16,4 @@
 - [ ] New behaviour is covered by tests (unit for `packages/*`, integration for `apps/api`)
 - [ ] `apps/api/openapi/openapi.yaml` updated for any route change (the contract test enforces this)
 - [ ] Scheduler changes: benchmark results regenerated if the algorithm changed
-- [ ] `CHANGELOG.md` updated under *Unreleased*
+- [ ] `CHANGELOG.md` updated under _Unreleased_

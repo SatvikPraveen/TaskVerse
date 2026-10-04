@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
 import { io, type Socket } from 'socket.io-client';
-import type { TaskSocketEvents } from '@taskverse/types';
 
 import { taskKeys } from '@/api/tasks.api';
 import { tokenStorage } from '@/store/tokens';
+import type { TaskSocketEvents } from '@taskverse/types';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '/';
 

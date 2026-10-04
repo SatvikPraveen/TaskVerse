@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: If you use TaskVerse or its planning engine in research, please cite it as below.
 type: software
-title: "TaskVerse: a task management platform with a reproducible planning and flow-analytics engine"
+title: 'TaskVerse: a task management platform with a reproducible planning and flow-analytics engine'
 authors:
   - family-names: Praveen
     given-names: Satvik
