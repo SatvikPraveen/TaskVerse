@@ -1,18 +1,20 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./src",
+    "noEmit": true,
+    "incremental": false,
+    "types": ["node", "jest"],
     "paths": {
-      "@/*": ["./*"],
-      "@/config/*": ["./config/*"],
-      "@/middleware/*": ["./middleware/*"],
-      "@/modules/*": ["./modules/*"],
-      "@/utils/*": ["./utils/*"],
-      "@/sockets/*": ["./sockets/*"]
+      "@/*": ["./*"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "exclude": ["node_modules", "dist"]
 }

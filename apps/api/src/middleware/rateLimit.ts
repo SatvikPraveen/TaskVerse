@@ -1,47 +1,38 @@
 // apps/api/src/middleware/rateLimit.ts
 import rateLimit from 'express-rate-limit';
+
 import { env } from '@/config/env';
 
-// General API rate limiting
+const tooMany = (message: string, retryAfterSeconds: number) => ({
+  error: 'Too Many Requests',
+  message,
+  retryAfter: retryAfterSeconds,
+});
+
 export const rateLimitMiddleware = rateLimit({
   windowMs: env.RATE_LIMIT_WINDOW_MS,
-  max: env.RATE_LIMIT_MAX_REQUESTS,
-  message: {
-    error: 'Too Many Requests',
-    message: 'Too many requests from this IP, please try again later.',
-    retryAfter: Math.ceil(env.RATE_LIMIT_WINDOW_MS / 1000),
-  },
-  standardHeaders: true,
+  limit: env.RATE_LIMIT_MAX_REQUESTS,
+  standardHeaders: 'draft-7',
   legacyHeaders: false,
-  // Custom key generator to handle reverse proxy scenarios
-  keyGenerator: (req) => {
-    return req.ip || req.connection.remoteAddress || 'unknown';
-  },
+  message: tooMany(
+    'Too many requests from this IP, please try again later.',
+    Math.ceil(env.RATE_LIMIT_WINDOW_MS / 1000)
+  ),
 });
 
-// Strict rate limiting for auth endpoints
 export const authRateLimitMiddleware = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts per window
-  message: {
-    error: 'Too Many Requests',
-    message: 'Too many authentication attempts, please try again later.',
-    retryAfter: 900, // 15 minutes in seconds
-  },
-  standardHeaders: true,
+  windowMs: 15 * 60 * 1000,
+  limit: env.AUTH_RATE_LIMIT_MAX,
+  standardHeaders: 'draft-7',
   legacyHeaders: false,
-  skipSuccessfulRequests: true, // Don't count successful requests
+  skipSuccessfulRequests: true,
+  message: tooMany('Too many authentication attempts, please try again later.', 900),
 });
 
-// Upload rate limiting
 export const uploadRateLimitMiddleware = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // 10 uploads per hour
-  message: {
-    error: 'Too Many Requests',
-    message: 'Too many uploads from this IP, please try again later.',
-    retryAfter: 3600,
-  },
-  standardHeaders: true,
+  windowMs: 60 * 60 * 1000,
+  limit: env.UPLOAD_RATE_LIMIT_MAX,
+  standardHeaders: 'draft-7',
   legacyHeaders: false,
+  message: tooMany('Too many uploads from this IP, please try again later.', 3600),
 });

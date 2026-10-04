@@ -1,116 +1,140 @@
 // apps/api/src/middleware/error.ts
-import { Request, Response, NextFunction } from 'express';
-import { ZodError } from 'zod';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import mongoose from 'mongoose';
-import { logger } from '@/config/logger';
-import { env } from '@/config/env';
+import { ZodError } from 'zod';
 
-interface AppError extends Error {
-  statusCode?: number;
-  isOperational?: boolean;
+import { env } from '@/config/env';
+import { logger } from '@/config/logger';
+
+export class AppError extends Error {
+  readonly statusCode: number;
+  readonly isOperational = true;
+  readonly details?: unknown;
+
+  constructor(message: string, statusCode = 500, details?: unknown) {
+    super(message);
+    this.name = 'AppError';
+    this.statusCode = statusCode;
+    this.details = details;
+  }
 }
 
-export const createError = (message: string, statusCode: number = 500): AppError => {
-  const error = new Error(message) as AppError;
-  error.statusCode = statusCode;
-  error.isOperational = true;
-  return error;
-};
-
-export const errorHandler = (
-  error: AppError | Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  let statusCode = 500;
-  let message = 'Internal Server Error';
-  let details: any = undefined;
-
-  // Zod validation errors
-  if (error instanceof ZodError) {
-    statusCode = 400;
-    message = 'Validation Error';
-    details = error.errors.map(err => ({
-      field: err.path.join('.'),
-      message: err.message,
-    }));
-  }
-  // MongoDB validation errors
-  else if (error instanceof mongoose.Error.ValidationError) {
-    statusCode = 400;
-    message = 'Validation Error';
-    details = Object.values(error.errors).map(err => ({
-      field: err.path,
-      message: err.message,
-    }));
-  }
-  // MongoDB duplicate key error
-  else if (error.name === 'MongoServerError' && (error as any).code === 11000) {
-    statusCode = 409;
-    message = 'Duplicate Entry';
-    const field = Object.keys((error as any).keyValue)[0];
-    details = `${field} already exists`;
-  }
-  // MongoDB cast error (invalid ObjectId)
-  else if (error instanceof mongoose.Error.CastError) {
-    statusCode = 400;
-    message = 'Invalid ID format';
-  }
-  // JWT errors
-  else if (error.name === 'JsonWebTokenError') {
-    statusCode = 401;
-    message = 'Invalid token';
-  }
-  else if (error.name === 'TokenExpiredError') {
-    statusCode = 401;
-    message = 'Token expired';
-  }
-  // Custom app errors
-  else if ((error as AppError).isOperational && (error as AppError).statusCode) {
-    statusCode = (error as AppError).statusCode!;
-    message = error.message;
-  }
-  // Generic errors
-  else if (error.message) {
-    message = error.message;
-  }
-
-  // Log error details
-  logger.error('Error occurred:', {
-    error: error.message,
-    stack: env.NODE_ENV === 'development' ? error.stack : undefined,
-    url: req.originalUrl,
-    method: req.method,
-    ip: req.ip,
-    statusCode,
-  });
-
-  // Send error response
-  const response: any = {
-    error: getErrorTitle(statusCode),
-    message,
-    ...(details && { details }),
-    ...(env.NODE_ENV === 'development' && { stack: error.stack }),
-  };
-
-  res.status(statusCode).json(response);
-};
+export const createError = (message: string, statusCode = 500, details?: unknown): AppError =>
+  new AppError(message, statusCode, details);
 
 const getErrorTitle = (statusCode: number): string => {
-  switch (statusCode) {
-    case 400: return 'Bad Request';
-    case 401: return 'Unauthorized';
-    case 403: return 'Forbidden';
-    case 404: return 'Not Found';
-    case 409: return 'Conflict';
-    case 422: return 'Unprocessable Entity';
-    case 429: return 'Too Many Requests';
-    case 500: return 'Internal Server Error';
-    default: return 'Error';
-  }
+  const titles: Record<number, string> = {
+    400: 'Bad Request',
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'Not Found',
+    409: 'Conflict',
+    413: 'Payload Too Large',
+    422: 'Unprocessable Entity',
+    429: 'Too Many Requests',
+    500: 'Internal Server Error',
+    503: 'Service Unavailable',
+  };
+  return titles[statusCode] ?? 'Error';
 };
 
-export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
+interface MongoDuplicateKeyError extends Error {
+  code: number;
+  keyValue?: Record<string, unknown>;
+}
+
+const isDuplicateKeyError = (error: unknown): error is MongoDuplicateKeyError =>
+  typeof error === 'object' &&
+  error !== null &&
+  (error as { name?: string }).name === 'MongoServerError' &&
+  (error as { code?: number }).code === 11000;
+
+export interface ErrorBody {
+  error: string;
+  message: string;
+  details?: unknown;
+  requestId?: string;
+  stack?: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const errorHandler = (error: unknown, req: Request, res: Response, _next: NextFunction): void => {
+  let statusCode = 500;
+  let message = 'Internal Server Error';
+  let title: string | undefined;
+  let details: unknown;
+
+  if (error instanceof ZodError) {
+    statusCode = 400;
+    title = 'Validation Error';
+    message = 'Request validation failed';
+    details = error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+  } else if (error instanceof mongoose.Error.ValidationError) {
+    statusCode = 400;
+    title = 'Validation Error';
+    message = 'Document validation failed';
+    details = Object.values(error.errors).map(err => ({ field: err.path, message: err.message }));
+  } else if (isDuplicateKeyError(error)) {
+    statusCode = 409;
+    message = 'Duplicate Entry';
+    const field = Object.keys(error.keyValue ?? {})[0];
+    details = field ? `${field} already exists` : undefined;
+  } else if (error instanceof mongoose.Error.CastError) {
+    statusCode = 400;
+    message = 'Invalid ID format';
+  } else if (error instanceof AppError) {
+    statusCode = error.statusCode;
+    message = error.message;
+    details = error.details;
+  } else if (error instanceof Error && error.name === 'MulterError') {
+    statusCode = 400;
+    message = error.message;
+  } else if (error instanceof Error && error.message === 'Not allowed by CORS policy') {
+    statusCode = 403;
+    message = error.message;
+  } else if (error instanceof Error && error.name === 'JsonWebTokenError') {
+    statusCode = 401;
+    message = 'Invalid token';
+  } else if (error instanceof Error && error.name === 'TokenExpiredError') {
+    statusCode = 401;
+    message = 'Token expired';
+  } else if (error instanceof Error && 'type' in error && error.type === 'entity.too.large') {
+    statusCode = 413;
+    message = 'Request body too large';
+  }
+
+  const requestId = (req as Request & { id?: string }).id;
+  const log = statusCode >= 500 ? logger.error.bind(logger) : logger.warn.bind(logger);
+  log(
+    {
+      err: error,
+      requestId,
+      url: req.originalUrl,
+      method: req.method,
+      statusCode,
+    },
+    statusCode >= 500 ? 'Unhandled error' : 'Request failed'
+  );
+
+  const body: ErrorBody = {
+    error: title ?? getErrorTitle(statusCode),
+    message,
+    ...(details !== undefined && { details }),
+    ...(requestId && { requestId }),
+    ...(env.NODE_ENV === 'development' && error instanceof Error && { stack: error.stack }),
+  };
+
+  res.status(statusCode).json(body);
 };
+
+type AsyncHandler<Req extends Request = Request> = (
+  req: Req,
+  res: Response,
+  next: NextFunction
+) => Promise<unknown>;
+
+export const asyncHandler =
+  <Req extends Request = Request>(fn: AsyncHandler<Req>): RequestHandler =>
+  (req, res, next) => {
+    Promise.resolve(fn(req as Req, res, next)).catch(next);
+  };

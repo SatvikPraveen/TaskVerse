@@ -1,65 +1,41 @@
 // apps/api/src/modules/auth/auth.model.ts
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { type Document, type Model, Schema } from 'mongoose';
 
 export interface IRefreshToken extends Document {
   token: string;
   userId: mongoose.Types.ObjectId;
   expiresAt: Date;
-  createdAt: Date;
   isRevoked: boolean;
   deviceInfo?: string;
   ipAddress?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const refreshTokenSchema = new Schema<IRefreshToken>({
-  token: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true,
-  },
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true,
-  },
-  expiresAt: {
-    type: Date,
-    required: true,
-    index: { expireAfterSeconds: 0 }, // MongoDB TTL index
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  isRevoked: {
-    type: Boolean,
-    default: false,
-  },
-  deviceInfo: {
-    type: String,
-    maxlength: 500,
-  },
-  ipAddress: {
-    type: String,
-  },
-}, {
-  timestamps: true,
-});
+export interface RefreshTokenModel extends Model<IRefreshToken> {
+  cleanupExpired(): Promise<{ deletedCount?: number }>;
+}
 
-// Compound index for efficient queries
+const refreshTokenSchema = new Schema<IRefreshToken, RefreshTokenModel>(
+  {
+    token: { type: String, required: true, unique: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    // TTL index: MongoDB removes the document once expiresAt has passed.
+    expiresAt: { type: Date, required: true, index: { expireAfterSeconds: 0 } },
+    isRevoked: { type: Boolean, default: false },
+    deviceInfo: { type: String, maxlength: 500 },
+    ipAddress: { type: String },
+  },
+  { timestamps: true }
+);
+
 refreshTokenSchema.index({ userId: 1, createdAt: -1 });
-refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-// Clean up expired tokens periodically
-refreshTokenSchema.statics.cleanupExpired = async function() {
-  return this.deleteMany({
-    $or: [
-      { expiresAt: { $lt: new Date() } },
-      { isRevoked: true }
-    ]
-  });
+refreshTokenSchema.statics.cleanupExpired = function cleanupExpired() {
+  return this.deleteMany({ $or: [{ expiresAt: { $lt: new Date() } }, { isRevoked: true }] });
 };
 
-export const RefreshToken = mongoose.model<IRefreshToken>('RefreshToken', refreshTokenSchema);
+export const RefreshToken = mongoose.model<IRefreshToken, RefreshTokenModel>(
+  'RefreshToken',
+  refreshTokenSchema
+);

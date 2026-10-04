@@ -1,62 +1,55 @@
 // apps/api/src/server.ts
 import http from 'http';
+
 import { Server as SocketIOServer } from 'socket.io';
-import app from './app';
-import { connectDB } from '@/config/db';
+
+import { connectDB, disconnectDB } from '@/config/db';
 import { env } from '@/config/env';
 import { logger } from '@/config/logger';
 import { initSocketIO } from '@/sockets/init';
 
+import app from './app';
+
 const server = http.createServer(app);
 
-// Initialize Socket.IO
 const io = new SocketIOServer(server, {
-  cors: {
-    origin: env.ALLOWED_ORIGINS,
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
+  cors: { origin: env.ALLOWED_ORIGINS, methods: ['GET', 'POST'], credentials: true },
   transports: ['websocket', 'polling'],
 });
-
-// Initialize socket connections and namespaces
 initSocketIO(io);
 
-async function startServer() {
-  try {
-    // Connect to MongoDB
-    await connectDB();
-    logger.info('✅ Connected to MongoDB');
-
-    // Start HTTP server
-    server.listen(env.PORT, () => {
-      logger.info(`🚀 Server running on port ${env.PORT}`);
-      logger.info(`📝 Environment: ${env.NODE_ENV}`);
-      logger.info(`🌐 API URL: ${env.API_BASE_URL}`);
-    });
-
-    // Graceful shutdown
-    process.on('SIGTERM', gracefulShutdown);
-    process.on('SIGINT', gracefulShutdown);
-  } catch (error) {
-    logger.error('❌ Failed to start server:', error);
-    process.exit(1);
-  }
-}
-
-function gracefulShutdown(signal: string) {
-  logger.info(`📴 ${signal} received, shutting down gracefully`);
-  
-  server.close(() => {
-    logger.info('🔒 HTTP server closed');
-    process.exit(0);
+async function start(): Promise<void> {
+  await connectDB();
+  server.listen(env.PORT, () => {
+    logger.info({ port: env.PORT, env: env.NODE_ENV, url: env.API_BASE_URL }, 'API listening');
   });
-
-  // Force close after 30 seconds
-  setTimeout(() => {
-    logger.error('⚡ Force closing server');
-    process.exit(1);
-  }, 30000);
 }
 
-startServer();
+let shuttingDown = false;
+async function shutdown(signal: NodeJS.Signals): Promise<void> {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  logger.info({ signal }, 'shutting down');
+
+  const forceExit = setTimeout(() => {
+    logger.error('forced shutdown after timeout');
+    process.exit(1);
+  }, 30_000);
+  forceExit.unref();
+
+  io.close();
+  await new Promise<void>(resolve => server.close(() => resolve()));
+  await disconnectDB();
+  process.exit(0);
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
+process.on('unhandledRejection', reason => {
+  logger.error({ err: reason }, 'unhandled rejection');
+});
+
+start().catch(error => {
+  logger.error({ err: error }, 'failed to start server');
+  process.exit(1);
+});

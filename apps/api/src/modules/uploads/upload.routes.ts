@@ -1,47 +1,46 @@
 // apps/api/src/modules/uploads/upload.routes.ts
 import { Router } from 'express';
 import multer from 'multer';
-import { UploadController } from './upload.controller';
+
 import { authenticateToken } from '@/middleware/auth';
+import { createError } from '@/middleware/error';
 import { uploadRateLimitMiddleware } from '@/middleware/rateLimit';
 
-const router = Router();
+import { UploadController } from './upload.controller';
 
-// Configure multer for file uploads
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/plain',
+  'text/csv',
+]);
+
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
-    files: 5, // Max 5 files per request
-  },
-  fileFilter: (req, file, cb) => {
-    // Allow common file types
-    const allowedMimes = [
-      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'text/plain',
-      'text/csv',
-    ];
-
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('File type not allowed'));
-    }
+  limits: { fileSize: 10 * 1024 * 1024, files: 5 },
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.has(file.mimetype)) return cb(null, true);
+    cb(createError(`File type ${file.mimetype} not allowed`, 400));
   },
 });
 
-// All upload routes require authentication
+const router = Router();
+
 router.use(authenticateToken);
 
-// Upload routes with rate limiting
 router.post('/presign', uploadRateLimitMiddleware, UploadController.getPresignedUrl);
 router.post('/direct', uploadRateLimitMiddleware, upload.array('files'), UploadController.directUpload);
 router.post('/avatar', uploadRateLimitMiddleware, upload.single('avatar'), UploadController.uploadAvatar);
-router.delete('/:fileKey', UploadController.deleteFile);
+router.post('/tasks/:taskId/attachments', UploadController.attachFileToTask);
+router.delete('/tasks/:taskId/attachments/:attachmentId', UploadController.removeAttachmentFromTask);
+router.delete('/:fileKey(*)', UploadController.deleteFile);
 
 export default router;

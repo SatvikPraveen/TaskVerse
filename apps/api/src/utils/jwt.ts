@@ -1,5 +1,6 @@
 // apps/api/src/utils/jwt.ts
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
+
 import { env } from '@/config/env';
 
 export interface JwtPayload {
@@ -10,66 +11,44 @@ export interface JwtPayload {
   exp?: number;
 }
 
-export const generateAccessToken = (userId: string): string => {
-  return jwt.sign(
-    {
-      userId,
-      type: 'access',
-    },
-    env.JWT_SECRET,
-    {
-      expiresIn: env.JWT_ACCESS_EXPIRES_IN,
-      issuer: 'taskverse-api',
-      audience: 'taskverse-client',
-    }
-  );
-};
+const ISSUER = 'taskverse-api';
+const AUDIENCE = 'taskverse-client';
 
-export const generateRefreshToken = (userId: string, tokenId: string): string => {
-  return jwt.sign(
-    {
-      userId,
-      type: 'refresh',
-      tokenId,
-    },
-    env.JWT_REFRESH_SECRET,
-    {
-      expiresIn: env.JWT_REFRESH_EXPIRES_IN,
-      issuer: 'taskverse-api',
-      audience: 'taskverse-client',
-    }
-  );
-};
+/** jsonwebtoken types `expiresIn` as a template literal union; env strings need a cast. */
+const expiresIn = (value: string): SignOptions['expiresIn'] =>
+  value as unknown as SignOptions['expiresIn'];
 
-export const verifyAccessToken = (token: string): JwtPayload => {
-  return jwt.verify(token, env.JWT_SECRET, {
-    issuer: 'taskverse-api',
-    audience: 'taskverse-client',
-  }) as JwtPayload;
-};
+export const generateAccessToken = (userId: string): string =>
+  jwt.sign({ userId, type: 'access' } satisfies JwtPayload, env.JWT_SECRET, {
+    expiresIn: expiresIn(env.JWT_ACCESS_EXPIRES_IN),
+    issuer: ISSUER,
+    audience: AUDIENCE,
+  });
 
-export const verifyRefreshToken = (token: string): JwtPayload => {
-  return jwt.verify(token, env.JWT_REFRESH_SECRET, {
-    issuer: 'taskverse-api',
-    audience: 'taskverse-client',
-  }) as JwtPayload;
-};
+export const generateRefreshToken = (userId: string, tokenId: string): string =>
+  jwt.sign({ userId, type: 'refresh', tokenId } satisfies JwtPayload, env.JWT_REFRESH_SECRET, {
+    expiresIn: expiresIn(env.JWT_REFRESH_EXPIRES_IN),
+    issuer: ISSUER,
+    audience: AUDIENCE,
+  });
+
+export const verifyAccessToken = (token: string): JwtPayload =>
+  jwt.verify(token, env.JWT_SECRET, { issuer: ISSUER, audience: AUDIENCE }) as JwtPayload;
+
+export const verifyRefreshToken = (token: string): JwtPayload =>
+  jwt.verify(token, env.JWT_REFRESH_SECRET, { issuer: ISSUER, audience: AUDIENCE }) as JwtPayload;
 
 export const decodeToken = (token: string): JwtPayload | null => {
   try {
-    return jwt.decode(token) as JwtPayload;
+    return jwt.decode(token) as JwtPayload | null;
   } catch {
     return null;
   }
 };
 
 export const getTokenExpiration = (token: string): Date | null => {
-  try {
-    const decoded = jwt.decode(token) as JwtPayload;
-    return decoded?.exp ? new Date(decoded.exp * 1000) : null;
-  } catch {
-    return null;
-  }
+  const decoded = decodeToken(token);
+  return decoded?.exp ? new Date(decoded.exp * 1000) : null;
 };
 
 export const isTokenExpired = (token: string): boolean => {

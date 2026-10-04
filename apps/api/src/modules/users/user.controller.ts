@@ -1,12 +1,16 @@
 // apps/api/src/modules/users/user.controller.ts
-import { Response } from 'express';
+import type { Response } from 'express';
 import { z } from 'zod';
-import { User } from './user.model';
-import { AuthRequest } from '@/middleware/auth';
+
+import type { AuthRequest } from '@/middleware/auth';
 import { asyncHandler, createError } from '@/middleware/error';
+import { AuthService } from '@/modules/auth/auth.service';
+import { Category } from '@/modules/categories/category.model';
+import { Task } from '@/modules/tasks/task.model';
 import { getPaginationParams } from '@/utils/pagination';
 
-// Validation schemas
+import { User } from './user.model';
+
 const updateProfileSchema = z.object({
   firstName: z.string().min(1).max(50).optional(),
   lastName: z.string().min(1).max(50).optional(),
@@ -17,108 +21,76 @@ const updateProfileSchema = z.object({
 
 const updatePreferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']).optional(),
-  notifications: z.object({
-    email: z.boolean().optional(),
-    push: z.boolean().optional(),
-    taskReminders: z.boolean().optional(),
-    taskAssignments: z.boolean().optional(),
-  }).optional(),
+  notifications: z
+    .object({
+      email: z.boolean().optional(),
+      push: z.boolean().optional(),
+      taskReminders: z.boolean().optional(),
+      taskAssignments: z.boolean().optional(),
+    })
+    .optional(),
   defaultView: z.enum(['list', 'kanban', 'calendar']).optional(),
 });
 
 const searchUsersSchema = z.object({
-  query: z.string().min(1).optional(),
+  query: z.string().min(1).max(100).optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(50).default(20),
 });
 
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export class UserController {
-  static getProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.id;
-    
-    const user = await User.findById(userId);
-    if (!user) {
-      throw createError('User not found', 404);
-    }
-
-    res.json({
-      success: true,
-      data: { user },
-    });
+  static getProfile = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const user = await User.findById(req.user!.id);
+    if (!user) throw createError('User not found', 404);
+    res.json({ success: true, data: { user } });
   });
 
-  static updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.id;
+  static updateProfile = asyncHandler<AuthRequest>(async (req, res: Response) => {
     const updateData = updateProfileSchema.parse(req.body);
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!user) {
-      throw createError('User not found', 404);
-    }
-
-    res.json({
-      success: true,
-      message: 'Profile updated successfully',
-      data: { user },
+    const user = await User.findByIdAndUpdate(req.user!.id, updateData, {
+      new: true,
+      runValidators: true,
     });
+    if (!user) throw createError('User not found', 404);
+    res.json({ success: true, message: 'Profile updated successfully', data: { user } });
   });
 
-  static updatePreferences = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.id;
-    const preferencesData = updatePreferencesSchema.parse(req.body);
+  static updatePreferences = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const preferences = updatePreferencesSchema.parse(req.body);
 
-    // Build update object for nested preferences
-    const updateObject: any = {};
-    if (preferencesData.theme) {
-      updateObject['preferences.theme'] = preferencesData.theme;
-    }
-    if (preferencesData.defaultView) {
-      updateObject['preferences.defaultView'] = preferencesData.defaultView;
-    }
-    if (preferencesData.notifications) {
-      Object.entries(preferencesData.notifications).forEach(([key, value]) => {
-        updateObject[`preferences.notifications.${key}`] = value;
-      });
+    const $set: Record<string, unknown> = {};
+    if (preferences.theme) $set['preferences.theme'] = preferences.theme;
+    if (preferences.defaultView) $set['preferences.defaultView'] = preferences.defaultView;
+    for (const [key, value] of Object.entries(preferences.notifications ?? {})) {
+      if (value !== undefined) $set[`preferences.notifications.${key}`] = value;
     }
 
     const user = await User.findByIdAndUpdate(
-      userId,
-      { $set: updateObject },
+      req.user!.id,
+      { $set },
       { new: true, runValidators: true }
     );
-
-    if (!user) {
-      throw createError('User not found', 404);
-    }
-
-    res.json({
-      success: true,
-      message: 'Preferences updated successfully',
-      data: { user },
-    });
+    if (!user) throw createError('User not found', 404);
+    res.json({ success: true, message: 'Preferences updated successfully', data: { user } });
   });
 
-  static searchUsers = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static searchUsers = asyncHandler<AuthRequest>(async (req, res: Response) => {
     const { query, page, limit } = searchUsersSchema.parse(req.query);
-    
-    const filter: any = { isActive: true };
-    
+
+    const filter: Record<string, unknown> = { isActive: true };
     if (query) {
+      const pattern = { $regex: escapeRegex(query), $options: 'i' };
       filter.$or = [
-        { username: { $regex: query, $options: 'i' } },
-        { firstName: { $regex: query, $options: 'i' } },
-        { lastName: { $regex: query, $options: 'i' } },
-        { email: { $regex: query, $options: 'i' } },
+        { username: pattern },
+        { firstName: pattern },
+        { lastName: pattern },
+        { email: pattern },
       ];
     }
 
     const { offset, pagination } = getPaginationParams(page, limit);
-
     const [users, total] = await Promise.all([
       User.find(filter)
         .select('username firstName lastName avatar bio createdAt')
@@ -128,87 +100,61 @@ export class UserController {
       User.countDocuments(filter),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
     res.json({
       success: true,
       data: {
         users,
-        pagination: {
-          ...pagination,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
+        pagination: { ...pagination, total, totalPages, hasNext: page < totalPages },
       },
     });
   });
 
-  static getUserById = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static getUserById = asyncHandler<AuthRequest>(async (req, res: Response) => {
     const { userId } = z.object({ userId: z.string() }).parse(req.params);
-
-    const user = await User.findById(userId)
-      .select('username firstName lastName avatar bio timezone createdAt');
-
-    if (!user) {
-      throw createError('User not found', 404);
-    }
-
-    res.json({
-      success: true,
-      data: { user },
-    });
-  });
-
-  static deleteAccount = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.id;
-
-    // Instead of hard delete, we'll deactivate the account
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { 
-        isActive: false,
-        email: `deleted_${Date.now()}_${user?.email}`, // Prevent email conflicts
-        username: `deleted_${Date.now()}_${user?.username}`, // Prevent username conflicts
-      },
-      { new: true }
+    const user = await User.findOne({ _id: userId, isActive: true }).select(
+      'username firstName lastName avatar bio timezone createdAt'
     );
-
-    if (!user) {
-      throw createError('User not found', 404);
-    }
-
-    // TODO: Handle cascade deletion or anonymization of user's data
-    // - Tasks created by user
-    // - Categories owned by user
-    // - Comments made by user
-    // - etc.
-
-    res.json({
-      success: true,
-      message: 'Account deactivated successfully',
-    });
+    if (!user) throw createError('User not found', 404);
+    res.json({ success: true, data: { user } });
   });
 
-  static getUserStats = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static deleteAccount = asyncHandler<AuthRequest>(async (req, res: Response) => {
     const userId = req.user!.id;
+    const user = await User.findById(userId);
+    if (!user) throw createError('User not found', 404);
 
-    // TODO: Implement when Task model is ready
-    // const stats = await Promise.all([
-    //   Task.countDocuments({ assignedTo: userId, status: 'completed' }),
-    //   Task.countDocuments({ assignedTo: userId, status: { $ne: 'completed' } }),
-    //   Task.countDocuments({ createdBy: userId }),
-    //   Category.countDocuments({ createdBy: userId }),
-    // ]);
+    // Soft delete: deactivate and free the unique identifiers for re-use.
+    const stamp = Date.now();
+    user.isActive = false;
+    user.email = `deleted_${stamp}_${user.email}`;
+    user.username = `del_${stamp.toString(36)}`;
+    await user.save({ validateBeforeSave: false });
+    await AuthService.logoutAllDevices(userId);
 
-    // For now, return placeholder data
-    const stats = {
-      tasksCompleted: 0,
-      tasksActive: 0,
-      tasksCreated: 0,
-      categoriesCreated: 0,
-    };
+    res.json({ success: true, message: 'Account deactivated successfully' });
+  });
+
+  static getUserStats = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const userId = req.user!.id;
+    const [tasksCompleted, tasksActive, tasksCreated, categoriesCreated] = await Promise.all([
+      Task.countDocuments({
+        $or: [{ createdBy: userId }, { assignedTo: userId }],
+        status: 'completed',
+        isArchived: false,
+      }),
+      Task.countDocuments({
+        $or: [{ createdBy: userId }, { assignedTo: userId }],
+        status: { $in: ['todo', 'in_progress'] },
+        isArchived: false,
+      }),
+      Task.countDocuments({ createdBy: userId }),
+      Category.countDocuments({ createdBy: userId, isActive: true }),
+    ]);
 
     res.json({
       success: true,
-      data: { stats },
+      data: { stats: { tasksCompleted, tasksActive, tasksCreated, categoriesCreated } },
     });
   });
 }

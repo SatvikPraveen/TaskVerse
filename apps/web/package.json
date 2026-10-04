@@ -48,7 +48,7 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
     "@playwright/test": "^1.40.0",
-    "@taskverse/types": "workspace:*",
-    "@taskverse/eslint-config": "workspace:*"
+    "@taskverse/types": "*",
+    "@taskverse/eslint-config": "*"
   }
 }

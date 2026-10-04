@@ -1,23 +1,21 @@
 // File: packages/types/index.ts
 
-// Auth exports
 export * from './zod/auth.schema';
-
-// Task exports  
 export * from './zod/task.schema';
-
-// Category exports
 export * from './zod/category.schema';
 
+import type { TaskPriority, TaskStatus, Task } from './zod/task.schema';
+import type { Category } from './zod/category.schema';
+
 // Common API Response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
 }
 
@@ -36,7 +34,7 @@ export interface PaginatedResponse<T> extends ApiResponse<T> {
 }
 
 // WebSocket Event types
-export interface WebSocketEvent<T = any> {
+export interface WebSocketEvent<T = unknown> {
   type: string;
   data?: T;
   userId?: string;
@@ -47,7 +45,11 @@ export interface TaskWebSocketEvents {
   'task:created': WebSocketEvent<Task>;
   'task:updated': WebSocketEvent<Task>;
   'task:deleted': WebSocketEvent<{ id: string }>;
-  'task:status-changed': WebSocketEvent<{ id: string; status: TaskStatus; previousStatus: TaskStatus }>;
+  'task:status-changed': WebSocketEvent<{
+    id: string;
+    status: TaskStatus;
+    previousStatus: TaskStatus;
+  }>;
 }
 
 export interface CategoryWebSocketEvents {
@@ -119,22 +121,6 @@ export interface SearchFilters extends TaskFilters {
   searchIn?: ('title' | 'description')[];
 }
 
-// User Preferences types
-export interface UserPreferences {
-  theme: 'light' | 'dark' | 'system';
-  defaultTaskPriority: TaskPriority;
-  defaultTaskStatus: TaskStatus;
-  notifications: {
-    email: boolean;
-    push: boolean;
-    dueDateReminders: boolean;
-    taskAssignments: boolean;
-  };
-  dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD';
-  timeFormat: '12h' | '24h';
-  timezone: string;
-}
-
 // Error types
 export interface ValidationError {
   field: string;
@@ -146,24 +132,21 @@ export interface ApiError {
   code: string;
   message: string;
   statusCode: number;
-  details?: any;
+  details?: unknown;
   validationErrors?: ValidationError[];
 }
 
-// JWT types (extending from auth schema)
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;
 }
 
-// Database document base interface
 export interface BaseDocument {
   id: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Query builder types
 export interface SortOptions {
   field: string;
   order: 'asc' | 'desc';
@@ -176,47 +159,15 @@ export interface QueryOptions {
   populate?: string[];
 }
 
-// Import/Export types
 export interface ExportOptions {
   format: 'json' | 'csv' | 'xlsx';
   includeAttachments: boolean;
-  dateRange?: {
-    from: Date;
-    to: Date;
-  };
+  dateRange?: { from: Date; to: Date };
   filters?: TaskFilters;
 }
 
 export interface ImportResult {
   imported: number;
   skipped: number;
-  errors: Array<{
-    row: number;
-    message: string;
-  }>;
+  errors: Array<{ row: number; message: string }>;
 }
-
-// Re-export commonly used types from schemas
-import type { 
-  Task, 
-  TaskStatus, 
-  TaskPriority, 
-  Category, 
-  User, 
-  CreateTaskInput, 
-  UpdateTaskInput, 
-  CreateCategoryInput, 
-  UpdateCategoryInput 
-} from './zod/auth.schema';
-
-export type {
-  Task,
-  TaskStatus,
-  TaskPriority,
-  Category,
-  User,
-  CreateTaskInput,
-  UpdateTaskInput,
-  CreateCategoryInput,
-  UpdateCategoryInput,
-};

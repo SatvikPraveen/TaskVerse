@@ -1,61 +1,47 @@
 // apps/api/src/app.ts
 import express from 'express';
 import helmet from 'helmet';
-import { corsMiddleware } from '@/middleware/cors';
-import { rateLimitMiddleware } from '@/middleware/rateLimit';
-import { errorHandler } from '@/middleware/error';
-import { logger } from '@/config/logger';
 
-// Route imports
+import { isDatabaseReady } from '@/config/db';
+import { env } from '@/config/env';
+import { corsMiddleware } from '@/middleware/cors';
+import { errorHandler } from '@/middleware/error';
+import { rateLimitMiddleware } from '@/middleware/rateLimit';
 import authRoutes from '@/modules/auth/auth.routes';
-import userRoutes from '@/modules/users/user.routes';
 import categoryRoutes from '@/modules/categories/category.routes';
 import taskRoutes from '@/modules/tasks/task.routes';
 import uploadRoutes from '@/modules/uploads/upload.routes';
+import userRoutes from '@/modules/users/user.routes';
 
 const app = express();
 
-// Security middleware
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+
 app.use(helmet());
 app.use(corsMiddleware);
 app.use(rateLimitMiddleware);
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Request logging middleware
-app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`, {
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-  });
-  next();
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
+app.get('/health', (_req, res) => {
+  res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV,
+    environment: env.NODE_ENV,
   });
 });
 
-// API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/uploads', uploadRoutes);
+app.get('/health/ready', (_req, res) => {
+  const ready = isDatabaseReady();
+  res.status(ready ? 200 : 503).json({ status: ready ? 'ready' : 'not_ready', database: ready });
+});
 
-// API info endpoint
-app.get('/api', (req, res) => {
+app.get('/api', (_req, res) => {
   res.json({
     name: 'TaskVerse API',
-    version: '1.0.0',
-    description: 'Task management API with real-time updates',
+    version: '2.0.0',
     endpoints: {
       auth: '/api/auth',
       users: '/api/users',
@@ -66,15 +52,16 @@ app.get('/api', (req, res) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Route ${req.originalUrl} not found`,
-  });
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/uploads', uploadRoutes);
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found', message: `Route ${req.originalUrl} not found` });
 });
 
-// Global error handler
 app.use(errorHandler);
 
 export default app;
