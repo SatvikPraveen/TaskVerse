@@ -121,7 +121,7 @@ export const errorHandler = (error: unknown, req: Request, res: Response, _next:
     message,
     ...(details !== undefined && { details }),
     ...(requestId && { requestId }),
-    ...(env.NODE_ENV === 'development' && error instanceof Error && { stack: error.stack }),
+    ...(env.NODE_ENV !== 'production' && error instanceof Error && { stack: error.stack }),
   };
 
   res.status(statusCode).json(body);

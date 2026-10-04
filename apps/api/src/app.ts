@@ -7,8 +7,10 @@ import { env } from '@/config/env';
 import { corsMiddleware } from '@/middleware/cors';
 import { errorHandler } from '@/middleware/error';
 import { rateLimitMiddleware } from '@/middleware/rateLimit';
+import analyticsRoutes from '@/modules/analytics/analytics.routes';
 import authRoutes from '@/modules/auth/auth.routes';
 import categoryRoutes from '@/modules/categories/category.routes';
+import planningRoutes from '@/modules/planning/planning.routes';
 import taskRoutes from '@/modules/tasks/task.routes';
 import uploadRoutes from '@/modules/uploads/upload.routes';
 import userRoutes from '@/modules/users/user.routes';
@@ -48,6 +50,8 @@ app.get('/api', (_req, res) => {
       categories: '/api/categories',
       tasks: '/api/tasks',
       uploads: '/api/uploads',
+      planning: '/api/planning',
+      analytics: '/api/analytics',
     },
   });
 });
@@ -57,6 +61,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/planning', planningRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found', message: `Route ${req.originalUrl} not found` });

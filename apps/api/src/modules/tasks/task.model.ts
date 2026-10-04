@@ -42,6 +42,13 @@ export interface IAttachment {
   uploadedAt: Date;
 }
 
+export interface IStatusTransition {
+  from: TaskStatus | null;
+  to: TaskStatus;
+  at: Date;
+  by: mongoose.Types.ObjectId;
+}
+
 export interface ITask extends Document {
   _id: mongoose.Types.ObjectId;
   title: string;
@@ -52,8 +59,12 @@ export interface ITask extends Document {
   category?: mongoose.Types.ObjectId;
   assignedTo?: mongoose.Types.ObjectId;
   createdBy: mongoose.Types.ObjectId;
+  /** Tasks that must be completed before this one can start. */
+  dependencies: mongoose.Types.ObjectId[];
   dueDate?: Date;
   startDate?: Date;
+  /** First transition into in_progress; drives cycle-time analytics. */
+  startedAt?: Date;
   completedAt?: Date;
   estimatedHours?: number;
   actualHours?: number;
@@ -61,6 +72,7 @@ export interface ITask extends Document {
   subtasks: ISubtask[];
   comments: IComment[];
   attachments: IAttachment[];
+  statusHistory: IStatusTransition[];
   isArchived: boolean;
   position: number;
   createdAt: Date;
@@ -97,6 +109,16 @@ const attachmentSchema = new Schema<IAttachment>({
   uploadedAt: { type: Date, default: Date.now },
 });
 
+const statusTransitionSchema = new Schema<IStatusTransition>(
+  {
+    from: { type: String, enum: [...TASK_STATUSES, null], default: null },
+    to: { type: String, enum: TASK_STATUSES, required: true },
+    at: { type: Date, required: true, default: Date.now },
+    by: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  },
+  { _id: false }
+);
+
 const taskSchema = new Schema<ITask>(
   {
     title: { type: String, required: true, trim: true, maxlength: 200 },
@@ -107,8 +129,10 @@ const taskSchema = new Schema<ITask>(
     category: { type: Schema.Types.ObjectId, ref: 'Category', index: true },
     assignedTo: { type: Schema.Types.ObjectId, ref: 'User', index: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    dependencies: [{ type: Schema.Types.ObjectId, ref: 'Task' }],
     dueDate: { type: Date, index: true },
     startDate: { type: Date },
+    startedAt: { type: Date },
     completedAt: { type: Date },
     estimatedHours: { type: Number, min: 0 },
     actualHours: { type: Number, min: 0 },
@@ -116,6 +140,7 @@ const taskSchema = new Schema<ITask>(
     subtasks: [subtaskSchema],
     comments: [commentSchema],
     attachments: [attachmentSchema],
+    statusHistory: { type: [statusTransitionSchema], default: [] },
     isArchived: { type: Boolean, default: false, index: true },
     position: { type: Number, default: 0 },
   },
@@ -131,13 +156,17 @@ taskSchema.index({ assignedTo: 1, status: 1 });
 taskSchema.index({ category: 1, status: 1 });
 taskSchema.index({ dueDate: 1, status: 1 });
 taskSchema.index({ createdBy: 1, isArchived: 1, position: 1 });
+taskSchema.index({ dependencies: 1 });
+taskSchema.index({ completedAt: 1 });
 taskSchema.index({ tags: 1 });
 taskSchema.index({ title: 'text', description: 'text', tags: 'text' });
 
 taskSchema.virtual('completionPercentage').get(function completionPercentage(this: ITask) {
-  if (this.subtasks.length === 0) return this.status === 'completed' ? 100 : 0;
-  const completed = this.subtasks.filter(s => s.isCompleted).length;
-  return Math.round((completed / this.subtasks.length) * 100);
+  // Populated references carry a projection, so arrays may be absent.
+  const subtasks = this.subtasks ?? [];
+  if (subtasks.length === 0) return this.status === 'completed' ? 100 : 0;
+  const completed = subtasks.filter(s => s.isCompleted).length;
+  return Math.round((completed / subtasks.length) * 100);
 });
 
 taskSchema.virtual('isOverdue').get(function isOverdue(this: ITask) {
@@ -148,11 +177,12 @@ taskSchema.virtual('isOverdue').get(function isOverdue(this: ITask) {
 taskSchema.pre('validate', function syncDerivedFields(this: ITask, next) {
   this.priorityWeight = PRIORITY_WEIGHT[this.priority];
   if (this.isModified('status')) {
-    if (this.status === 'completed' && !this.completedAt) {
-      this.completedAt = new Date();
-    } else if (this.status !== 'completed' && this.completedAt) {
-      this.completedAt = undefined;
-    }
+    const now = new Date();
+    if (this.status === 'completed' && !this.completedAt) this.completedAt = now;
+    if (this.status !== 'completed' && this.completedAt) this.completedAt = undefined;
+    if (this.status === 'in_progress' && !this.startedAt) this.startedAt = now;
+    // A task completed straight from todo still "started" when it completed.
+    if (this.status === 'completed' && !this.startedAt) this.startedAt = this.completedAt;
   }
   next();
 });

@@ -8,6 +8,7 @@ module.exports = {
   testMatch: ['**/*.test.ts', '**/*.int.test.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@taskverse/scheduler$': '<rootDir>/../../packages/scheduler/src/index.ts',
   },
   transform: {
     '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json', diagnostics: false }],

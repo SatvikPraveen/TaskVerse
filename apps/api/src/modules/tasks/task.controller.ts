@@ -8,6 +8,7 @@ import { asyncHandler, createError } from '@/middleware/error';
 import { getPaginationParams } from '@/utils/pagination';
 
 import { type ITask, PRIORITY_WEIGHT, Task, TASK_PRIORITIES, TASK_STATUSES } from './task.model';
+import { accessibleBy, applyStatusTransition, assertValidDependencies } from './task.service';
 
 const objectId = z.string().regex(/^[a-f\d]{24}$/i, 'Invalid id');
 
@@ -18,6 +19,7 @@ const createTaskSchema = z.object({
   priority: z.enum(TASK_PRIORITIES).default('medium'),
   category: objectId.optional(),
   assignedTo: objectId.optional(),
+  dependencies: z.array(objectId).max(50).default([]),
   dueDate: z.string().datetime().optional(),
   startDate: z.string().datetime().optional(),
   estimatedHours: z.number().min(0).optional(),
@@ -54,17 +56,13 @@ const getTasksSchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).default('asc'),
 });
 
-const POPULATE = [
+export const TASK_POPULATE = [
   { path: 'category', select: 'name color icon' },
   { path: 'assignedTo', select: 'username firstName lastName avatar' },
   { path: 'createdBy', select: 'username firstName lastName avatar' },
   { path: 'comments.author', select: 'username firstName lastName avatar' },
+  { path: 'dependencies', select: 'title status priority dueDate' },
 ];
-
-/** Tasks a user may read: ones they created or are assigned to. */
-export const accessibleBy = (userId: string): FilterQuery<ITask> => ({
-  $or: [{ createdBy: userId }, { assignedTo: userId }],
-});
 
 export class TaskController {
   static getTasks = asyncHandler<AuthRequest>(async (req, res: Response) => {
@@ -93,7 +91,7 @@ export class TaskController {
     const sort: Record<string, SortOrder> = { [sortField]: direction, _id: 1 };
 
     const [tasks, total] = await Promise.all([
-      Task.find(filter).populate(POPULATE).sort(sort).skip(offset).limit(q.limit),
+      Task.find(filter).populate(TASK_POPULATE).sort(sort).skip(offset).limit(q.limit),
       Task.countDocuments(filter),
     ]);
 
@@ -110,41 +108,57 @@ export class TaskController {
   static getTaskById = asyncHandler<AuthRequest>(async (req, res: Response) => {
     const { taskId } = z.object({ taskId: objectId }).parse(req.params);
     const task = await Task.findOne({ _id: taskId, ...accessibleBy(req.user!.id) }).populate([
-      ...POPULATE,
+      ...TASK_POPULATE,
       { path: 'attachments.uploadedBy', select: 'username firstName lastName' },
+      { path: 'statusHistory.by', select: 'username' },
     ]);
     if (!task) throw createError('Task not found', 404);
     res.json({ success: true, data: { task } });
   });
 
   static createTask = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const userId = req.user!.id;
     const input = createTaskSchema.parse(req.body);
-    const task = await Task.create({
+    await assertValidDependencies(userId, null, input.dependencies);
+
+    const task = new Task({
       ...input,
+      status: 'todo',
       priorityWeight: PRIORITY_WEIGHT[input.priority],
-      createdBy: req.user!.id,
+      createdBy: userId,
       dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
     });
-    await task.populate(POPULATE);
+    // Route the initial status through the transition log too.
+    if (input.status !== 'todo') applyStatusTransition(task, input.status, userId);
+    else task.statusHistory.push({ from: null, to: 'todo', at: new Date(), by: new mongoose.Types.ObjectId(userId) });
+
+    await task.save();
+    await task.populate(TASK_POPULATE);
     res.status(201).json({ success: true, message: 'Task created successfully', data: { task } });
   });
 
   static updateTask = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const userId = req.user!.id;
     const { taskId } = z.object({ taskId: objectId }).parse(req.params);
     const input = updateTaskSchema.parse(req.body);
 
-    const task = await Task.findOne({ _id: taskId, ...accessibleBy(req.user!.id) });
+    const task = await Task.findOne({ _id: taskId, ...accessibleBy(userId) });
     if (!task) throw createError('Task not found or access denied', 404);
 
-    const { dueDate, startDate, subtasks, ...rest } = input;
+    const { dueDate, startDate, subtasks, status, dependencies, ...rest } = input;
+    if (dependencies !== undefined) {
+      await assertValidDependencies(userId, taskId, dependencies);
+      task.set('dependencies', dependencies);
+    }
     task.set(rest);
     if (dueDate !== undefined) task.dueDate = new Date(dueDate);
     if (startDate !== undefined) task.startDate = new Date(startDate);
     if (subtasks !== undefined) task.set('subtasks', subtasks);
+    if (status !== undefined) applyStatusTransition(task, status, userId);
 
     await task.save();
-    await task.populate(POPULATE);
+    await task.populate(TASK_POPULATE);
     res.json({ success: true, message: 'Task updated successfully', data: { task } });
   });
 
@@ -153,6 +167,8 @@ export class TaskController {
     // Only the creator may delete.
     const task = await Task.findOneAndDelete({ _id: taskId, createdBy: req.user!.id });
     if (!task) throw createError('Task not found or access denied', 404);
+    // Detach dependents so the graph never references a missing node.
+    await Task.updateMany({ dependencies: task._id }, { $pull: { dependencies: task._id } });
     res.json({ success: true, message: 'Task deleted successfully' });
   });
 
@@ -181,7 +197,7 @@ export class TaskController {
       { _id: taskId, 'subtasks._id': subtaskId, ...accessibleBy(req.user!.id) },
       { $set: { 'subtasks.$.isCompleted': isCompleted } },
       { new: true }
-    ).populate(POPULATE);
+    ).populate(TASK_POPULATE);
     if (!task) throw createError('Task or subtask not found', 404);
 
     res.json({ success: true, message: 'Subtask updated successfully', data: { task } });
