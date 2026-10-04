@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: If you use TaskVerse or its planning engine in research, please cite it as below.
+type: software
+title: "TaskVerse: a task management platform with a reproducible planning and flow-analytics engine"
+authors:
+  - family-names: Praveen
+    given-names: Satvik
+    email: satvikpraveen707@gmail.com
+repository-code: https://github.com/SatvikPraveen/TaskVerse
+license: MIT
+version: 2.0.0
+date-released: 2026-10-03
+keywords:
+  - task scheduling
+  - weighted shortest job first
+  - earliest deadline first
+  - critical path method
+  - monte carlo forecasting
+  - flow metrics
+  - typescript
+abstract: >-
+  TaskVerse pairs a conventional task-management application (Express, MongoDB,
+  React) with a pure, dependency-free planning engine that implements
+  dependency graphs, the Critical Path Method, six prioritisation policies
+  (FIFO, static priority, SPT, EDF, WSJF, Eisenhower), a non-preemptive list
+  scheduler, bootstrap Monte Carlo completion forecasting and Kanban flow
+  metrics. A seeded benchmark harness evaluates the policies on synthetic
+  workloads and the calibration of the forecaster, and the same engine powers
+  the application's planning and analytics endpoints.
