@@ -14,8 +14,8 @@
     "date-fns": "^2.30.0"
   },
   "devDependencies": {
-    "typescript": "^5.1.6",
-    "@types/node": "^20.5.0"
+    "typescript": "^7.0.2",
+    "@types/node": "^26.6.3"
   },
   "publishConfig": {
     "access": "restricted"
