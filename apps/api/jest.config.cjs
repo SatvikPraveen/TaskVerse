@@ -24,10 +24,10 @@ module.exports = {
   coverageReporters: ['text-summary', 'lcov', 'html'],
   coverageThreshold: {
     global: {
-      statements: 70,
-      branches: 55,
-      functions: 65,
-      lines: 70,
+      statements: 85,
+      branches: 62,
+      functions: 80,
+      lines: 85,
     },
   },
   testTimeout: 60000,

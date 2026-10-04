@@ -5,6 +5,7 @@ import app from '../app';
 
 export interface TestSession {
   accessToken: string;
+  refreshToken: string;
   userId: string;
   auth: (req: request.Test) => request.Test;
 }
@@ -23,8 +24,10 @@ export const registerUser = async (
   };
   const res = await request(app).post('/api/auth/register').send(body).expect(201);
   const accessToken: string = res.body.data.tokens.accessToken;
+  const refreshToken: string = res.body.data.tokens.refreshToken;
   return {
     accessToken,
+    refreshToken,
     userId: res.body.data.user._id ?? res.body.data.user.id,
     auth: req => req.set('Authorization', `Bearer ${accessToken}`),
   };
