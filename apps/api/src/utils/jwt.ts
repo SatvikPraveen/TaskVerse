@@ -36,21 +36,3 @@ export const verifyAccessToken = (token: string): JwtPayload =>
 
 export const verifyRefreshToken = (token: string): JwtPayload =>
   jwt.verify(token, env.JWT_REFRESH_SECRET, { issuer: ISSUER, audience: AUDIENCE }) as JwtPayload;
-
-export const decodeToken = (token: string): JwtPayload | null => {
-  try {
-    return jwt.decode(token) as JwtPayload | null;
-  } catch {
-    return null;
-  }
-};
-
-export const getTokenExpiration = (token: string): Date | null => {
-  const decoded = decodeToken(token);
-  return decoded?.exp ? new Date(decoded.exp * 1000) : null;
-};
-
-export const isTokenExpired = (token: string): boolean => {
-  const expiration = getTokenExpiration(token);
-  return expiration ? expiration < new Date() : true;
-};

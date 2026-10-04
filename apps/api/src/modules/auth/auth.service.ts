@@ -1,14 +1,13 @@
 // apps/api/src/modules/auth/auth.service.ts
 import crypto from 'crypto';
 
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import { env } from '@/config/env';
 import { createError } from '@/middleware/error';
 import { User, type IUser } from '@/modules/users/user.model';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '@/utils/jwt';
-import { hashPassword } from '@/utils/passwords';
+import { comparePassword, hashPassword } from '@/utils/passwords';
 
 import { RefreshToken } from './auth.model';
 
@@ -58,7 +57,7 @@ export class AuthService {
     ipAddress?: string
   ): Promise<LoginResult> {
     const user = await User.findOne({ email: email.toLowerCase(), isActive: true }).select('+password');
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await comparePassword(password, user.password))) {
       throw createError('Invalid credentials', 401);
     }
 
@@ -111,7 +110,7 @@ export class AuthService {
     if (!user) {
       throw createError('User not found', 404);
     }
-    if (!(await bcrypt.compare(currentPassword, user.password))) {
+    if (!(await comparePassword(currentPassword, user.password))) {
       throw createError('Current password is incorrect', 400);
     }
 

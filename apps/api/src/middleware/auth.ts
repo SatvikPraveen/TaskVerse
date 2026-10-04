@@ -62,15 +62,3 @@ export const authenticateToken = async (
     next(error);
   }
 };
-
-export const optionalAuth = async (req: AuthRequest, _res: Response, next: NextFunction): Promise<void> => {
-  const token = extractBearer(req);
-  if (!token) return next();
-  try {
-    const user = await resolveUserFromToken(token);
-    if (user) req.user = user;
-  } catch {
-    // Optional auth never fails the request.
-  }
-  next();
-};

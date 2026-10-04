@@ -4,101 +4,18 @@ export interface PaginationParams {
   pagination: {
     page: number;
     limit: number;
-    hasNext: boolean;
     hasPrev: boolean;
   };
 }
 
-export interface PaginationResult {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+export const MAX_PAGE_SIZE = 100;
 
-export const getPaginationParams = (page: number = 1, limit: number = 20): PaginationParams => {
+/** Normalises page/limit from a query string into a Mongo skip offset. */
+export const getPaginationParams = (page = 1, limit = 20): PaginationParams => {
   const normalizedPage = Math.max(1, Math.floor(page));
-  const normalizedLimit = Math.max(1, Math.min(100, Math.floor(limit)));
-  const offset = (normalizedPage - 1) * normalizedLimit;
-
+  const normalizedLimit = Math.max(1, Math.min(MAX_PAGE_SIZE, Math.floor(limit)));
   return {
-    offset,
-    pagination: {
-      page: normalizedPage,
-      limit: normalizedLimit,
-      hasNext: false, // Will be calculated after query
-      hasPrev: normalizedPage > 1,
-    },
+    offset: (normalizedPage - 1) * normalizedLimit,
+    pagination: { page: normalizedPage, limit: normalizedLimit, hasPrev: normalizedPage > 1 },
   };
-};
-
-export const buildPaginationResult = (page: number, limit: number, total: number): PaginationResult => {
-  const totalPages = Math.ceil(total / limit);
-
-  return {
-    page,
-    limit,
-    total,
-    totalPages,
-    hasNext: page < totalPages,
-    hasPrev: page > 1,
-  };
-};
-
-export const getPaginationMeta = (
-  page: number,
-  limit: number,
-  total: number,
-  items: unknown[]
-): PaginationResult & { count: number } => {
-  const result = buildPaginationResult(page, limit, total);
-
-  return {
-    ...result,
-    count: items.length,
-  };
-};
-
-export interface CursorPaginationParams {
-  limit: number;
-  cursor?: string;
-  sortField: string;
-  sortOrder: 'asc' | 'desc';
-}
-
-export const buildCursorQuery = (
-  cursor: string | undefined,
-  sortField: string,
-  sortOrder: 'asc' | 'desc'
-): Record<string, Record<string, unknown>> => {
-  if (!cursor) return {};
-
-  try {
-    const decodedCursor = JSON.parse(Buffer.from(cursor, 'base64').toString());
-    const operator = sortOrder === 'asc' ? '$gt' : '$lt';
-
-    return {
-      [sortField]: { [operator]: decodedCursor[sortField] },
-    };
-  } catch {
-    return {};
-  }
-};
-
-export const encodeCursor = (item: Record<string, unknown>, sortField: string): string => {
-  return Buffer.from(JSON.stringify({ [sortField]: item[sortField] })).toString('base64');
-};
-
-export interface OffsetLimitParams {
-  offset?: number;
-  limit?: number;
-}
-
-export const normalizeOffsetLimit = (params: OffsetLimitParams) => {
-  const offset = Math.max(0, params.offset || 0);
-  const limit = Math.max(1, Math.min(100, params.limit || 20));
-
-  return { offset, limit };
 };
