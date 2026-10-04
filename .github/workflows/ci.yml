@@ -22,8 +22,8 @@ jobs:
     name: Lint, typecheck, build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -32,7 +32,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build --workspace=apps/api --workspace=apps/web
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: web-dist
           path: apps/web/dist
@@ -45,8 +45,8 @@ jobs:
       matrix:
         node: [18, 20, 22]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node }}
           cache: npm
@@ -57,8 +57,8 @@ jobs:
     name: API integration tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -70,7 +70,7 @@ jobs:
           NODE_ENV: test
           JWT_SECRET: ci-access-secret-at-least-32-characters-long
           JWT_REFRESH_SECRET: ci-refresh-secret-at-least-32-characters-long
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: api-coverage
           path: apps/api/coverage/lcov.info
@@ -80,8 +80,8 @@ jobs:
     name: Research harness smoke run
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
