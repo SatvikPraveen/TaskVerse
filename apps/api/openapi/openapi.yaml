@@ -1,0 +1,1229 @@
+openapi: 3.1.0
+info:
+  title: TaskVerse API
+  version: 2.0.0
+  summary: Task management with a research-grade planning and flow-analytics engine
+  description: |
+    REST API for TaskVerse. All `/api/*` routes except authentication entry
+    points require a bearer access token. Mutations publish domain events
+    that are persisted to the activity log and pushed over Socket.IO.
+
+    Planning endpoints are read-only views computed by `@taskverse/scheduler`
+    over the caller's own tasks: ranked recommendations (EDF, WSJF,
+    Eisenhower, …), critical path, Monte Carlo forecasts and what-if policy
+    simulation. Analytics endpoints expose flow metrics (cycle time, lead
+    time, throughput, cumulative flow, aging WIP).
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: Satvik Praveen
+    url: https://github.com/SatvikPraveen/TaskVerse
+servers:
+  - url: http://localhost:3001
+    description: Local development
+tags:
+  - name: System
+  - name: Auth
+  - name: Users
+  - name: Categories
+  - name: Tasks
+  - name: Uploads
+  - name: Planning
+  - name: Analytics
+  - name: Activity
+
+security:
+  - bearerAuth: []
+
+paths:
+  /health:
+    get:
+      tags: [System]
+      summary: Liveness probe
+      security: []
+      responses:
+        '200':
+          description: Process is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, const: ok }
+                  timestamp: { type: string, format: date-time }
+                  uptime: { type: number }
+                  environment: { type: string }
+  /health/ready:
+    get:
+      tags: [System]
+      summary: Readiness probe (database connectivity)
+      security: []
+      responses:
+        '200': { description: Ready }
+        '503': { description: Database not connected }
+  /metrics:
+    get:
+      tags: [System]
+      summary: Prometheus metrics
+      security: []
+      responses:
+        '200':
+          description: Prometheus exposition format
+          content:
+            text/plain: { schema: { type: string } }
+  /api:
+    get:
+      tags: [System]
+      summary: API index
+      security: []
+      responses:
+        '200': { description: Endpoint directory }
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterInput' }
+      responses:
+        '201': { $ref: '#/components/responses/AuthResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginInput' }
+      responses:
+        '200': { $ref: '#/components/responses/AuthResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rotate the refresh token
+      description: The presented refresh token is revoked atomically; a replay fails with 403.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshTokenInput' }
+      responses:
+        '200':
+          description: New token pair
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          tokens: { $ref: '#/components/schemas/TokenPair' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Revoke one refresh token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshTokenInput' }
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+  /api/auth/profile:
+    get:
+      tags: [Auth]
+      summary: Identity of the bearer token
+      responses:
+        '200':
+          description: Minimal identity
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user: { $ref: '#/components/schemas/AuthUser' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/auth/logout-all:
+    post:
+      tags: [Auth]
+      summary: Revoke every session of the caller
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+  /api/auth/change-password:
+    post:
+      tags: [Auth]
+      summary: Change password and revoke all sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangePasswordInput' }
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/auth/sessions:
+    get:
+      tags: [Auth]
+      summary: Active sessions
+      responses:
+        '200':
+          description: Sessions newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sessions:
+                            type: array
+                            items: { $ref: '#/components/schemas/Session' }
+  /api/auth/sessions/{sessionId}:
+    delete:
+      tags: [Auth]
+      summary: Revoke a session
+      parameters: [{ $ref: '#/components/parameters/SessionId' }]
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/users/profile:
+    get:
+      tags: [Users]
+      summary: Full profile
+      responses:
+        '200': { $ref: '#/components/responses/UserResponse' }
+    put:
+      tags: [Users]
+      summary: Update profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateProfileInput' }
+      responses:
+        '200': { $ref: '#/components/responses/UserResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/users/preferences:
+    put:
+      tags: [Users]
+      summary: Update preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdatePreferencesInput' }
+      responses:
+        '200': { $ref: '#/components/responses/UserResponse' }
+  /api/users/search:
+    get:
+      tags: [Users]
+      summary: Search users
+      parameters:
+        - { name: query, in: query, schema: { type: string, maxLength: 100 } }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Limit' }
+      responses:
+        '200': { description: Paginated users }
+  /api/users/stats:
+    get:
+      tags: [Users]
+      summary: Counts of the caller's tasks and categories
+      responses:
+        '200': { description: Stats }
+  /api/users/account:
+    delete:
+      tags: [Users]
+      summary: Deactivate the account
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+  /api/users/{userId}:
+    get:
+      tags: [Users]
+      summary: Public profile
+      parameters: [{ $ref: '#/components/parameters/UserId' }]
+      responses:
+        '200': { $ref: '#/components/responses/UserResponse' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/categories:
+    get:
+      tags: [Categories]
+      summary: List categories
+      responses:
+        '200': { description: Categories with task counts }
+    post:
+      tags: [Categories]
+      summary: Create category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCategoryInput' }
+      responses:
+        '201': { $ref: '#/components/responses/CategoryResponse' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/categories/stats:
+    get:
+      tags: [Categories]
+      summary: Task and completion counts per category
+      responses:
+        '200': { description: Stats }
+  /api/categories/reorder:
+    put:
+      tags: [Categories]
+      summary: Reorder categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReorderCategoriesInput' }
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+  /api/categories/{categoryId}:
+    parameters: [{ $ref: '#/components/parameters/CategoryId' }]
+    get:
+      tags: [Categories]
+      summary: Get category
+      responses:
+        '200': { $ref: '#/components/responses/CategoryResponse' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Categories]
+      summary: Update category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateCategoryInput' }
+      responses:
+        '200': { $ref: '#/components/responses/CategoryResponse' }
+    delete:
+      tags: [Categories]
+      summary: Soft-delete category and detach its tasks
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+
+  /api/tasks:
+    get:
+      tags: [Tasks]
+      summary: List tasks
+      parameters:
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/TaskStatus' } }
+        - { name: priority, in: query, schema: { $ref: '#/components/schemas/TaskPriority' } }
+        - { name: category, in: query, schema: { $ref: '#/components/schemas/ObjectId' } }
+        - { name: assignedTo, in: query, schema: { $ref: '#/components/schemas/ObjectId' } }
+        - { name: search, in: query, schema: { type: string, maxLength: 200 }, description: Full-text search }
+        - { name: tags, in: query, schema: { type: string }, description: Comma-separated }
+        - { name: dueAfter, in: query, schema: { type: string, format: date-time } }
+        - { name: dueBefore, in: query, schema: { type: string, format: date-time } }
+        - { name: archived, in: query, schema: { type: string, enum: ['true', 'false'], default: 'false' } }
+        - { name: sortBy, in: query, schema: { type: string, enum: [createdAt, updatedAt, dueDate, priority, title, position], default: position } }
+        - { name: sortOrder, in: query, schema: { type: string, enum: [asc, desc], default: asc } }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Limit' }
+      responses:
+        '200':
+          description: Paginated tasks
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          tasks:
+                            type: array
+                            items: { $ref: '#/components/schemas/Task' }
+                          pagination: { $ref: '#/components/schemas/Pagination' }
+    post:
+      tags: [Tasks]
+      summary: Create task
+      description: Dependencies must be visible to the caller; a new task cannot introduce a cycle.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTaskInput' }
+      responses:
+        '201': { $ref: '#/components/responses/TaskResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/tasks/stats:
+    get:
+      tags: [Tasks]
+      summary: Counts by status plus overdue
+      responses:
+        '200':
+          description: Stats
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          stats: { $ref: '#/components/schemas/TaskStats' }
+  /api/tasks/{taskId}:
+    parameters: [{ $ref: '#/components/parameters/TaskId' }]
+    get:
+      tags: [Tasks]
+      summary: Get task
+      responses:
+        '200': { $ref: '#/components/responses/TaskResponse' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Tasks]
+      summary: Update task
+      description: |
+        Status changes are appended to the task's transition log and set
+        `startedAt`/`completedAt`. Dependency edges that would close a cycle
+        are rejected with 409 and the offending edge in `details`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTaskInput' }
+      responses:
+        '200': { $ref: '#/components/responses/TaskResponse' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [Tasks]
+      summary: Delete task (creator only) and detach dependents
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/tasks/{taskId}/comments:
+    post:
+      tags: [Tasks]
+      summary: Add comment
+      parameters: [{ $ref: '#/components/parameters/TaskId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string, minLength: 1, maxLength: 2000 }
+      responses:
+        '201': { description: Comment created }
+  /api/tasks/{taskId}/subtasks/{subtaskId}:
+    put:
+      tags: [Tasks]
+      summary: Toggle subtask completion
+      parameters:
+        - { $ref: '#/components/parameters/TaskId' }
+        - { name: subtaskId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isCompleted]
+              properties:
+                isCompleted: { type: boolean }
+      responses:
+        '200': { $ref: '#/components/responses/TaskResponse' }
+
+  /api/uploads/presign:
+    post:
+      tags: [Uploads]
+      summary: Pre-signed direct-to-storage upload URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filename, contentType, fileSize]
+              properties:
+                filename: { type: string, maxLength: 255 }
+                contentType: { type: string }
+                fileSize: { type: integer, maximum: 10485760 }
+      responses:
+        '200': { description: uploadUrl, publicUrl, fileKey, expiresIn }
+  /api/uploads/direct:
+    post:
+      tags: [Uploads]
+      summary: Upload up to 5 files through the API
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files: { type: array, items: { type: string, format: binary } }
+      responses:
+        '201': { description: Uploaded file descriptors }
+  /api/uploads/avatar:
+    post:
+      tags: [Uploads]
+      summary: Upload and set the caller's avatar
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar: { type: string, format: binary }
+      responses:
+        '200': { description: avatarUrl }
+  /api/uploads/tasks/{taskId}/attachments:
+    post:
+      tags: [Uploads]
+      summary: Attach an uploaded file to a task
+      parameters: [{ $ref: '#/components/parameters/TaskId' }]
+      responses:
+        '201': { description: Attachment }
+  /api/uploads/tasks/{taskId}/attachments/{attachmentId}:
+    delete:
+      tags: [Uploads]
+      summary: Remove an attachment from a task
+      parameters:
+        - { $ref: '#/components/parameters/TaskId' }
+        - { name: attachmentId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+  /api/uploads/{fileKey}:
+    delete:
+      tags: [Uploads]
+      summary: Delete an uploaded object the caller owns
+      parameters:
+        - { name: fileKey, in: path, required: true, schema: { type: string }, description: 'Object key, e.g. uploads/{userId}/{name}' }
+      responses:
+        '200': { $ref: '#/components/responses/Message' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/planning/policies:
+    get:
+      tags: [Planning]
+      summary: Catalogue of ranking policies
+      responses:
+        '200':
+          description: Policies with labels and literature references
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          policies:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name: { $ref: '#/components/schemas/PolicyName' }
+                                label: { type: string }
+                                summary: { type: string }
+                                reference: { type: string }
+  /api/planning/recommendations:
+    get:
+      tags: [Planning]
+      summary: Ranked "what to work on next"
+      description: |
+        Ranks the caller's open tasks whose prerequisites are complete (the
+        ready set) under the chosen policy. Each entry carries a score, its
+        components and a one-line rationale.
+      parameters:
+        - { name: policy, in: query, schema: { $ref: '#/components/schemas/PolicyName' }, description: Default wsjf }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { name: includeBlocked, in: query, schema: { type: boolean, default: false } }
+      responses:
+        '200':
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          policy: { $ref: '#/components/schemas/PolicyName' }
+                          generatedAt: { type: string, format: date-time }
+                          totals:
+                            type: object
+                            properties:
+                              open: { type: integer }
+                              ready: { type: integer }
+                              blocked: { type: integer }
+                          recommendations:
+                            type: array
+                            items: { $ref: '#/components/schemas/Recommendation' }
+  /api/planning/critical-path:
+    get:
+      tags: [Planning]
+      summary: Critical Path Method over the dependency graph
+      responses:
+        '200':
+          description: Makespan, critical chain and slack per task
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/CriticalPath' }
+  /api/planning/eisenhower:
+    get:
+      tags: [Planning]
+      summary: Eisenhower quadrants of open work
+      responses:
+        '200': { description: do_first, schedule, delegate, eliminate }
+  /api/planning/forecast:
+    get:
+      tags: [Planning]
+      summary: Monte Carlo completion forecast
+      description: Bootstraps historical throughput over the lookback window to forecast when the remaining open tasks will be done.
+      parameters:
+        - { name: lookbackDays, in: query, schema: { type: integer, minimum: 7, maximum: 365, default: 60 } }
+        - { name: bucket, in: query, schema: { type: string, enum: [day, week], default: day } }
+        - { name: trials, in: query, schema: { type: integer, minimum: 100, maximum: 50000, default: 10000 } }
+        - { name: seed, in: query, schema: { type: integer, default: 42 } }
+      responses:
+        '200':
+          description: Forecast or an explanatory note when history is insufficient
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Forecast' }
+  /api/planning/simulate:
+    get:
+      tags: [Planning]
+      summary: What-if comparison of policies on the caller's backlog
+      parameters:
+        - { name: workers, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 1 } }
+        - { name: policies, in: query, schema: { type: string }, description: Comma-separated policy names; default all }
+      responses:
+        '200':
+          description: One run per policy, sorted by weighted tardiness then makespan
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          workers: { type: integer }
+                          pendingTasks: { type: integer }
+                          recommendedPolicy: { $ref: '#/components/schemas/PolicyName' }
+                          runs:
+                            type: array
+                            items: { $ref: '#/components/schemas/SimulationRun' }
+
+  /api/analytics/flow:
+    get:
+      tags: [Analytics]
+      summary: Flow summary (cycle/lead time, throughput, Little's Law)
+      parameters: [{ $ref: '#/components/parameters/Days' }]
+      responses:
+        '200':
+          description: Flow summary
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/FlowSummary' }
+  /api/analytics/throughput:
+    get:
+      tags: [Analytics]
+      summary: Created and completed per bucket
+      parameters:
+        - { $ref: '#/components/parameters/Days' }
+        - { $ref: '#/components/parameters/Bucket' }
+      responses:
+        '200': { description: Series }
+  /api/analytics/cfd:
+    get:
+      tags: [Analytics]
+      summary: Cumulative flow diagram series
+      parameters:
+        - { $ref: '#/components/parameters/Days' }
+        - { $ref: '#/components/parameters/Bucket' }
+      responses:
+        '200': { description: Series of todo/in_progress/completed counts }
+  /api/analytics/aging:
+    get:
+      tags: [Analytics]
+      summary: Aging work in progress
+      responses:
+        '200': { description: Open items oldest first }
+
+  /api/activity:
+    get:
+      tags: [Activity]
+      summary: Personal activity feed
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 30 } }
+        - { name: before, in: query, schema: { $ref: '#/components/schemas/ObjectId' }, description: Cursor from nextCursor }
+        - { name: event, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Activity entries newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          activity:
+                            type: array
+                            items: { $ref: '#/components/schemas/Activity' }
+                          hasMore: { type: boolean }
+                          nextCursor: { type: [string, 'null'] }
+  /api/activity/tasks/{taskId}:
+    get:
+      tags: [Activity]
+      summary: History of one task
+      parameters:
+        - { $ref: '#/components/parameters/TaskId' }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 30 } }
+        - { name: before, in: query, schema: { $ref: '#/components/schemas/ObjectId' } }
+      responses:
+        '200': { description: Activity entries }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    Days: { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 365, default: 30 } }
+    Bucket: { name: bucket, in: query, schema: { type: string, enum: [day, week], default: day } }
+    TaskId: { name: taskId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+    CategoryId: { name: categoryId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+    UserId: { name: userId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+    SessionId: { name: sessionId, in: path, required: true, schema: { $ref: '#/components/schemas/ObjectId' } }
+
+  responses:
+    Message:
+      description: Success with a message
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Envelope' }
+    ValidationError:
+      description: Request failed schema validation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Token expired, invalid, or action not permitted
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Not found or not accessible
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: Duplicate or cycle
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    AuthResponse:
+      description: User and token pair
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      user: { $ref: '#/components/schemas/User' }
+                      tokens: { $ref: '#/components/schemas/TokenPair' }
+    UserResponse:
+      description: User
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      user: { $ref: '#/components/schemas/User' }
+    CategoryResponse:
+      description: Category
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      category: { $ref: '#/components/schemas/Category' }
+    TaskResponse:
+      description: Task
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      task: { $ref: '#/components/schemas/Task' }
+
+  schemas:
+    ObjectId:
+      type: string
+      pattern: '^[a-fA-F0-9]{24}$'
+    Envelope:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean, const: true }
+        message: { type: string }
+        data: { type: object }
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error: { type: string, description: 'Short title, e.g. "Validation Error"' }
+        message: { type: string }
+        details: {}
+        requestId: { type: string }
+    Pagination:
+      type: object
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+        hasNext: { type: boolean }
+        hasPrev: { type: boolean }
+    TokenPair:
+      type: object
+      required: [accessToken, refreshToken]
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+    TaskStatus:
+      type: string
+      enum: [todo, in_progress, completed, cancelled]
+    TaskPriority:
+      type: string
+      enum: [low, medium, high, urgent]
+    PolicyName:
+      type: string
+      enum: [fifo, priority, spt, edf, wsjf, eisenhower]
+
+    RegisterInput:
+      type: object
+      required: [username, email, password]
+      properties:
+        username: { type: string, minLength: 3, maxLength: 20, pattern: '^[a-zA-Z0-9_-]+$' }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 128 }
+        firstName: { type: string, maxLength: 50 }
+        lastName: { type: string, maxLength: 50 }
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+    RefreshTokenInput:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken: { type: string }
+    ChangePasswordInput:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword: { type: string }
+        newPassword: { type: string, minLength: 8 }
+    UpdateProfileInput:
+      type: object
+      properties:
+        firstName: { type: string, maxLength: 50 }
+        lastName: { type: string, maxLength: 50 }
+        bio: { type: string, maxLength: 500 }
+        avatar: { type: string, format: uri }
+        timezone: { type: string }
+    UpdatePreferencesInput:
+      type: object
+      properties:
+        theme: { type: string, enum: [light, dark, system] }
+        defaultView: { type: string, enum: [list, kanban, calendar] }
+        notifications:
+          type: object
+          properties:
+            email: { type: boolean }
+            push: { type: boolean }
+            taskReminders: { type: boolean }
+            taskAssignments: { type: boolean }
+    AuthUser:
+      type: object
+      properties:
+        id: { $ref: '#/components/schemas/ObjectId' }
+        email: { type: string }
+        username: { type: string }
+    User:
+      type: object
+      properties:
+        _id: { $ref: '#/components/schemas/ObjectId' }
+        username: { type: string }
+        email: { type: string, format: email }
+        firstName: { type: string }
+        lastName: { type: string }
+        avatar: { type: string }
+        bio: { type: string }
+        timezone: { type: string }
+        preferences: { type: object }
+        isActive: { type: boolean }
+        lastLoginAt: { type: string, format: date-time }
+        fullName: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Session:
+      type: object
+      properties:
+        _id: { $ref: '#/components/schemas/ObjectId' }
+        deviceInfo: { type: string }
+        ipAddress: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    CreateCategoryInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        description: { type: string, maxLength: 500 }
+        color: { type: string, pattern: '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', default: '#6366f1' }
+        icon: { type: string, maxLength: 50 }
+        sortOrder: { type: number, default: 0 }
+    UpdateCategoryInput:
+      allOf: [{ $ref: '#/components/schemas/CreateCategoryInput' }]
+      required: []
+    ReorderCategoriesInput:
+      type: object
+      required: [categories]
+      properties:
+        categories:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [id, sortOrder]
+            properties:
+              id: { $ref: '#/components/schemas/ObjectId' }
+              sortOrder: { type: number }
+    Category:
+      type: object
+      properties:
+        _id: { $ref: '#/components/schemas/ObjectId' }
+        name: { type: string }
+        description: { type: string }
+        color: { type: string }
+        icon: { type: string }
+        createdBy: { $ref: '#/components/schemas/ObjectId' }
+        isDefault: { type: boolean }
+        sortOrder: { type: number }
+        isActive: { type: boolean }
+        taskCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CreateTaskInput:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: string, maxLength: 5000 }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        category: { $ref: '#/components/schemas/ObjectId' }
+        assignedTo: { $ref: '#/components/schemas/ObjectId' }
+        dependencies:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/ObjectId' }
+          description: Tasks that must complete before this one can start
+        dueDate: { type: string, format: date-time }
+        startDate: { type: string, format: date-time }
+        estimatedHours: { type: number, minimum: 0 }
+        tags: { type: array, items: { type: string, maxLength: 50 } }
+        subtasks:
+          type: array
+          items:
+            type: object
+            required: [title]
+            properties:
+              title: { type: string, maxLength: 200 }
+              isCompleted: { type: boolean, default: false }
+    UpdateTaskInput:
+      allOf: [{ $ref: '#/components/schemas/CreateTaskInput' }]
+      required: []
+      properties:
+        actualHours: { type: number, minimum: 0 }
+        isArchived: { type: boolean }
+        position: { type: number }
+    StatusTransition:
+      type: object
+      properties:
+        from: { type: [string, 'null'] }
+        to: { $ref: '#/components/schemas/TaskStatus' }
+        at: { type: string, format: date-time }
+        by: { $ref: '#/components/schemas/ObjectId' }
+    Task:
+      type: object
+      properties:
+        _id: { $ref: '#/components/schemas/ObjectId' }
+        title: { type: string }
+        description: { type: string }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priority: { $ref: '#/components/schemas/TaskPriority' }
+        priorityWeight: { type: integer, minimum: 1, maximum: 4 }
+        category: { type: [object, 'null'] }
+        assignedTo: { type: [object, 'null'] }
+        createdBy: { type: object }
+        dependencies: { type: array, items: { type: object } }
+        dueDate: { type: string, format: date-time }
+        startDate: { type: string, format: date-time }
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+        estimatedHours: { type: number }
+        actualHours: { type: number }
+        tags: { type: array, items: { type: string } }
+        subtasks: { type: array, items: { type: object } }
+        comments: { type: array, items: { type: object } }
+        attachments: { type: array, items: { type: object } }
+        statusHistory: { type: array, items: { $ref: '#/components/schemas/StatusTransition' } }
+        isArchived: { type: boolean }
+        position: { type: number }
+        completionPercentage: { type: number }
+        isOverdue: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    TaskStats:
+      type: object
+      properties:
+        todo: { type: integer }
+        in_progress: { type: integer }
+        completed: { type: integer }
+        cancelled: { type: integer }
+        overdue: { type: integer }
+
+    Recommendation:
+      type: object
+      properties:
+        rank: { type: integer }
+        taskId: { $ref: '#/components/schemas/ObjectId' }
+        title: { type: string }
+        status: { $ref: '#/components/schemas/TaskStatus' }
+        priorityWeight: { type: integer }
+        dueDate: { type: [string, 'null'], format: date-time }
+        estimatedHours: { type: [number, 'null'] }
+        score: { type: [number, 'null'] }
+        rationale: { type: string }
+        components: { type: object, additionalProperties: true }
+        isBlocked: { type: boolean }
+        unblocks: { type: integer, description: Number of tasks transitively waiting on this one }
+    CriticalPath:
+      type: object
+      properties:
+        makespanHours: { type: number }
+        criticalPath:
+          type: array
+          items:
+            type: object
+            properties:
+              taskId: { $ref: '#/components/schemas/ObjectId' }
+              title: { type: string }
+        cycle: { type: [array, 'null'], items: { type: object } }
+        nodes:
+          type: array
+          items:
+            type: object
+            properties:
+              taskId: { $ref: '#/components/schemas/ObjectId' }
+              title: { type: string }
+              durationHours: { type: number }
+              earliestStart: { type: number }
+              earliestFinish: { type: number }
+              latestStart: { type: number }
+              latestFinish: { type: number }
+              slackHours: { type: number }
+              isCritical: { type: boolean }
+    Forecast:
+      type: object
+      properties:
+        generatedAt: { type: string, format: date-time }
+        remainingItems: { type: integer }
+        lookback:
+          type: object
+          properties:
+            from: { type: string, format: date-time }
+            to: { type: string, format: date-time }
+            bucket: { type: string, enum: [day, week] }
+            periods: { type: integer }
+        throughput:
+          type: object
+          properties:
+            samples: { type: array, items: { type: integer } }
+            mean: { type: number }
+        forecast:
+          type: [object, 'null']
+          properties:
+            trials: { type: integer }
+            seed: { type: integer }
+            periods:
+              type: object
+              properties:
+                p50: { type: integer }
+                p70: { type: integer }
+                p85: { type: integer }
+                p95: { type: integer }
+            dates:
+              type: object
+              properties:
+                p50: { type: string, format: date-time }
+                p70: { type: string, format: date-time }
+                p85: { type: string, format: date-time }
+                p95: { type: string, format: date-time }
+            meanPeriods: { type: number }
+            histogram:
+              type: array
+              items:
+                type: object
+                properties:
+                  periods: { type: integer }
+                  count: { type: integer }
+            truncatedShare: { type: number }
+        note: { type: string }
+    SimulationRun:
+      type: object
+      properties:
+        policy: { $ref: '#/components/schemas/PolicyName' }
+        label: { type: string }
+        summary: { type: string }
+        reference: { type: string }
+        metrics:
+          type: object
+          properties:
+            makespan: { type: number }
+            meanFlowTime: { type: number }
+            totalTardiness: { type: number }
+            meanTardiness: { type: number }
+            weightedTardiness: { type: number }
+            maxLateness: { type: number }
+            lateTasks: { type: integer }
+            onTimeRate: { type: number }
+            scheduledTasks: { type: integer }
+        unscheduled: { type: array, items: { type: string } }
+    DistributionSummary:
+      type: object
+      properties:
+        n: { type: integer }
+        mean: { type: number }
+        stddev: { type: number }
+        min: { type: number }
+        p50: { type: number }
+        p85: { type: number }
+        p95: { type: number }
+        max: { type: number }
+    FlowSummary:
+      type: object
+      properties:
+        window:
+          type: object
+          properties:
+            from: { type: string, format: date-time }
+            to: { type: string, format: date-time }
+            days: { type: number }
+        wip: { type: integer }
+        completed: { type: integer }
+        throughputPerDay: { type: number }
+        cycleTimeHours: { $ref: '#/components/schemas/DistributionSummary' }
+        leadTimeHours: { $ref: '#/components/schemas/DistributionSummary' }
+        littlesLawLeadTimeDays: { type: [number, 'null'] }
+        onTimeRate: { type: [number, 'null'] }
+    Activity:
+      type: object
+      properties:
+        _id: { $ref: '#/components/schemas/ObjectId' }
+        event: { type: string, example: task.status_changed }
+        entityType: { type: string, enum: [task, category] }
+        entityId: { $ref: '#/components/schemas/ObjectId' }
+        actor: { type: object }
+        audience: { type: array, items: { $ref: '#/components/schemas/ObjectId' } }
+        summary: { type: string }
+        changes: { type: array, items: { type: string } }
+        metadata: { type: object, additionalProperties: true }
+        createdAt: { type: string, format: date-time }

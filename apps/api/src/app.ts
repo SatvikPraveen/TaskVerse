@@ -4,6 +4,7 @@ import helmet from 'helmet';
 
 import { isDatabaseReady } from '@/config/db';
 import { env } from '@/config/env';
+import docsRoutes from '@/docs/docs.routes';
 import { registerEventSubscribers } from '@/events/bootstrap';
 import { corsMiddleware } from '@/middleware/cors';
 import { errorHandler } from '@/middleware/error';
@@ -67,6 +68,7 @@ app.get('/api', (_req, res) => {
       planning: '/api/planning',
       analytics: '/api/analytics',
       activity: '/api/activity',
+      docs: '/api/docs',
     },
   });
 });
@@ -79,6 +81,7 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/planning', planningRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/activity', activityRoutes);
+app.use('/api/docs', docsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found', message: `Route ${req.originalUrl} not found` });
