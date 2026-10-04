@@ -7,7 +7,9 @@ import { env } from '@/config/env';
 import { registerEventSubscribers } from '@/events/bootstrap';
 import { corsMiddleware } from '@/middleware/cors';
 import { errorHandler } from '@/middleware/error';
+import { httpLogger } from '@/middleware/httpLogger';
 import { rateLimitMiddleware } from '@/middleware/rateLimit';
+import { requestId } from '@/middleware/requestId';
 import activityRoutes from '@/modules/activity/activity.routes';
 import analyticsRoutes from '@/modules/analytics/analytics.routes';
 import authRoutes from '@/modules/auth/auth.routes';
@@ -16,13 +18,19 @@ import planningRoutes from '@/modules/planning/planning.routes';
 import taskRoutes from '@/modules/tasks/task.routes';
 import uploadRoutes from '@/modules/uploads/upload.routes';
 import userRoutes from '@/modules/users/user.routes';
+import { metricsHandler, metricsMiddleware, registerMetricsSubscribers } from '@/observability/metrics';
 
 registerEventSubscribers();
+if (env.METRICS_ENABLED) registerMetricsSubscribers();
 
 const app = express();
 
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
+
+app.use(requestId);
+app.use(httpLogger);
+if (env.METRICS_ENABLED) app.use(metricsMiddleware);
 
 app.use(helmet());
 app.use(corsMiddleware);
@@ -38,6 +46,8 @@ app.get('/health', (_req, res) => {
     environment: env.NODE_ENV,
   });
 });
+
+if (env.METRICS_ENABLED) app.get('/metrics', metricsHandler);
 
 app.get('/health/ready', (_req, res) => {
   const ready = isDatabaseReady();

@@ -10,4 +10,4 @@ process.env.LOG_LEVEL = 'error';
 process.env.RATE_LIMIT_MAX_REQUESTS = '100000';
 process.env.AUTH_RATE_LIMIT_MAX = '100000';
 process.env.UPLOAD_RATE_LIMIT_MAX = '100000';
-process.env.METRICS_ENABLED = 'false';
+process.env.METRICS_ENABLED = 'true';

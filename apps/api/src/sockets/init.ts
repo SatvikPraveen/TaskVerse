@@ -3,6 +3,7 @@ import type { Server as SocketIOServer, Socket } from 'socket.io';
 
 import { logger } from '@/config/logger';
 import { type AuthUser, resolveUserFromToken } from '@/middleware/auth';
+import { socketConnections } from '@/observability/metrics';
 
 export interface AuthenticatedSocket extends Socket {
   user?: AuthUser;
@@ -39,6 +40,7 @@ export function initSocketIO(io: SocketIOServer): void {
     const user = socket.user!;
     logger.debug({ userId: user.id, socketId: socket.id }, 'socket connected');
     socket.join(userRoom(user.id));
+    socketConnections.inc();
 
     socket.on('task:join', (taskId: unknown) => {
       if (typeof taskId === 'string') socket.join(taskRoom(taskId));
@@ -61,6 +63,7 @@ export function initSocketIO(io: SocketIOServer): void {
     });
 
     socket.on('disconnect', reason => {
+      socketConnections.dec();
       logger.debug({ userId: user.id, socketId: socket.id, reason }, 'socket disconnected');
     });
   });
