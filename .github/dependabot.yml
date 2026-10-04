@@ -16,6 +16,10 @@ updates:
         patterns: ['react', 'react-dom', '@types/react', '@types/react-dom']
       dev-tooling:
         dependency-type: development
+    # Major upgrades are done deliberately as separate migrations.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -24,7 +28,15 @@ updates:
     directory: /apps/api
     schedule:
       interval: monthly
+    # Major upgrades are done deliberately as separate migrations.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: docker
     directory: /apps/web
     schedule:
       interval: monthly
+    # Major upgrades are done deliberately as separate migrations.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
