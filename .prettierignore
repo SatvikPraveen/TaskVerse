@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.turbo
+package-lock.json
+research/results
+playwright-report
+test-results
+*.min.js

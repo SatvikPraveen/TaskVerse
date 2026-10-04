@@ -1,82 +1,61 @@
-# File: .github/workflows/e2e.yml
-
-name: E2E Tests
+# .github/workflows/e2e.yml
+name: E2E
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 2 * * *' # Run daily at 2 AM
+    - cron: '0 2 * * 1' # weekly, Monday 02:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  e2e-test:
+  playwright:
+    name: Playwright (Chromium)
     runs-on: ubuntu-latest
-
+    timeout-minutes: 30
     services:
       mongodb:
         image: mongo:7
-        env:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: password
         ports:
           - 27017:27017
         options: >-
-          --health-cmd "mongosh --eval 'db.runCommand({ping: 1})'"
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
+    env:
+      NODE_ENV: test
+      PORT: 3001
+      MONGODB_URI: mongodb://localhost:27017/taskverse_e2e
+      JWT_SECRET: e2e-access-secret-at-least-32-characters-long
+      JWT_REFRESH_SECRET: e2e-refresh-secret-at-least-32-characters-long
+      ALLOWED_ORIGINS: http://localhost:5173
+      METRICS_ENABLED: 'false'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build packages
-        run: npm run build
-
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-
-      - name: Start application
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build --workspace=packages/types --workspace=packages/scheduler --workspace=apps/api
+      - run: npx playwright install --with-deps chromium
+      - name: Start API
         run: |
-          npm run dev &
-          sleep 30
-        env:
-          NODE_ENV: test
-          MONGODB_URI: mongodb://root:password@localhost:27017/taskverse_e2e?authSource=admin
-          JWT_SECRET: e2e-test-secret-key
-          JWT_REFRESH_SECRET: e2e-test-refresh-secret-key
-          PORT: 3001
-          VITE_API_URL: http://localhost:3001/api/v1
-
+          node apps/api/dist/server.js > api.log 2>&1 &
+          npx wait-on --timeout 60000 http://localhost:3001/health/ready
       - name: Run E2E tests
-        run: npm run e2e --workspace=apps/web
-        env:
-          BASE_URL: http://localhost:5173
-          API_URL: http://localhost:3001/api/v1
-
-      - name: Upload test results
+        run: npx playwright test --project=chromium
+        working-directory: apps/web
+      - uses: actions/upload-artifact@v4
         if: failure()
-        uses: actions/upload-artifact@v3
         with:
           name: playwright-report
-          path: apps/web/playwright-report/
-          retention-days: 30
-
-      - name: Upload test artifacts
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: apps/web/test-results/
-          retention-days: 30
+          path: |
+            apps/web/playwright-report
+            apps/web/test-results
+            api.log
+          retention-days: 14
