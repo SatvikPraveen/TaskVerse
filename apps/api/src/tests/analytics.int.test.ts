@@ -20,7 +20,7 @@ describe('Analytics API', () => {
   });
 
   const seedHistory = async () => {
-    // Two completed (one late), one in progress, one todo, one cancelled.
+    // Two completed (A on time, B late), one in progress, one todo, one cancelled.
     const a = await createTask(session, { title: 'A', dueDate: new Date(Date.now() - 1 * DAY).toISOString() });
     await seedRaw(a._id, { status: 'completed', createdAt: new Date(Date.now() - 5 * DAY), startedAt: new Date(Date.now() - 4 * DAY), completedAt: new Date(Date.now() - 2 * DAY) });
     const b = await createTask(session, { title: 'B', dueDate: new Date(Date.now() - 3 * DAY).toISOString() });
@@ -46,7 +46,7 @@ describe('Analytics API', () => {
     expect(d.cycleTimeHours.min).toBe(48);
     expect(d.cycleTimeHours.max).toBe(48);
     expect(d.leadTimeHours.p50).toBe(96);
-    expect(d.onTimeRate).toBe(0); // both completed after their due date
+    expect(d.onTimeRate).toBe(0.5); // A finished a day early, B two days late
     expect(d.littlesLawLeadTimeDays).toBe(14); // 2 WIP / (2 per 14 days)
   });
 
