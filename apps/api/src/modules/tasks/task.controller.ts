@@ -7,6 +7,7 @@ import type { AuthRequest } from '@/middleware/auth';
 import { asyncHandler, createError } from '@/middleware/error';
 import { getPaginationParams } from '@/utils/pagination';
 
+import { publishTaskEvent } from './task.events';
 import { type ITask, PRIORITY_WEIGHT, Task, TASK_PRIORITIES, TASK_STATUSES } from './task.model';
 import { accessibleBy, applyStatusTransition, assertValidDependencies } from './task.service';
 
@@ -29,11 +30,14 @@ const createTaskSchema = z.object({
     .default([]),
 });
 
-const updateTaskSchema = createTaskSchema.partial().extend({
-  actualHours: z.number().min(0).optional(),
-  isArchived: z.boolean().optional(),
-  position: z.number().optional(),
-});
+const updateTaskSchema = createTaskSchema
+  .partial()
+  .extend({
+    assignedTo: objectId.nullable().optional(),
+    actualHours: z.number().min(0).optional(),
+    isArchived: z.boolean().optional(),
+    position: z.number().optional(),
+  });
 
 const getTasksSchema = z.object({
   status: z.enum(TASK_STATUSES).optional(),
@@ -135,6 +139,12 @@ export class TaskController {
 
     await task.save();
     await task.populate(TASK_POPULATE);
+
+    await publishTaskEvent('task.created', task, userId, { task: task.toJSON() });
+    if (input.assignedTo && input.assignedTo !== userId) {
+      await publishTaskEvent('task.assigned', task, userId, { task: task.toJSON(), assignedTo: input.assignedTo });
+    }
+
     res.status(201).json({ success: true, message: 'Task created successfully', data: { task } });
   });
 
@@ -146,60 +156,93 @@ export class TaskController {
     const task = await Task.findOne({ _id: taskId, ...accessibleBy(userId) });
     if (!task) throw createError('Task not found or access denied', 404);
 
-    const { dueDate, startDate, subtasks, status, dependencies, ...rest } = input;
+    const previousStatus = task.status;
+    const previousAssignee = task.assignedTo?.toString() ?? null;
+    const { dueDate, startDate, subtasks, status, dependencies, assignedTo, ...rest } = input;
+
     if (dependencies !== undefined) {
       await assertValidDependencies(userId, taskId, dependencies);
       task.set('dependencies', dependencies);
     }
     task.set(rest);
+    if (assignedTo !== undefined) task.set('assignedTo', assignedTo);
     if (dueDate !== undefined) task.dueDate = new Date(dueDate);
     if (startDate !== undefined) task.startDate = new Date(startDate);
     if (subtasks !== undefined) task.set('subtasks', subtasks);
     if (status !== undefined) applyStatusTransition(task, status, userId);
 
+    const changes = task.modifiedPaths({ includeChildren: false }).filter(p => p !== 'statusHistory');
     await task.save();
     await task.populate(TASK_POPULATE);
+
+    const snapshot = task.toJSON();
+    const statusChanged = status !== undefined && status !== previousStatus;
+    const newAssignee = task.assignedTo ? String((task.assignedTo as { _id?: unknown })._id ?? task.assignedTo) : null;
+    const assigneeChanged = assignedTo !== undefined && newAssignee !== previousAssignee;
+
+    if (statusChanged) {
+      await publishTaskEvent('task.status_changed', task, userId, {
+        task: snapshot,
+        oldStatus: previousStatus,
+        newStatus: task.status,
+      });
+    }
+    if (assigneeChanged) {
+      await publishTaskEvent('task.assigned', task, userId, { task: snapshot, assignedTo: newAssignee });
+    }
+    const otherChanges = changes.filter(c => c !== 'status' && c !== 'assignedTo' && c !== 'priorityWeight');
+    if (otherChanges.length > 0 || (!statusChanged && !assigneeChanged)) {
+      await publishTaskEvent('task.updated', task, userId, { task: snapshot, changes: otherChanges });
+    }
+
     res.json({ success: true, message: 'Task updated successfully', data: { task } });
   });
 
   static deleteTask = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const userId = req.user!.id;
     const { taskId } = z.object({ taskId: objectId }).parse(req.params);
     // Only the creator may delete.
-    const task = await Task.findOneAndDelete({ _id: taskId, createdBy: req.user!.id });
+    const task = await Task.findOneAndDelete({ _id: taskId, createdBy: userId });
     if (!task) throw createError('Task not found or access denied', 404);
     // Detach dependents so the graph never references a missing node.
     await Task.updateMany({ dependencies: task._id }, { $pull: { dependencies: task._id } });
+
+    await publishTaskEvent('task.deleted', task, userId, {});
     res.json({ success: true, message: 'Task deleted successfully' });
   });
 
   static addComment = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const userId = req.user!.id;
     const { taskId } = z.object({ taskId: objectId }).parse(req.params);
     const { content } = z.object({ content: z.string().min(1).max(2000).trim() }).parse(req.body);
 
     const task = await Task.findOneAndUpdate(
-      { _id: taskId, ...accessibleBy(req.user!.id) },
-      { $push: { comments: { content, author: req.user!.id } } },
+      { _id: taskId, ...accessibleBy(userId) },
+      { $push: { comments: { content, author: userId } } },
       { new: true }
     ).populate('comments.author', 'username firstName lastName avatar');
     if (!task) throw createError('Task not found or access denied', 404);
 
     const comment = task.comments[task.comments.length - 1];
+    await publishTaskEvent('task.comment_added', task, userId, { comment });
     res.status(201).json({ success: true, message: 'Comment added successfully', data: { comment } });
   });
 
   static updateSubtask = asyncHandler<AuthRequest>(async (req, res: Response) => {
+    const userId = req.user!.id;
     const { taskId, subtaskId } = z
       .object({ taskId: objectId, subtaskId: objectId })
       .parse(req.params);
     const { isCompleted } = z.object({ isCompleted: z.boolean() }).parse(req.body);
 
     const task = await Task.findOneAndUpdate(
-      { _id: taskId, 'subtasks._id': subtaskId, ...accessibleBy(req.user!.id) },
+      { _id: taskId, 'subtasks._id': subtaskId, ...accessibleBy(userId) },
       { $set: { 'subtasks.$.isCompleted': isCompleted } },
       { new: true }
     ).populate(TASK_POPULATE);
     if (!task) throw createError('Task or subtask not found', 404);
 
+    await publishTaskEvent('task.subtask_updated', task, userId, { task: task.toJSON(), subtaskId, isCompleted });
     res.json({ success: true, message: 'Subtask updated successfully', data: { task } });
   });
 

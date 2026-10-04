@@ -3,6 +3,7 @@ import type { Response } from 'express';
 import mongoose from 'mongoose';
 import { z } from 'zod';
 
+import { domainEvents } from '@/events/domain-events';
 import type { AuthRequest } from '@/middleware/auth';
 import { asyncHandler, createError } from '@/middleware/error';
 import { Task } from '@/modules/tasks/task.model';
@@ -49,6 +50,13 @@ export class CategoryController {
     const input = createCategorySchema.parse(req.body);
     const category = await Category.create({ ...input, createdBy: req.user!.id });
     await category.populate('taskCount');
+    await domainEvents.publish('category.created', {
+      categoryId: category._id.toString(),
+      name: category.name,
+      actorId: req.user!.id,
+      recipients: [req.user!.id],
+      timestamp: new Date().toISOString(),
+    });
     res
       .status(201)
       .json({ success: true, message: 'Category created successfully', data: { category } });
@@ -64,6 +72,14 @@ export class CategoryController {
       { new: true, runValidators: true }
     ).populate('taskCount');
     if (!category) throw createError('Category not found', 404);
+    await domainEvents.publish('category.updated', {
+      categoryId: category._id.toString(),
+      name: category.name,
+      changes: Object.keys(input),
+      actorId: req.user!.id,
+      recipients: [req.user!.id],
+      timestamp: new Date().toISOString(),
+    });
 
     res.json({ success: true, message: 'Category updated successfully', data: { category } });
   });
@@ -81,6 +97,13 @@ export class CategoryController {
     category.isActive = false;
     await category.save();
     await Task.updateMany({ category: category._id }, { $unset: { category: 1 } });
+    await domainEvents.publish('category.deleted', {
+      categoryId: category._id.toString(),
+      name: category.name,
+      actorId: req.user!.id,
+      recipients: [req.user!.id],
+      timestamp: new Date().toISOString(),
+    });
 
     res.json({ success: true, message: 'Category deleted successfully' });
   });
