@@ -17,7 +17,9 @@ export const slugify = (str: string): string => {
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    // Runs were collapsed above, so at most one '-' remains at each end; matching a
+    // single char avoids the quadratic backtracking of /-+$/ on long '-' runs.
+    .replace(/^-|-$/g, '');
 };
 
 export const generateId = (length = 8): string => {
