@@ -15,7 +15,7 @@ COPY packages/types packages/types
 COPY apps/web apps/web
 RUN npm run build --workspace=packages/types && npm run build --workspace=apps/web
 
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.31-alpine AS runtime
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /repo/apps/web/dist /usr/share/nginx/html
 EXPOSE 80
