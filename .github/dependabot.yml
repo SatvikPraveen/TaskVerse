@@ -20,6 +20,10 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Pre-1.0: 0.5.x requires eslint ^9 || ^10, we are on ESLint 8.
+      # Drop this entry after the ESLint 9 / flat-config migration.
+      - dependency-name: eslint-plugin-react-refresh
+        update-types: ["version-update:semver-minor"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
