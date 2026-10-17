@@ -14,7 +14,7 @@ interface ChartCardProps {
 export default function ChartCard({ title, description, table, actions, children }: ChartCardProps) {
   const [showTable, setShowTable] = useState(false);
   return (
-    <section className="rounded-lg bg-white p-5 shadow-sm" aria-label={title}>
+    <section className="rounded-lg bg-white p-5 shadow-xs" aria-label={title}>
       <header className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold text-gray-900">{title}</h2>

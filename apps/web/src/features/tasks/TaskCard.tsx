@@ -40,7 +40,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
     <div
       onClick={onClick}
       className={clsx(
-        'bg-white rounded-lg shadow-sm border-l-4 p-6 cursor-pointer hover:shadow-md transition-shadow',
+        'bg-white rounded-lg shadow-xs border-l-4 p-6 cursor-pointer hover:shadow-md transition-shadow',
         priorityColors[task.priority]
       )}
     >

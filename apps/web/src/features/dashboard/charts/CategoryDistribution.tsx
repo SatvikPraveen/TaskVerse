@@ -14,7 +14,7 @@ export default function CategoryDistribution({ stats, isLoading }: CategoryDistr
       <div className="flex h-64 items-center justify-center" aria-busy="true">
         <div className="animate-pulse">
           <div className="mx-auto mb-4 h-32 w-32 rounded-full bg-gray-200" />
-          <div className="mx-auto h-3 w-24 rounded bg-gray-200" />
+          <div className="mx-auto h-3 w-24 rounded-sm bg-gray-200" />
         </div>
       </div>
     );

@@ -141,7 +141,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-gray-500/75 transition-opacity" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-hidden">
@@ -301,7 +301,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                                 <button
                                   onClick={() => handleSubtaskToggle(subtask._id, !subtask.isCompleted)}
                                   className={clsx(
-                                    'flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center',
+                                    'shrink-0 w-5 h-5 rounded-sm border-2 flex items-center justify-center',
                                     subtask.isCompleted
                                       ? 'bg-green-500 border-green-500'
                                       : 'border-gray-300 hover:border-gray-400'
@@ -394,7 +394,7 @@ export default function TaskDrawer({ task, isOpen, onClose }: TaskDrawerProps) {
                                 href={attachment.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-2 p-2 rounded border hover:bg-gray-50"
+                                className="flex items-center gap-2 p-2 rounded-sm border hover:bg-gray-50"
                               >
                                 <PaperClipIcon className="h-4 w-4 text-gray-400" />
                                 <span className="text-sm text-gray-900">{attachment.originalName}</span>

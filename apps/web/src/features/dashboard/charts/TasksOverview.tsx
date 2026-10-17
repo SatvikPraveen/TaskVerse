@@ -20,9 +20,9 @@ export default function TasksOverview({ stats, isLoading }: TasksOverviewProps) 
     return (
       <div className="flex h-64 items-center justify-center" aria-busy="true">
         <div className="w-48 animate-pulse space-y-3">
-          <div className="h-3 rounded bg-gray-200" />
-          <div className="h-3 w-5/6 rounded bg-gray-200" />
-          <div className="h-3 w-4/6 rounded bg-gray-200" />
+          <div className="h-3 rounded-sm bg-gray-200" />
+          <div className="h-3 w-5/6 rounded-sm bg-gray-200" />
+          <div className="h-3 w-4/6 rounded-sm bg-gray-200" />
         </div>
       </div>
     );

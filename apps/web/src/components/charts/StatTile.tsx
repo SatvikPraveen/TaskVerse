@@ -12,7 +12,7 @@ interface StatTileProps {
 /** A headline number. Not a chart: one value, read at a glance. */
 export default function StatTile({ label, value, hint, detail }: StatTileProps) {
   return (
-    <div className="rounded-lg bg-white p-5 shadow-sm" title={hint}>
+    <div className="rounded-lg bg-white p-5 shadow-xs" title={hint}>
       <dt className="truncate text-sm font-medium text-gray-500">{label}</dt>
       <dd className="mt-1 text-3xl font-semibold tabular-nums text-gray-900">{value}</dd>
       {detail && <p className="mt-1 text-xs text-gray-500">{detail}</p>}

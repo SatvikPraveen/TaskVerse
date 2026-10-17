@@ -93,10 +93,10 @@ export default function TasksPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="animate-pulse rounded-lg bg-white p-6 shadow">
-              <div className="mb-4 h-4 w-3/4 rounded bg-gray-200" />
-              <div className="mb-2 h-3 w-full rounded bg-gray-200" />
-              <div className="h-3 w-2/3 rounded bg-gray-200" />
+            <div key={i} className="animate-pulse rounded-lg bg-white p-6 shadow-sm">
+              <div className="mb-4 h-4 w-3/4 rounded-sm bg-gray-200" />
+              <div className="mb-2 h-3 w-full rounded-sm bg-gray-200" />
+              <div className="h-3 w-2/3 rounded-sm bg-gray-200" />
             </div>
           ))}
         </div>

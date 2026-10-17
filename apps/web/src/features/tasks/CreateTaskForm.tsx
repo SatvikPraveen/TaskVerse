@@ -28,7 +28,7 @@ interface TaskForm {
 }
 
 const selectClass =
-  'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
+  'block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
 
 /** Interprets a yyyy-mm-dd input as the end of that day in local time. */
 const toIsoEndOfDay = (date: string) => {

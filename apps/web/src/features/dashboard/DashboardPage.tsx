@@ -61,10 +61,10 @@ export default function DashboardPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map(stat => (
-          <div key={stat.name} className="bg-white overflow-hidden shadow rounded-lg">
+          <div key={stat.name} className="bg-white overflow-hidden shadow-sm rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className={`p-3 rounded-md ${stat.bgColor}`}>
                     <stat.icon className={`h-6 w-6 ${stat.color}`} aria-hidden="true" />
                   </div>
@@ -74,7 +74,7 @@ export default function DashboardPage() {
                     <dt className="text-sm font-medium text-gray-500 truncate">{stat.name}</dt>
                     <dd className="text-3xl font-semibold text-gray-900">
                       {taskStatsLoading ? (
-                        <div className="animate-pulse bg-gray-200 h-8 w-12 rounded"></div>
+                        <div className="animate-pulse bg-gray-200 h-8 w-12 rounded-sm"></div>
                       ) : (
                         stat.value
                       )}
@@ -90,29 +90,29 @@ export default function DashboardPage() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Tasks Overview Chart */}
-        <div className="bg-white shadow rounded-lg p-6">
+        <div className="bg-white shadow-sm rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Tasks Overview</h3>
           <TasksOverview stats={taskStats} isLoading={taskStatsLoading} />
         </div>
 
         {/* Category Distribution Chart */}
-        <div className="bg-white shadow rounded-lg p-6">
+        <div className="bg-white shadow-sm rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Tasks by Category</h3>
           <CategoryDistribution stats={categoryStats} isLoading={categoryStatsLoading} />
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white shadow rounded-lg">
+      <div className="bg-white shadow-sm rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link
               to="/tasks?status=todo"
-              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-xs hover:border-gray-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 text-indigo-600">
+                <div className="shrink-0 text-indigo-600">
                   <ClockIcon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -123,10 +123,10 @@ export default function DashboardPage() {
 
             <Link
               to="/tasks?status=in_progress"
-              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-xs hover:border-gray-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 text-blue-600">
+                <div className="shrink-0 text-blue-600">
                   <ClockIcon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -137,10 +137,10 @@ export default function DashboardPage() {
 
             <Link
               to="/categories"
-              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-xs hover:border-gray-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 text-purple-600">
+                <div className="shrink-0 text-purple-600">
                   <PlusIcon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -151,10 +151,10 @@ export default function DashboardPage() {
 
             <Link
               to="/tasks"
-              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="relative rounded-lg border border-gray-300 bg-white px-6 py-4 shadow-xs hover:border-gray-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 text-green-600">
+                <div className="shrink-0 text-green-600">
                   <PlusIcon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0 flex-1">

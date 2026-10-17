@@ -80,7 +80,7 @@ npm run docker:up                      # web on http://localhost:8080
 ```
 apps/
   api/          Express 4 · Mongoose 8 · Socket.IO 4 · Zod · pino · prom-client
-  web/          React 18 · Vite 5 · React Query · Zustand · Tailwind · Recharts
+  web/          React 18 · Vite 6 · React Query · Zustand · Tailwind 4 · Recharts
 packages/
   types/        Zod schemas + inferred types: the single source of truth for the API contract
   scheduler/    Pure planning engine (no I/O, explicit time, seeded randomness)

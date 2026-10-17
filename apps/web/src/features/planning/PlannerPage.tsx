@@ -16,7 +16,7 @@ import { axisTick, chart, formatHours, formatPercent, tooltipStyle } from '@/com
 import type { EisenhowerQuadrant, PolicyName } from '@taskverse/types';
 
 const selectClass =
-  'rounded-md border-gray-300 py-1 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500';
+  'rounded-md border-gray-300 py-1 text-sm shadow-xs focus:border-indigo-500 focus:ring-indigo-500';
 
 const QUADRANTS: Array<{ key: EisenhowerQuadrant; label: string; hint: string }> = [
   { key: 'do_first', label: 'Do first', hint: 'Important and urgent' },
@@ -107,7 +107,7 @@ export default function PlannerPage() {
             <label className="flex items-center gap-1 text-sm text-gray-600">
               <input
                 type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                className="h-4 w-4 rounded-sm border-gray-300 text-indigo-600"
                 checked={includeBlocked}
                 onChange={e => setIncludeBlocked(e.target.checked)}
               />
