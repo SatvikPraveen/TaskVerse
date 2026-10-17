@@ -34,7 +34,7 @@ import {
 const WINDOWS = [14, 30, 90] as const;
 
 const selectClass =
-  'rounded-md border-gray-300 py-1 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500';
+  'rounded-md border-gray-300 py-1 text-sm shadow-xs focus:border-indigo-500 focus:ring-indigo-500';
 
 export default function AnalyticsPage() {
   const [days, setDays] = useState<number>(30);

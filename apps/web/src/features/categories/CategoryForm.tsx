@@ -85,7 +85,7 @@ export default function CategoryForm({ initialData, onSubmit, onCancel, isLoadin
           id="category-description"
           rows={3}
           placeholder="Optional description"
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           {...register('description', {
             maxLength: { value: 500, message: 'Description must not exceed 500 characters' },
           })}
@@ -127,7 +127,7 @@ export default function CategoryForm({ initialData, onSubmit, onCancel, isLoadin
         </label>
         <select
           id="category-icon"
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           {...register('icon')}
         >
           <option value="">No icon</option>

@@ -34,7 +34,7 @@ const sortOptions: Array<{ value: TaskSortBy; label: string }> = [
 ];
 
 const selectClass =
-  'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
+  'block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
 
 function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
   return (
@@ -60,7 +60,7 @@ export default function FiltersBar({ filters, onFiltersChange, categories }: Fil
   const hasFilters = Object.entries(filters).some(([k, v]) => k !== 'page' && v !== undefined && v !== '');
 
   return (
-    <section className="rounded-lg border bg-white p-4 shadow-sm" aria-label="Task filters">
+    <section className="rounded-lg border bg-white p-4 shadow-xs" aria-label="Task filters">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-medium text-gray-900">Filters</h2>
         {hasFilters && (
@@ -200,7 +200,7 @@ export default function FiltersBar({ filters, onFiltersChange, categories }: Fil
           type="checkbox"
           checked={filters.archived ?? false}
           onChange={e => update('archived', e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500"
         />
         <label htmlFor="filter-archived" className="ml-2 block text-sm text-gray-700">
           Show archived tasks

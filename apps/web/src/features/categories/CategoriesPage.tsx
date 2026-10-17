@@ -21,15 +21,15 @@ function CategorySkeleton() {
   return (
     <div className="space-y-4" aria-hidden="true">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="animate-pulse rounded-lg bg-white p-6 shadow">
+        <div key={i} className="animate-pulse rounded-lg bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-4 w-4 rounded bg-gray-200" />
-              <div className="h-6 w-32 rounded bg-gray-200" />
+              <div className="h-4 w-4 rounded-sm bg-gray-200" />
+              <div className="h-6 w-32 rounded-sm bg-gray-200" />
             </div>
             <div className="flex gap-2">
-              <div className="h-8 w-16 rounded bg-gray-200" />
-              <div className="h-8 w-16 rounded bg-gray-200" />
+              <div className="h-8 w-16 rounded-sm bg-gray-200" />
+              <div className="h-8 w-16 rounded-sm bg-gray-200" />
             </div>
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function CategoriesPage() {
           {categories.map(category => (
             <li
               key={category._id}
-              className="flex items-center justify-between rounded-lg bg-white p-6 shadow-sm"
+              className="flex items-center justify-between rounded-lg bg-white p-6 shadow-xs"
             >
               <div className="flex min-w-0 items-center gap-4">
                 <span
