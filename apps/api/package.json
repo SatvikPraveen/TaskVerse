@@ -16,8 +16,8 @@
     "clean": "rm -rf dist coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1147.0",
-    "@aws-sdk/s3-request-presigner": "^3.1147.0",
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
     "@taskverse/scheduler": "*",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
