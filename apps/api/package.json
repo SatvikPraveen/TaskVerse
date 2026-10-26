@@ -26,7 +26,7 @@
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.24.5",
+    "mongoose": "^8.24.6",
     "multer": "^2.4.0",
     "pino": "^8.17.2",
     "pino-http": "^9.0.0",
