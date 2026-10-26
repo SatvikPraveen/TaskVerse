@@ -34,8 +34,8 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "globals": "^13.24.0",
-    "prettier": "^3.0.0",
-    "turbo": "^2.9.14",
+    "prettier": "^3.9.10",
+    "turbo": "^2.11.10",
     "typescript": "^5.1.6",
     "wait-on": "^7.2.0"
   },
