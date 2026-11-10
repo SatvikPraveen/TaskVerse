@@ -42,7 +42,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build --workspace=packages/types --workspace=packages/scheduler --workspace=apps/api
-      - run: npx playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
       - name: Start API
         run: |
           node apps/api/dist/server.js > api.log 2>&1 &
