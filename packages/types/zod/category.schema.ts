@@ -28,7 +28,12 @@ export const CreateCategorySchema = z.object({
   sortOrder: z.number().default(0),
 });
 
-export const UpdateCategorySchema = CreateCategorySchema.partial();
+export const UpdateCategorySchema = CreateCategorySchema.partial().extend({
+  // Zod 4 applies .default() inside .partial(); unwrap the defaulted fields so an
+  // omitted field stays undefined on update instead of being reset to its default.
+  color: CreateCategorySchema.shape.color.unwrap().optional(),
+  sortOrder: CreateCategorySchema.shape.sortOrder.unwrap().optional(),
+});
 
 export const ReorderCategoriesSchema = z.object({
   categories: z.array(z.object({ id: ObjectIdSchema, sortOrder: z.number() })).min(1),

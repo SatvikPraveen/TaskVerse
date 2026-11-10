@@ -11,9 +11,10 @@ export const HexColorSchema = z
   .string()
   .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Invalid hex color format');
 
+// Zod 4 types a coerced field's input as `unknown`; keep it `number` for callers.
 export const PaginationQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  page: z.coerce.number<number>().int().min(1).default(1),
+  limit: z.coerce.number<number>().int().min(1).max(100).default(20),
 });
 
 export const PaginationSchema = z.object({

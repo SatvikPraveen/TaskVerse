@@ -7,7 +7,7 @@ export interface ValidationError {
 }
 
 export function parseZodErrors(error: ZodError): ValidationError[] {
-  return error.errors.map(err => ({
+  return error.issues.map(err => ({
     field: err.path.join('.'),
     message: err.message,
   }));

@@ -95,6 +95,12 @@ export const CreateTaskSchema = z.object({
 });
 
 export const UpdateTaskSchema = CreateTaskSchema.partial().extend({
+  // Zod 4 applies .default() inside .partial(); unwrap the defaulted fields so an
+  // omitted field stays undefined on update instead of being reset to its default.
+  status: CreateTaskSchema.shape.status.unwrap().optional(),
+  priority: CreateTaskSchema.shape.priority.unwrap().optional(),
+  tags: CreateTaskSchema.shape.tags.unwrap().optional(),
+  subtasks: CreateTaskSchema.shape.subtasks.unwrap().optional(),
   actualHours: z.number().min(0).optional(),
   isArchived: z.boolean().optional(),
   position: z.number().optional(),
