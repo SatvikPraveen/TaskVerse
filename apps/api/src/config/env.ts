@@ -65,7 +65,7 @@ const parseEnv = (): EnvConfig => {
   if (!result.success) {
     // eslint-disable-next-line no-console
     console.error('❌ Environment validation failed:');
-    result.error.errors.forEach(err => {
+    result.error.issues.forEach(err => {
       // eslint-disable-next-line no-console
       console.error(`  • ${err.path.join('.')}: ${err.message}`);
     });

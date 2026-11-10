@@ -265,6 +265,27 @@ describe('Tasks Integration Tests', () => {
 
       expect(response.body.data.task.completedAt).toBeTruthy();
     });
+
+    it('should leave omitted fields unchanged on a partial update', async () => {
+      await request(app)
+        .put(`/api/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ status: 'in_progress', priority: 'high', tags: ['keep'] })
+        .expect(200);
+
+      const response = await request(app)
+        .put(`/api/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ title: 'Renamed' })
+        .expect(200);
+
+      expect(response.body.data.task).toMatchObject({
+        title: 'Renamed',
+        status: 'in_progress',
+        priority: 'high',
+        tags: ['keep'],
+      });
+    });
   });
 
   describe('DELETE /api/tasks/:taskId', () => {

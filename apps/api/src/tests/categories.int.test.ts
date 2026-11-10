@@ -230,6 +230,16 @@ describe('Categories Integration Tests', () => {
       categoryId = createResponse.body.data.category._id;
     });
 
+    it('should leave omitted fields unchanged on a partial update', async () => {
+      const response = await request(app)
+        .put(`/api/categories/${categoryId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ name: 'Renamed' })
+        .expect(200);
+
+      expect(response.body.data.category).toMatchObject({ name: 'Renamed', color: '#ff0000' });
+    });
+
     it('should update category successfully', async () => {
       const updateData = {
         name: 'Updated Name',

@@ -68,7 +68,7 @@ export const errorHandler = (error: unknown, req: Request, res: Response, _next:
     statusCode = 400;
     title = 'Validation Error';
     message = 'Request validation failed';
-    details = error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+    details = error.issues.map(err => ({ field: err.path.join('.'), message: err.message }));
   } else if (error instanceof mongoose.Error.ValidationError) {
     statusCode = 400;
     title = 'Validation Error';

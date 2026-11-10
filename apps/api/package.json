@@ -35,7 +35,7 @@
     "socket.io": "^4.7.4",
     "swagger-ui-express": "^5.0.0",
     "yaml": "^2.4.0",
-    "zod": "^3.22.4"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@taskverse/eslint-config": "*",
