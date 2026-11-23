@@ -32,7 +32,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/postcss": "^4.3.5",
     "@taskverse/eslint-config": "*",
@@ -46,9 +46,9 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
-    "postcss": "^8.5.32",
+    "postcss": "^8.5.33",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.2.2",
-    "vite": "^6.4.5"
+    "vite": "^6.4.6"
   }
 }
